@@ -1,2 +1,1 @@
-# chainviz
-Blockchain visualization.
+# chainsynth

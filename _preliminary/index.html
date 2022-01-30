@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <style>
+            body {
+                margin: 0;
+                transition: opacity ease-in 0.2s; 
+            } 
+            body[unresolved] {
+                opacity: 0; 
+                display: block; 
+                overflow: hidden;
+                position: relative;
+            }
+        </style>
+        <meta charset="utf-8">
+        <title>ChainSynth</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+        <script src="./js/Tone.js"></script>
+    </head>
+    <body>
+        <script src="./js/three.js"></script>
+        <script src="./js/polkadot.js"></script>
+        <button id="tone-button">Asd.</button>
+        <script type="text/javascript">
+            let audioOn = false;
+
+            async function connectApi() {
+                const wsProvider = new api.WsProvider('wss://kusama-rpc.polkadot.io');
+                const mApi = await api.ApiPromise.create({ provider: wsProvider });
+
+                const chain = await mApi.rpc.system.chain();
+                await mApi.rpc.chain.subscribeNewHeads(async (lastHeader) => {
+                    const signedBlock = await mApi.rpc.chain.getBlock(lastHeader.hash);
+                    console.log(`${chain}: last block #${lastHeader.number} has hash ${lastHeader.hash}. ${signedBlock.block.extrinsics.length} extrinsics.`);
+                    if (audioOn) {
+                        env.triggerAttack();
+                        setTimeout(() => {
+                            env.triggerRelease();
+                        }, 500); 
+                    }
+                });
+            }
+
+            connectApi();
+
+            const scene = new THREE.Scene();
+            const camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 0.1, 1000 );
+
+            const renderer = new THREE.WebGLRenderer();
+            renderer.setSize( window.innerWidth, window.innerHeight );
+            document.body.appendChild( renderer.domElement );
+
+            const geometry = new THREE.BoxGeometry();
+            const material = new THREE.MeshBasicMaterial( { color: 0x00ff00 } );
+            const cube = new THREE.Mesh( geometry, material );
+            scene.add( cube );
+
+            camera.position.z = 5;
+
+            function animate() {
+                requestAnimationFrame( animate );
+                cube.rotation.x += 0.01;
+                cube.rotation.y += 0.01;
+                renderer.render( scene, camera );
+            }
+            animate();
+
+
+            const env = new Tone.AmplitudeEnvelope({
+                attack: 0.11,
+                decay: 0.21,
+                sustain: 0.5,
+                release: 1.2
+            }).toDestination();
+
+            // create an oscillator and connect it to the envelope
+            const osc = new Tone.Oscillator({
+                partials: [3, 2, 1],
+                type: "custom",
+                frequency: "C#4",
+                volume: -8,
+            }).connect(env);
+	
+            document.querySelector("#tone-button").addEventListener(
+                "click", 
+                () => {
+                    alert(1);
+                    osc.start();
+                    audioOn = true;
+                }
+            );
+        </script>
+    </body>
+</html>
