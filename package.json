@@ -1,7 +1,7 @@
 {
   "name": "three.js-typescript-boilerplate",
   "version": "1.0.0",
-  "description": "",
+  "description": "Chain visualization for Polkadot and Kusama.",
   "scripts": {
     "build": "webpack --config ./src/client/webpack.prod.js",
     "dev": "webpack serve --config ./src/client/webpack.dev.js",
@@ -9,24 +9,30 @@
     "start": "node ./dist/server/server.js",
     "deploy": "gh-pages -d ./dist/client"
   },
-  "author": "Sean Bradley",
-  "license": "ISC",
+  "author": "Kutsal Kaan Bilgin | Helikon Labs",
+  "license": "GPL 3",
   "devDependencies": {
+    "@polkadot/api": "^7.6.1",
+    "@types/camelcase-keys-deep": "^0.1.0",
     "@types/dat.gui": "^0.7.7",
     "@types/express": "^4.17.13",
     "@types/node": "^17.0.13",
     "@types/three": "^0.137.0",
+    "camelcase-keys-deep": "^0.1.0",
     "cannon-es": "^0.19.0",
     "dat.gui": "^0.7.7",
     "gh-pages": "^3.2.3",
-    "three": "^0.137.4",
+    "reconnecting-websocket": "^4.4.0",
+    "three": "^0.137.5",
+    "three-js-capsule-geometry": "maximeq/three-js-capsule-geometry#master",
     "tone": "^14.7.77",
     "ts-loader": "^9.2.6",
     "typescript": "^4.5.5",
-    "webpack": "^5.67.0",
+    "webpack": "^5.68.0",
     "webpack-cli": "^4.9.2",
     "webpack-dev-server": "^4.7.3",
-    "webpack-merge": "^5.8.0"
+    "webpack-merge": "^5.8.0",
+    "ws": "^8.4.2"
   },
   "dependencies": {
     "express": "^4.17.2"

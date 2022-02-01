@@ -11,4 +11,9 @@ module.exports = merge(common, {
         },
         hot: true,
     },
+    resolve: {
+        fallback: {
+            "fs": false
+        },
+    },
 })

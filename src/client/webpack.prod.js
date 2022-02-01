@@ -5,5 +5,10 @@ module.exports = merge(common, {
     mode: 'production',
     performance: {
         hints: false
+    },
+    resolve: {
+        fallback: {
+            "fs": false
+        },
     }
 });
