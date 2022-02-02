@@ -3,4 +3,4 @@ interface ValidatorPreferences {
     blocksNominations: boolean;
 }
 
-export { ValidatorPreferences }
+export { ValidatorPreferences };

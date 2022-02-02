@@ -62,4 +62,4 @@ export {
     ValidatorSummary,
     ValidatorSummaryDiff,
     ValidatorListUpdate,
-}
+};

@@ -4,4 +4,4 @@ interface ValidatorStakeSummary {
     nominatorCount: number;
 }
 
-export { ValidatorStakeSummary }
+export { ValidatorStakeSummary };

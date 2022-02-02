@@ -3,4 +3,4 @@ interface StakeSummary {
     activeAmount: BigInt;
 }
 
-export { StakeSummary }
+export { StakeSummary };

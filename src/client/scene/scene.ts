@@ -1,21 +1,33 @@
 import * as THREE from 'three';
+import * as TWEEN from '@tweenjs/tween.js';
+import { SignedBlock } from '@polkadot/types/interfaces';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
+import { Font, FontLoader } from 'three/examples/jsm/loaders/FontLoader';
 import Stats from 'three/examples/jsm/libs/stats.module';
+import { Block } from '../model/app/block';
 import { Validator } from '../model/app/validator';
 import { ValidatorSummary } from '../model/subvt/validator_summary';
 
 class ChainVizScene {
-    private readonly scene;
+    private readonly scene: THREE.Scene;
     private readonly camera: THREE.PerspectiveCamera;
     private readonly controls: OrbitControls;
     private readonly renderer: THREE.WebGLRenderer;
     private readonly stats: Stats;
-    private readonly validators = new Array<Validator>();
     private readonly raycaster: THREE.Raycaster;
     private clickPoint?: THREE.Vec2;
+
+    private readonly fontLoader = new FontLoader();
+    private blockNumberFont!: Font;
     private readonly ringSizes = [82, 102, 120, 140, 165, 190, 201, 240];
+    private readonly validators = new Array<Validator>();
+    private readonly blocks = new Array<Block>();
 
     constructor() {
+        // init font loader
+        this.fontLoader.load( './font/fira_mono_regular.typeface.json', (font) => {
+            this.blockNumberFont = font;
+        });
         this.scene = new THREE.Scene();
         this.camera = new THREE.PerspectiveCamera(
             20,
@@ -84,20 +96,20 @@ class ChainVizScene {
     }
 
     private onWindowResize() {
-        this.camera.aspect = window.innerWidth / window.innerHeight
-        this.camera.updateProjectionMatrix()
-        this.renderer.setSize(window.innerWidth, window.innerHeight)
-        this.render()
+        this.camera.aspect = window.innerWidth / window.innerHeight;
+        this.camera.updateProjectionMatrix();
+        this.renderer.setSize(window.innerWidth, window.innerHeight);
+        this.render();
     }
 
     private animate() {
         requestAnimationFrame(() => {
             this.animate();
         });
-        this.controls.update()
-        this.render()
-    
-        this.stats.update()
+        this.controls.update();
+        this.render();
+        TWEEN.update();
+        this.stats.update();
     }
 
     private render() {
@@ -115,7 +127,11 @@ class ChainVizScene {
     }
 
     start() {
-        // relay chain
+        this.addRelayChain();
+        this.animate();
+    }
+
+    private addRelayChain() {
         const relayChainGeometry = new THREE.RingGeometry(
             18, 19,
             120, 1,
@@ -128,7 +144,13 @@ class ChainVizScene {
         const relayChain = new THREE.Mesh(relayChainGeometry, relayChainMaterial);
         this.scene.add(relayChain);
 
-        this.animate();
+        const lineMaterial = new THREE.LineBasicMaterial( { color: 0x005500 } );
+        const points = [];
+        points.push( new THREE.Vector3(0, 0, 0));
+        points.push( new THREE.Vector3(-15000, 0, 0));
+        const geometry = new THREE.BufferGeometry().setFromPoints(points);
+        const line = new THREE.Line(geometry, lineMaterial);
+        this.scene.add(line);
     }
 
     async initValidators(summaries: [ValidatorSummary]) {
@@ -147,89 +169,33 @@ class ChainVizScene {
                 if (index >= summaries.length) {
                     break;
                 }
-                let validator = new Validator(summaries[index]);
-                this.validators.push(validator);
-                validator.mesh.position.x = -22 - (ring * 5);
-                validator.mesh.rotation.z = Math.PI / 2;
-                validator.mesh.addEventListener(
-                    "click",
-                    function() {
-                        alert(summaries[index].accountId);
-                    }
-                )
-                this.rotateAboutPoint(
-                    validator.mesh,
-                    new THREE.Vector3(0, 0, 0),
-                    new THREE.Vector3(0, 0, 1),
-                    -(Math.PI / 10.5) - i * ((11 * Math.PI / 6) / this.ringSizes[ring]),
-                    false,
+                let validator = new Validator(
+                    summaries[index],
+                    [ring, i],
+                    this.ringSizes[ring],
                 );
-                this.scene.add(validator.mesh);
-                /*
-                if (index % 20 == 0) {
-                    await new Promise(resolve => { setTimeout(resolve, 0); });
-                }
-                */
+                this.validators.push(validator);
+                validator.addTo(this.scene);
                 index++;
+            }
+            if (index >= summaries.length) {
+                break;
             }
             await new Promise(resolve => { setTimeout(resolve, 150); });
         }
     }
 
-    private rotateAboutPoint(
-        obj: THREE.Object3D,
-        point: THREE.Vector3,
-        axis: THREE.Vector3,
-        theta: number,
-        pointIsWorld: boolean,
-    ){
-        pointIsWorld = (pointIsWorld === undefined)? false : pointIsWorld;
-    
-        if(pointIsWorld){
-            obj.parent?.localToWorld(obj.position); // compensate for world coordinate
-        }
-    
-        obj.position.sub(point); // remove the offset
-        obj.position.applyAxisAngle(axis, theta); // rotate the POSITION
-        obj.position.add(point); // re-add the offset
-    
-        if(pointIsWorld){
-            obj.parent?.worldToLocal(obj.position); // undo world coordinates compensation
-        }
-    
-        obj.rotateOnAxis(axis, theta); // rotate the OBJECT
-    }
-
-    addBlocks() {
-        const lineMaterial = new THREE.LineBasicMaterial( { color: 0x005500 } );
-        const points = [];
-        points.push( new THREE.Vector3(0, 0, 0));
-        points.push( new THREE.Vector3(-15000, 0, 0));
-        const geometry = new THREE.BufferGeometry().setFromPoints(points);
-        const line = new THREE.Line(geometry, lineMaterial);
-        this.scene.add(line);
-
-        
-        let phongMaterial = new THREE.MeshPhongMaterial({
-            color: 0x00FF00,
-            shininess: 8,
-            specular: 0xffffff,
-        });
-        const material = new THREE.MeshBasicMaterial({
-            color: 0x00FF00,
-            wireframe: true,
-          });
-        /**
-         * extrude ::
-         * https://github.com/mrdoob/three.js/blob/master/examples/webgl_geometry_shapes.html
-         */
-        for (let i = 0; i < 15; i++) {
-            const geometry = new THREE.BoxGeometry(2.3, 2.3, 2.3);
-            const cube = new THREE.Mesh(geometry, phongMaterial);
-            cube.position.x = -i * 5;
-            this.scene.add(cube);
+    async initBlocks(signedBlocks: Array<SignedBlock>) {
+        for (let i = signedBlocks.length - 1; i >= 0; i--) {
+            let block = new Block(signedBlocks[i], this.blockNumberFont);
+            this.blocks.unshift(block);
+            block.addTo(
+                this.scene,
+                0);
+            block.setIndex(i, true);
+            await new Promise(resolve => { setTimeout(resolve, 50); });
         }
     }
 }
 
-export { ChainVizScene }
+export { ChainVizScene };

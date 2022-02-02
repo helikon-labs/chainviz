@@ -3,4 +3,4 @@ interface InactiveNominationsSummary {
     totalAmount: BigInt;
 }
 
-export { InactiveNominationsSummary }
+export { InactiveNominationsSummary };
