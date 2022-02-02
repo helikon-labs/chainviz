@@ -1,32 +1,36 @@
 import {
     RPCSubscriptionService,
-    RPCSubscriptionServiceListener
+    RPCSubscriptionServiceListener,
+    RPCSubscriptionServiceState,
 } from './service/rpc/RPCSubscriptionService';
 import { ChainVizScene } from './scene/scene';
 import { ValidatorListUpdate } from './model/subvt/validator_summary';
+import { ApiPromise, WsProvider } from '@polkadot/api';
 
 class ChainViz {
     private readonly scene: ChainVizScene = new ChainVizScene();
-
+    private hasReceivedFirstUpdate = false;
     private readonly validatorListListener: RPCSubscriptionServiceListener<ValidatorListUpdate> = {
         onConnected: () => {
             console.log("Connected.");
-            this.validatorListClient.subscribe();
+            if (this.substrateClient != undefined) {
+                this.subscribeToValidatorList();
+            }
         },
         onSubscribed: (subscriptionId: number) => {
-            console.log("Subscribed: " + subscriptionId);
+            console.log(`Subscribed to validator list with subscription id #${subscriptionId}.`);
         },
         onUnsubscribed: (subscriptionId: number) => {
-            console.log("Unsubscribed: " + subscriptionId);
+            console.log(`Unsubscribed from validator list with subscription id #${subscriptionId}.`);
         },
         onDisconnected: () => {
-            console.log("Disconnected");
+            console.log("Disconnected from validator list service.");
         },
         onUpdate: (update: ValidatorListUpdate) => {
             this.processValidatorListUpdate(update);
         },
         onError: (code: number, message: string) => {
-            
+            console.log(`Validator list service error (${code}: ${message}).`);
         }
     }
     private readonly validatorListClient = new RPCSubscriptionService(
@@ -35,20 +39,52 @@ class ChainViz {
         "unsubscribe_validatorList",
         this.validatorListListener,
     );
-
-    async start() {
-        this.validatorListClient.connect();
-        this.scene.start();
-    }
+    private readonly substrateWSProvider = new WsProvider('wss://kusama-rpc.polkadot.io');
+    private substrateClient!: ApiPromise
 
     private processValidatorListUpdate(update: ValidatorListUpdate) {
-        console.log("Block #" + update.finalizedBlockNumber);
-        console.log("Insert count: " + update.insert.length);
-        console.log("Update count: " + update.update.length);
-        console.log("Remove count: " + update.removeIds.length);
-        if (update.insert.length > 0) {
-            this.scene.addValidators(update.insert);
+        if (!this.hasReceivedFirstUpdate) {
+            this.scene.start();
+            document.getElementById("spinner")?.remove();
+            document.getElementById("loading-status")?.remove();
+            this.hasReceivedFirstUpdate = true;
         }
+        if (update.insert.length > 0) {
+            this.scene.initValidators(update.insert);
+        }
+    }
+
+    private addBlocks() {
+        this.scene.addBlocks();
+    }
+
+    private connectSubstrateAPI() {
+        ApiPromise
+            .create({ provider: this.substrateWSProvider })
+            .then((api) => {
+                    this.substrateClient = api;
+                    console.log(api.genesisHash.toHex());
+                    if (this.validatorListClient.getState() == RPCSubscriptionServiceState.Connected) {
+                        this.subscribeToValidatorList();
+                    }
+                }
+            );
+    }
+
+    private subscribeToValidatorList() {
+        this.setLoadingStatus(":: connected ::<br>:: waiting for data ::");
+        this.validatorListClient.subscribe();
+    }
+
+    private setLoadingStatus(status: string) {
+        const element = document.getElementById("loading-status") as HTMLElement;
+        element.innerHTML = status;
+    }
+
+    async init() {
+        this.setLoadingStatus(":: connecting to services ::");
+        this.validatorListClient.connect();
+        this.connectSubstrateAPI();
     }
 }
 

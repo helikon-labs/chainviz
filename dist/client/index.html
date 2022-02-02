@@ -3,14 +3,32 @@
     <head>
         <title>ChainViz by Helikon</title>
         <link rel="icon" type="image/x-icon" href="./img/favicon.ico">
-        <style>
-            body {
-                overflow: hidden;
-                margin: 0px;
-            }
-        </style>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Audiowide">
+        <link rel="stylesheet" href="./css/chainviz.css">
     </head>
     <body>
         <script src="bundle.js"></script>
+        <!-- top logos -->
+        <div id="chainviz-logo">CHAINVIZ</div>
+        <a href="https://kusama.network">
+            <img src="./img/kusama_logo.svg" alt="Kusama" id="kusama-logo">
+        </a>
+        <!-- bottom icons -->
+        <a href="https://github.com/helikon-labs">
+            <img id="helikon-icon" src="./img/helikon_logo.svg" alt="Developed by Helikon Labs">
+        </a>
+        <a href="https://subvt-test.helikon.io">
+            <img id="subvt-icon" src="./img/subvt_icon.svg" alt="Powered by SubVT">
+        </a>
+        <a href="https://github.com/helikon-labs/chainviz">
+            <img id="github-icon" src="./img/github_icon.svg" alt="ChainViz GitHub Repo">
+        </a>
+        <!-- spinner -->
+        <div id="spinner" id="spinner">
+            <div id="double-bounce1"></div>
+            <div id="double-bounce2"></div>
+        </div>
+        <!-- status -->
+        <div id="loading-status">Asd.</div>
     </body>
 </html>

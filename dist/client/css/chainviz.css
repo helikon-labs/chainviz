@@ -1,0 +1,91 @@
+body {
+    overflow: hidden;
+    margin: 0px;
+    background-color: #000000;
+}
+#spinner {
+    width: 60px;
+    height: 60px;
+
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+#double-bounce1, #double-bounce2 {
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    background-color: #FFF;
+    opacity: 0.8;
+    position: absolute;
+    top: 0;
+    left: 0;
+
+    -webkit-animation: sk-bounce 2.0s infinite ease-in-out;
+    animation: sk-bounce 2.0s infinite ease-in-out;
+}
+#double-bounce2 {
+    -webkit-animation-delay: -1.0s;
+    animation-delay: -1.0s;
+}
+@-webkit-keyframes sk-bounce {
+    0%, 100% { -webkit-transform: scale(0.0) }
+    50% { -webkit-transform: scale(1.0) }
+}
+@keyframes sk-bounce {
+    0%, 100% { 
+        transform: scale(0.0);
+        -webkit-transform: scale(0.0);
+    } 50% { 
+        transform: scale(1.0);
+        -webkit-transform: scale(1.0);
+    }
+}
+#loading-status {
+    display: inline;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    color: #DDDDDD;
+    transform: translate(-50%, -50%);
+    margin-top: 54px;
+    font-family: "Courier";
+    font-size: 12px;
+    text-align: center;
+}
+
+#chainviz-logo {
+    position: absolute;
+    top: 8px;
+    left: 10px;
+    color: #FFFFFF;
+    font-family: "Audiowide", sans-serif;
+    font-size: 20px;
+    font-weight: 800;
+}
+#kusama-logo {
+    position:absolute;
+    top: -20px;
+    right: 2px;
+    filter: invert(1);
+    width: 120px;
+}
+#helikon-icon {
+    position:absolute;
+    bottom: 0px;
+    left: 4px;
+    width: 36px;
+}
+#subvt-icon {
+    position:absolute;
+    bottom: -14px;
+    left: 0px;
+    width: 110px;
+}
+#github-icon {
+    position:absolute;
+    bottom: 10px;
+    left: 74px;
+    width: 26px;
+}

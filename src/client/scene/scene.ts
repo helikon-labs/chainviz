@@ -13,6 +13,7 @@ class ChainVizScene {
     private readonly validators = new Array<Validator>();
     private readonly raycaster: THREE.Raycaster;
     private clickPoint?: THREE.Vec2;
+    private readonly ringSizes = [82, 102, 120, 140, 165, 190, 201, 240];
 
     constructor() {
         this.scene = new THREE.Scene();
@@ -25,7 +26,7 @@ class ChainVizScene {
         this.camera.position.z = 340;
         // axes helper :: x is red, y is green, z is blue
         const axesHelper = new THREE.AxesHelper(5);
-        this.scene.add(axesHelper);
+        // this.scene.add(axesHelper);
         // point light front
         {
             const pointLight = new THREE.PointLight(0x404040);
@@ -56,8 +57,9 @@ class ChainVizScene {
         this.renderer.shadowMap.type = THREE.PCFSoftShadowMap;
         document.body.appendChild(this.renderer.domElement);
         // stats
-        this.stats = Stats()
-        document.body.appendChild(this.stats.dom)
+        this.stats = Stats();
+        document.body.appendChild(this.stats.dom);
+        this.stats.domElement.style.cssText = "position:absolute; bottom:0px; right:0px;";
         this.controls = new OrbitControls(
             this.camera,
             this.renderer.domElement
@@ -72,20 +74,6 @@ class ChainVizScene {
         window.addEventListener('resize', () => {
             this.onWindowResize();
         }, false);
-
-        // relay chain
-        const relayChainGeometry = new THREE.RingGeometry(
-            18, 19,
-            120, 1,
-            Math.PI + Math.PI / 12, Math.PI * 11 / 6
-        );
-        const relayChainMaterial = new THREE.MeshBasicMaterial({
-            color: 0x6D7379,
-            side: THREE.DoubleSide
-        });
-        const relayChain = new THREE.Mesh(relayChainGeometry, relayChainMaterial);
-        this.scene.add(relayChain);
-
     }
 
     private onClick(event: MouseEvent) {
@@ -127,14 +115,35 @@ class ChainVizScene {
     }
 
     start() {
+        // relay chain
+        const relayChainGeometry = new THREE.RingGeometry(
+            18, 19,
+            120, 1,
+            Math.PI + Math.PI / 12, Math.PI * 11 / 6
+        );
+        const relayChainMaterial = new THREE.MeshBasicMaterial({
+            color: 0x6D7379,
+            side: THREE.DoubleSide
+        });
+        const relayChain = new THREE.Mesh(relayChainGeometry, relayChainMaterial);
+        this.scene.add(relayChain);
+
         this.animate();
     }
 
-    addValidators(summaries: [ValidatorSummary]) {
-        let ringSizes = [82, 102, 120, 140, 165, 191, 200, 240];
+    async initValidators(summaries: [ValidatorSummary]) {
+        summaries.sort((a, b) => {
+            if (a.isParaValidator && !b.isParaValidator) {
+                return 1;
+            } else if (!a.isParaValidator && b.isParaValidator) {
+                return -1;
+            } else {
+                return 0;
+            }
+        });
         let index = 0;
         for (let ring = 0; ring < 10; ring++) {
-            for (let i = 0; i < ringSizes[ring]; i++) {
+            for (let i = 0; i < this.ringSizes[ring]; i++) {
                 if (index >= summaries.length) {
                     break;
                 }
@@ -148,16 +157,22 @@ class ChainVizScene {
                         alert(summaries[index].accountId);
                     }
                 )
-                this.scene.add(validator.mesh);
                 this.rotateAboutPoint(
                     validator.mesh,
                     new THREE.Vector3(0, 0, 0),
                     new THREE.Vector3(0, 0, 1),
-                    -(Math.PI / 10.5) - i * ((11 * Math.PI / 6) / ringSizes[ring]),
+                    -(Math.PI / 10.5) - i * ((11 * Math.PI / 6) / this.ringSizes[ring]),
                     false,
                 );
+                this.scene.add(validator.mesh);
+                /*
+                if (index % 20 == 0) {
+                    await new Promise(resolve => { setTimeout(resolve, 0); });
+                }
+                */
                 index++;
             }
+            await new Promise(resolve => { setTimeout(resolve, 150); });
         }
     }
 
@@ -183,6 +198,37 @@ class ChainVizScene {
         }
     
         obj.rotateOnAxis(axis, theta); // rotate the OBJECT
+    }
+
+    addBlocks() {
+        const lineMaterial = new THREE.LineBasicMaterial( { color: 0x005500 } );
+        const points = [];
+        points.push( new THREE.Vector3(0, 0, 0));
+        points.push( new THREE.Vector3(-15000, 0, 0));
+        const geometry = new THREE.BufferGeometry().setFromPoints(points);
+        const line = new THREE.Line(geometry, lineMaterial);
+        this.scene.add(line);
+
+        
+        let phongMaterial = new THREE.MeshPhongMaterial({
+            color: 0x00FF00,
+            shininess: 8,
+            specular: 0xffffff,
+        });
+        const material = new THREE.MeshBasicMaterial({
+            color: 0x00FF00,
+            wireframe: true,
+          });
+        /**
+         * extrude ::
+         * https://github.com/mrdoob/three.js/blob/master/examples/webgl_geometry_shapes.html
+         */
+        for (let i = 0; i < 15; i++) {
+            const geometry = new THREE.BoxGeometry(2.3, 2.3, 2.3);
+            const cube = new THREE.Mesh(geometry, phongMaterial);
+            cube.position.x = -i * 5;
+            this.scene.add(cube);
+        }
     }
 }
 
