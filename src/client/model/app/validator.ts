@@ -13,11 +13,13 @@ class Validator {
         color: 0xE6007A,
         shininess: 6,
         specular: 0xffffff,
+        opacity: 0.5,
     });
     private readonly phongMaterial2 = new THREE.MeshPhongMaterial({
         color: 0x8EDFFF,
         shininess: 6,
         specular: 0xffffff,
+        opacity: 0.5,
     });
 
     private readonly radius = 0.6;

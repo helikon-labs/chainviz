@@ -22,6 +22,7 @@ class ChainVizScene {
     private readonly ringSizes = [82, 102, 120, 140, 165, 190, 201, 240];
     private readonly validators = new Array<Validator>();
     private readonly blocks = new Array<Block>();
+    private readonly maxBlocks = 15;
 
     constructor() {
         // init font loader
@@ -191,10 +192,29 @@ class ChainVizScene {
             this.blocks.unshift(block);
             block.addTo(
                 this.scene,
-                0);
+                0
+            );
             block.setIndex(i, true);
             await new Promise(resolve => { setTimeout(resolve, 50); });
         }
+    }
+
+    async pushBlock(signedBlock: SignedBlock) {
+        for (const block of this.blocks) {
+            block.setIndex(block.getIndex() + 1, true);
+        }
+        let block = new Block(signedBlock, this.blockNumberFont);
+        this.blocks.unshift(block);
+        setTimeout(() => {
+            for (let i = this.blocks.length; i > this.maxBlocks; i--) {
+                let blockToRemove = this.blocks.pop();
+                blockToRemove?.removeAndDispose()
+            }
+            block.addTo(
+                this.scene,
+                0
+            );
+        }, 500);
     }
 }
 

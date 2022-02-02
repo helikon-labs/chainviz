@@ -6,7 +6,7 @@ import {
 import { ChainVizScene } from './scene/scene';
 import { ValidatorListUpdate } from './model/subvt/validator_summary';
 import { ApiPromise, WsProvider } from '@polkadot/api';
-import { SignedBlock } from '@polkadot/types/interfaces';
+import { Header, SignedBlock } from '@polkadot/types/interfaces';
 
 THREE.Cache.enabled = true;
 
@@ -49,7 +49,7 @@ class ChainViz {
     private substrateClientIsConnected = false;
 
     private sceneStarted = false;
-    private readonly initialBlockCount = 15;
+    private readonly initialBlockCount = 10;
     private initialBlocks = new Array<SignedBlock>();
     private initialValidatorListUpdate?: ValidatorListUpdate = undefined;
 
@@ -113,10 +113,23 @@ class ChainViz {
         this.removeLoadingStatus();
         this.scene.start();
         await this.scene.initValidators(this.initialValidatorListUpdate!.insert);
-        this.scene.initBlocks(this.initialBlocks);
+        await this.scene.initBlocks(this.initialBlocks);
         // clear data
         this.initialValidatorListUpdate = undefined;
         this.initialBlocks = [];
+        // subscribe to finalized blocks
+        this.subscribeToFinalizedBlocks();
+    }
+
+    private subscribeToFinalizedBlocks() {
+        this.substrateClient.rpc.chain.subscribeFinalizedHeads((header) => {
+            this.onFinalizedBlock(header);
+        });
+    }
+
+    private async onFinalizedBlock(blockHeader: Header) {
+        const block = await this.substrateClient.rpc.chain.getBlock(blockHeader.hash);
+        this.scene.pushBlock(block);
     }
 }
 
