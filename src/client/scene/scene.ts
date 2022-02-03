@@ -90,7 +90,6 @@ class ChainVizScene {
     }
 
     private onClick(event: MouseEvent) {
-        console.log('doc clicked');
         this.clickPoint = new THREE.Vector2();
         this.clickPoint.x = (event.clientX / window.innerWidth) * 2 - 1;
         this.clickPoint.y = (event.clientY / window.innerHeight) * 2 + 1;
@@ -128,30 +127,41 @@ class ChainVizScene {
     }
 
     start() {
-        this.addRelayChain();
+        this.addChainRing();
+        this.addChainLine();
         this.animate();
     }
 
-    private addRelayChain() {
-        const relayChainGeometry = new THREE.RingGeometry(
+    private addChainRing() {
+        const geometry = new THREE.RingGeometry(
             18, 19,
             120, 1,
             Math.PI + Math.PI / 12, Math.PI * 11 / 6
         );
-        const relayChainMaterial = new THREE.MeshBasicMaterial({
+        const material = new THREE.MeshBasicMaterial({
             color: 0x6D7379,
             side: THREE.DoubleSide
         });
-        const relayChain = new THREE.Mesh(relayChainGeometry, relayChainMaterial);
-        this.scene.add(relayChain);
+        this.scene.add(
+            new THREE.Mesh(
+                geometry,
+                material
+            )
+        );
+    }
 
-        const lineMaterial = new THREE.LineBasicMaterial( { color: 0x005500 } );
+    private addChainLine() {
         const points = [];
         points.push( new THREE.Vector3(0, 0, 0));
-        points.push( new THREE.Vector3(-15000, 0, 0));
+        points.push( new THREE.Vector3(-this.maxBlocks * 5, 0, 0));
         const geometry = new THREE.BufferGeometry().setFromPoints(points);
-        const line = new THREE.Line(geometry, lineMaterial);
-        this.scene.add(line);
+        const material = new THREE.LineBasicMaterial( { color: 0x005500 } );
+        this.scene.add(
+            new THREE.Line(
+                geometry,
+                material
+            )
+        );
     }
 
     async initValidators(summaries: [ValidatorSummary]) {
@@ -203,13 +213,13 @@ class ChainVizScene {
         for (const block of this.blocks) {
             block.setIndex(block.getIndex() + 1, true);
         }
+        for (let i = this.blocks.length; i > this.maxBlocks; i--) {
+            let blockToRemove = this.blocks.pop();
+            blockToRemove?.removeAndDispose()
+        }
         let block = new Block(signedBlock, this.blockNumberFont);
         this.blocks.unshift(block);
         setTimeout(() => {
-            for (let i = this.blocks.length; i > this.maxBlocks; i--) {
-                let blockToRemove = this.blocks.pop();
-                blockToRemove?.removeAndDispose()
-            }
             block.addTo(
                 this.scene,
                 0

@@ -10,7 +10,7 @@ class Block {
     private index: number;
 
     private readonly indexXOffset = 5;
-    private readonly sideLength = 2.3;
+    private readonly sideLength = 2.5;
     private readonly boxMaterial = new THREE.MeshPhongMaterial({
         color: 0x00FF00,
         shininess: 8,
