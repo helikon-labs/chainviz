@@ -1,12 +1,14 @@
 import * as THREE from 'three';
 import * as TWEEN from '@tweenjs/tween.js';
-import { SignedBlock } from '@polkadot/types/interfaces';
+import { Block as SubstrateBlock, SignedBlock } from '@polkadot/types/interfaces';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
 import { Font, FontLoader } from 'three/examples/jsm/loaders/FontLoader';
 import Stats from 'three/examples/jsm/libs/stats.module';
 import { Block } from '../model/app/block';
 import { Validator } from '../model/app/validator';
 import { ValidatorSummary } from '../model/subvt/validator_summary';
+import AsyncLock = require('async-lock');
+import { Constants } from '../util/constants';
 
 class ChainVizScene {
     private readonly scene: THREE.Scene;
@@ -22,7 +24,10 @@ class ChainVizScene {
     private readonly ringSizes = [82, 102, 120, 140, 165, 190, 201, 240];
     private readonly validators = new Array<Validator>();
     private readonly blocks = new Array<Block>();
-    private readonly maxBlocks = 15;
+    private readonly maxBlocks = 13;
+
+    private readonly lock = new AsyncLock();
+    private readonly blockPushLockKey = "block_push";
 
     constructor() {
         // init font loader
@@ -153,7 +158,7 @@ class ChainVizScene {
     private addChainLine() {
         const points = [];
         points.push( new THREE.Vector3(0, 0, 0));
-        points.push( new THREE.Vector3(-this.maxBlocks * 5, 0, 0));
+        points.push( new THREE.Vector3(-(this.maxBlocks - 1) * 5, 0, 0));
         const geometry = new THREE.BufferGeometry().setFromPoints(points);
         const material = new THREE.LineBasicMaterial( { color: 0x005500 } );
         this.scene.add(
@@ -198,33 +203,76 @@ class ChainVizScene {
 
     async initBlocks(signedBlocks: Array<SignedBlock>) {
         for (let i = signedBlocks.length - 1; i >= 0; i--) {
-            let block = new Block(signedBlocks[i], this.blockNumberFont);
+            let block = new Block(signedBlocks[i].block, this.blockNumberFont);
             this.blocks.unshift(block);
-            block.addTo(
-                this.scene,
-                0
-            );
+            block.addTo(this.scene);
             block.setIndex(i, true);
             await new Promise(resolve => { setTimeout(resolve, 50); });
         }
     }
 
-    async pushBlock(signedBlock: SignedBlock) {
-        for (const block of this.blocks) {
-            block.setIndex(block.getIndex() + 1, true);
+    private hasBlock(substrateBlock: SubstrateBlock): boolean {
+        return this.blocks.filter((block) => {
+            block.substrateBlock.header.hash.toHex() == substrateBlock.header.hash.toHex()
+        }).length > 0
+    }
+
+    async pushBlock(
+        substrateBlock: SubstrateBlock,
+        authorAccountIdHex?: string,
+    ) {
+        if (this.hasBlock(substrateBlock)) {
+            // skip duplicate block
+            return;
         }
-        for (let i = this.blocks.length; i > this.maxBlocks; i--) {
-            let blockToRemove = this.blocks.pop();
-            blockToRemove?.removeAndDispose()
-        }
-        let block = new Block(signedBlock, this.blockNumberFont);
-        this.blocks.unshift(block);
-        setTimeout(() => {
-            block.addTo(
-                this.scene,
-                0
-            );
-        }, 500);
+        this.lock.acquire(
+            this.blockPushLockKey,
+            (done) => {
+                let block = new Block(substrateBlock, this.blockNumberFont);
+                this.blocks.unshift(block);
+                const validator = this.validators.find((validator) => {
+                    return validator.getAccountIdHex().toLowerCase() === authorAccountIdHex;
+                });
+                if (validator) {
+                    validator.beginAuthorship(() => {
+                        for (let i = 1; i < this.blocks.length; i++) {
+                            const block = this.blocks[i];
+                            block.setIndex(block.getIndex() + 1, true);
+                        }
+                        setTimeout(() => {
+                            // shift blocks
+                            block.spawn(
+                                this.scene,
+                                validator.index,
+                                validator.ringSize,
+                                () => {
+                                    for (let i = this.blocks.length; i >= this.maxBlocks; i--) {
+                                        let blockToRemove = this.blocks.pop();
+                                        blockToRemove?.removeAndDispose()
+                                    }
+                                    done();
+                                }
+                            );
+                            setTimeout(() => {
+                                validator.endAuthorship();
+                            }, Constants.VALIDATOR_AUTHORSHIP_END_DELAY);
+                        }, Constants.BLOCK_SPAWN_DELAY);
+                    });
+                } else {
+                    // shift blocks
+                    for (const block of this.blocks) {
+                        block.setIndex(block.getIndex() + 1, true);
+                    }
+                    setTimeout(() => {
+                        block.addTo(this.scene);
+                        done();
+                    }, Constants.BLOCK_SHIFT_TIME_MS);
+                }
+            },
+            (err, _) => {
+                // lock released
+            }
+        );
     }
 }
 

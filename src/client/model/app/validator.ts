@@ -1,26 +1,16 @@
 import * as THREE from 'three';
-import { rotateAboutPoint } from '../../utils/geom_util';
+import * as TWEEN from '@tweenjs/tween.js';
+import { rotateAboutPoint } from '../../util/geom_util';
 import { ValidatorSummary } from "../subvt/validator_summary";
+import { createTween } from '../../util/tween_util';
+import { Constants } from '../../util/constants';
 
 class Validator {
-    private readonly mesh: THREE.Group;
+    private readonly mesh: THREE.Mesh<THREE.CylinderGeometry, THREE.MeshPhongMaterial>;
     private readonly summary: ValidatorSummary;
-    private readonly index: [number, number];
-    private readonly ringSize: number;
-
-    private readonly normalMaterial = new THREE.MeshNormalMaterial();
-    private readonly phongMaterial = new THREE.MeshPhongMaterial({
-        color: 0xE6007A,
-        shininess: 6,
-        specular: 0xffffff,
-        opacity: 0.5,
-    });
-    private readonly phongMaterial2 = new THREE.MeshPhongMaterial({
-        color: 0x8EDFFF,
-        shininess: 6,
-        specular: 0xffffff,
-        opacity: 0.5,
-    });
+    readonly index: [number, number];
+    readonly ringSize: number;
+    private readonly color: THREE.Color;
 
     private readonly radius = 0.6;
     private readonly segments = 16;
@@ -32,12 +22,15 @@ class Validator {
         ringSize: number,
     ) {
         this.summary = summary;
-        this.mesh = this.createMesh();
+        this.color = summary.isParaValidator
+            ? Constants.PARA_VALIDATOR_COLOR
+            : Constants.VALIDATOR_COLOR;
         this.index = index;
         this.ringSize = ringSize;
+        this.mesh = this.createMesh();
     }
 
-    private createMesh(): THREE.Group {
+    private createMesh(): THREE.Mesh<THREE.CylinderGeometry, THREE.MeshPhongMaterial> {
         // cylinder
         const cylinderGeometry = new THREE.CylinderGeometry(
             this.radius,
@@ -45,29 +38,17 @@ class Validator {
             this.height,
             this.segments
         );
-        let material = this.summary.isParaValidator ? this.phongMaterial2 : this.phongMaterial;
+        const material = new THREE.MeshPhongMaterial({
+            color: this.color,
+            shininess: 6,
+            specular: Constants.VALIDATOR_SPECULAR_COLOR,
+        });
         const cylinder = new THREE.Mesh(
             cylinderGeometry,
             material,
         );
-        const sphereGeometry = new THREE.SphereGeometry(
-            this.radius,
-            this.segments,
-            this.segments
-        );
-        // top
-        const topSphere = new THREE.Mesh(sphereGeometry, material)
-        topSphere.position.y = this.height / 2;
-        // bottom
-        const bottomSphere = new THREE.Mesh(sphereGeometry, material)
-        bottomSphere.position.y = -this.height / 2;
-        // group
-        const group = new THREE.Group();
-        group.add(cylinder);
-        //group.add(topSphere);
-        //group.add(bottomSphere);
-        group.receiveShadow = true;
-        return group
+        cylinder.receiveShadow = true;
+        return cylinder;
     }
 
     addTo(scene: THREE.Scene) {
@@ -82,6 +63,86 @@ class Validator {
             false,
         );
         scene.add(this.mesh);
+    }
+
+    getAccountIdHex(): string {
+        return this.summary.accountId;
+    }
+
+    beginAuthorship(onComplete: () => void) {
+        const scaleTween = createTween(
+            this.mesh.scale,
+            {
+                x: Constants.VALIDATOR_AUTHORSHIP_SCALE,
+                y: Constants.VALIDATOR_AUTHORSHIP_SCALE,
+                z: Constants.VALIDATOR_AUTHORSHIP_SCALE,
+            },
+            Constants.VALIDATOR_AUTHORSHIP_SCALE_CURVE,
+            Constants.VALIDATOR_AUTHORSHIP_MOVE_TIME_MS,
+        );
+        const translateTween = createTween(
+            this.mesh.position,
+            { z: Constants.VALIDATOR_AUTHORSHIP_TRANSLATE_Z },
+            Constants.VALIDATOR_AUTHORSHIP_TRANSLATE_CURVE,
+            Constants.VALIDATOR_AUTHORSHIP_MOVE_TIME_MS,
+            () => {
+                scaleTween.start();
+            },
+            () => {
+                onComplete();
+            },
+        );
+        createTween(
+            this.mesh.material.color,
+            {
+                r: 0.0,
+                g: 1.0,
+                b: 0.0,
+            },
+            Constants.VALIDATOR_AUTHORSHIP_SCALE_CURVE,
+            Constants.VALIDATOR_AUTHORSHIP_MOVE_TIME_MS,
+            undefined,
+            () => {
+                translateTween.start();
+            }
+        ).start();
+    }
+
+    endAuthorship(onComplete?: () => void) {
+        const colorTween = createTween(
+            this.mesh.material.color,
+            this.color,
+            Constants.VALIDATOR_AUTHORSHIP_SCALE_CURVE,
+            Constants.VALIDATOR_AUTHORSHIP_MOVE_TIME_MS,
+            undefined,
+            () => {
+                if (onComplete) {
+                    onComplete();
+                }
+            }
+        );
+        const scaleTween = createTween(
+            this.mesh.scale,
+            {
+                x: 1,
+                y: 1,
+                z: 1,
+            },
+            Constants.VALIDATOR_AUTHORSHIP_SCALE_CURVE,
+            Constants.VALIDATOR_AUTHORSHIP_MOVE_TIME_MS,
+        );
+        createTween(
+            this.mesh.position,
+            { z: 0 },
+            Constants.VALIDATOR_AUTHORSHIP_TRANSLATE_CURVE,
+            Constants.VALIDATOR_AUTHORSHIP_MOVE_TIME_MS,
+            () => {
+                scaleTween.start();
+            },
+            () => {
+                colorTween.start();
+            }
+        ).start();
     }
 }
 

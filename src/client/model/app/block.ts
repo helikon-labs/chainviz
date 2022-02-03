@@ -1,12 +1,15 @@
-import { SignedBlock } from '@polkadot/types/interfaces';
+import { Block as SubstrateBlock, SignedBlock } from '@polkadot/types/interfaces';
 import * as THREE from 'three';
 import * as TWEEN from '@tweenjs/tween.js';
 import { Font } from 'three/examples/jsm/loaders/FontLoader';
 import { TextGeometry } from 'three/examples/jsm/geometries/TextGeometry';
+import { Constants } from '../../util/constants';
+import { createTween } from '../../util/tween_util';
+import { rotateAboutPoint } from '../../util/geom_util';
 
 class Block {
     private readonly mesh: THREE.Group;
-    private readonly block: SignedBlock;
+    readonly substrateBlock: SubstrateBlock;
     private index: number;
 
     private readonly indexXOffset = 5;
@@ -23,8 +26,8 @@ class Block {
     private textGeometry!: TextGeometry;
     private scene!: THREE.Scene;
 
-    constructor(block: SignedBlock, font: Font) {
-        this.block = block;
+    constructor(block: SubstrateBlock, font: Font) {
+        this.substrateBlock = block;
         this.index = -1;
         this.mesh = this.createMesh(font);
     }
@@ -46,7 +49,7 @@ class Block {
         // text
         {
             this.textGeometry = new TextGeometry(
-                `${this.block.block.header.number.toNumber()}`,
+                `${this.substrateBlock.header.number.toNumber()}`,
                 {
                     font: font,
                     size: 0.45,
@@ -62,11 +65,65 @@ class Block {
         return group;
     }
 
-    addTo(scene: THREE.Scene, index: number) {
+    addTo(scene: THREE.Scene) {
         this.scene = scene;
-        this.index = index;
+        this.index = 0;
         this.mesh.position.x = -this.index * 5;
         scene.add(this.mesh);
+    }
+
+    spawn(
+        scene: THREE.Scene,
+        validatorIndex: [number, number],
+        ringSize: number,
+        onComplete: () => void,
+    ) {
+        this.scene = scene;
+        this.index = 0;
+        this.mesh.rotation.z = Math.PI / 2;
+        this.mesh.position.z = Constants.VALIDATOR_AUTHORSHIP_TRANSLATE_Z;
+        const [ringIndex, index] = validatorIndex;
+        this.mesh.position.x = -22 - (ringIndex * 5) + 6;
+        rotateAboutPoint(
+            this.mesh,
+            new THREE.Vector3(0, 0, 0),
+            new THREE.Vector3(0, 0, 1),
+            -(Math.PI / 10.5) - index * ((11 * Math.PI / 6) / ringSize),
+            false,
+        );
+        this.mesh.scale.x = 0;
+        this.mesh.scale.y = 0;
+        this.mesh.scale.z = 0;
+        scene.add(this.mesh);
+        createTween(
+            this.mesh.scale,
+            { x: 1, y: 1, z: 1 },
+            Constants.BLOCK_SPAWN_SCALE_CURVE,
+            Constants.BLOCK_SPAWN_SCALE_TIME_MS,
+            undefined,
+            () => {
+                setTimeout(() => {
+                    this.resetToOrigin(onComplete);
+                }, 250);
+            }
+        ).start();
+    }
+
+    private resetToOrigin(onComplete: () => void) {
+        let rotationTween = createTween(
+            this.mesh.rotation,
+            { x: 0, y: 0, z: 0 },
+            Constants.BLOCK_TO_ORIGIN_CURVE,
+            Constants.BLOCK_TO_ORIGIN_TIME_MS,
+        );
+        createTween(
+            this.mesh.position,
+            { x: 0, y: 0, z: 0 },
+            Constants.BLOCK_TO_ORIGIN_CURVE,
+            Constants.BLOCK_TO_ORIGIN_TIME_MS,
+            () => { rotationTween.start(); },
+            () => { onComplete(); },
+        ).start();
     }
 
     getIndex(): number {
@@ -82,15 +139,12 @@ class Block {
             this.mesh.position.x = -newIndex * 5;
             return;
         }
-        new TWEEN.Tween(
-            this.mesh.position
-        ).to({
-            x: -newIndex * this.indexXOffset
-        }, 500).easing(
-            TWEEN.Easing.Cubic.Out
-        ).start().onComplete(() => {
-            // no-op
-        });
+        createTween(
+            this.mesh.position,
+            { x: -newIndex * this.indexXOffset },
+            Constants.BLOCK_SHIFT_CURVE,
+            Constants.BLOCK_SHIFT_TIME_MS,
+        ).start();
     }
 
     removeAndDispose() {

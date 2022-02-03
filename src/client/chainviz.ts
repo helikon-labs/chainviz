@@ -129,9 +129,10 @@ class ChainViz {
         });
     }
 
-    private async onFinalizedBlock(blockHeader: Header) {
-        const block = await this.substrateClient.rpc.chain.getBlock(blockHeader.hash);
-        this.scene.pushBlock(block);
+    private async onFinalizedBlock(header: Header) {
+        const extendedHeader = await this.substrateClient.derive.chain.getHeader(header.hash);
+        const block = await this.substrateClient.rpc.chain.getBlock(header.hash);
+        this.scene.pushBlock(block.block, extendedHeader?.author?.toHex());
     }
 }
 
