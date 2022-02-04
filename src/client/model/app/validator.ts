@@ -1,12 +1,18 @@
 import * as THREE from 'three';
-import * as TWEEN from '@tweenjs/tween.js';
-import { rotateAboutPoint } from '../../util/geom_util';
+import { getOnScreenPosition, rotateAboutPoint } from '../../util/geom_util';
 import { ValidatorSummary } from "../subvt/validator_summary";
 import { createTween } from '../../util/tween_util';
 import { Constants } from '../../util/constants';
+import { formatNumber, getCondensedAddress } from '../../util/format_util';
+import { Keyring } from '@polkadot/keyring';
+import { network } from '../../chainviz';
+import { generateIdenticonSVGHTML } from '../../util/identicon_util';
+import { parachainMap } from '../../data/parachains';
+
+type ValidatorMesh = THREE.Mesh<THREE.CylinderGeometry, THREE.MeshPhongMaterial>;
 
 class Validator {
-    private readonly mesh: THREE.Mesh<THREE.CylinderGeometry, THREE.MeshPhongMaterial>;
+    private readonly mesh: ValidatorMesh;
     private readonly summary: ValidatorSummary;
     readonly index: [number, number];
     readonly ringSize: number;
@@ -15,6 +21,10 @@ class Validator {
     private readonly radius = 0.6;
     private readonly segments = 16;
     private readonly height = 2.8;
+
+    private static readonly keyring = new Keyring();
+
+    private _isAuthoring = false;
 
     constructor(
         summary: ValidatorSummary,
@@ -30,7 +40,7 @@ class Validator {
         this.mesh = this.createMesh();
     }
 
-    private createMesh(): THREE.Mesh<THREE.CylinderGeometry, THREE.MeshPhongMaterial> {
+    private createMesh(): ValidatorMesh {
         // cylinder
         const cylinderGeometry = new THREE.CylinderGeometry(
             this.radius,
@@ -69,7 +79,178 @@ class Validator {
         return this.summary.accountId;
     }
 
+    getUUID(): string {
+        return this.mesh.uuid;
+    }
+
+    onHover() {
+        this.mesh.material.color.setHex(0xFFFF00);
+    }
+
+    clearHover() {
+        this.mesh.material.color.set(this.color);
+    }
+
+    getMeshOnScreenPosition(
+        renderer: THREE.WebGLRenderer,
+        camera: THREE.Camera,
+    ): THREE.Vec2 {
+        return getOnScreenPosition(this.mesh, renderer, camera);
+    }
+
+    getSS58Address(): string {
+        return Validator.keyring.encodeAddress(
+            this.summary.accountId,
+            network.ss58Prefix
+        );
+    }
+
+    getHoverInfoHTML(): string {
+        const sections = []
+        // general
+        {
+            const components = [];
+            const address = this.getSS58Address();
+            // identicon
+            components.push(
+                generateIdenticonSVGHTML(
+                    address,
+                    Constants.IDENTICON_SIZE
+                )
+            );
+            // identity
+            let identity = "";
+            if (this.summary.confirmed) {
+                identity += "✅ ";
+            }
+            if (this.summary.display) {
+                identity += this.summary.display;
+            } else if (this.summary.parentDisplay) {
+                identity += this.summary.parentDisplay;
+                if (this.summary.childDisplay) {
+                    identity += ' / ' + this.summary.childDisplay;
+                }
+            }
+            if (identity.length > 0) {
+                components.push(identity);
+            } else {
+                components.push(getCondensedAddress(address));
+            }
+            // para validator
+            if (this.summary.isParaValidator) {
+                const parachain = parachainMap.get(this.summary.paraId ?? 0);
+                if (parachain) {
+                    components.push(`Validating for ${parachain.name}`);
+                } else {
+                    components.push("Parachain Validator");
+                }
+            }
+            sections.push("<center>" + components.join("<br>\n") + "</center>");
+        }
+        // performance
+        {
+            const components = [];
+            // blocks produced
+            let blockCount = this.summary.blocksAuthored ?? 0;
+            components.push(blockCount + " era blocks");
+            if (this.summary.isActive) {
+
+            } else {
+                console.log('inactive');
+            }
+            // points
+            let points = this.summary.rewardPoints ?? 0;
+            components.push(points + " era points");
+            // return rate
+            if (this.summary.returnRatePerBillion) {
+                let returnRate = formatNumber(
+                    BigInt(this.summary.returnRatePerBillion!),
+                    7,
+                    2
+                )
+                components.push(returnRate + "% return");
+            }
+            sections.push(components.join("<br>\n"));
+        }
+        // active stake
+        {
+            const components = [];
+            components.push("<span class=\"active-title\">ACTIVE</span>");
+            // self stake
+            components.push(
+                `<div><div class="amount-title">Self</div><div class="amount">` +
+                formatNumber(
+                    this.summary.selfStake.activeAmount,
+                    network.tokenDecimals,
+                    Constants.BALANCE_FORMAT_DECIMALS,
+                    network.tokenTicker,
+                ) + `</div></div>`
+            );
+            // other stake
+            if (this.summary.validatorStake) {
+                const stake = this.summary.validatorStake!;
+                components.push(
+                    `<div><div class="amount-title">${stake.nominatorCount} nom.s</div><div class="amount">` +
+                    formatNumber(
+                        stake.totalStake - stake.selfStake,
+                        network.tokenDecimals,
+                        Constants.BALANCE_FORMAT_DECIMALS,
+                        network.tokenTicker,
+                    ) + `</div></div>`
+                );
+            }
+            sections.push(components.join(`\n`));
+        }
+        // inactive stake
+        {
+            const components = [];
+            components.push("<span class=\"inactive-title\">INACTIVE</span>");
+            if (this.summary.inactiveNominations.nominationCount > 0) {
+                const noms = this.summary.inactiveNominations;
+                components.push(
+                    `<div><div class="amount-title">${noms.nominationCount} nom.s</div><div class="amount">` +
+                    formatNumber(
+                        noms.totalAmount,
+                        network.tokenDecimals,
+                        Constants.BALANCE_FORMAT_DECIMALS,
+                        network.tokenTicker,
+                    ) + `</div></div>`
+                );
+            } else {
+                components.push("None");
+            }
+            sections.push(components.join("\n"));
+        }
+        // icons
+        {
+            const components = [];
+            if (this.summary.isEnrolledIn1kv) {
+                components.push(`<img src="./img/status/status_icon_1kv.svg">`);
+            }
+            if (this.summary.heartbeatReceived ?? false) {
+                components.push(`<img src="./img/status/status_icon_heartbeat_received.svg">`);
+            }
+            if (this.summary.activeNextSession) {
+                components.push(`<img src="./img/status/status_icon_active_next_session.svg">`);
+            }
+            if (this.summary.slashCount > 0) {
+                components.push(`<img src="./img/status/status_icon_slashed.svg">`);
+            }
+            if (this.summary.preferences.blocksNominations) {
+                components.push(`<img src="./img/status/status_icon_blocks_nominations.svg">`);
+            }
+            if (this.summary.oversubscribed) {
+                components.push(`<img src="./img/status/status_icon_oversubscribed.svg">`);
+            }
+            if (components.length > 0) {
+                sections.push(`<div class="status-icon-container">${components.join("&nbsp;")}</div>`);
+            }
+        }
+        return sections.join("\n<hr>\n");
+    }
+
     beginAuthorship(onComplete: () => void) {
+        this._isAuthoring = true;
         const scaleTween = createTween(
             this.mesh.scale,
             {
@@ -116,6 +297,7 @@ class Validator {
             Constants.VALIDATOR_AUTHORSHIP_MOVE_TIME_MS,
             undefined,
             () => {
+                this._isAuthoring = false;
                 if (onComplete) {
                     onComplete();
                 }
@@ -144,6 +326,10 @@ class Validator {
             }
         ).start();
     }
+
+    isAuthoring(): boolean {
+        return this._isAuthoring;
+    }
 }
 
-export { Validator };
+export { Validator, ValidatorMesh };

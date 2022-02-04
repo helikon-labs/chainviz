@@ -1,6 +1,6 @@
 interface StakeSummary {
     stashAccountId: string;
-    activeAmount: BigInt;
+    activeAmount: bigint;
 }
 
 export { StakeSummary };

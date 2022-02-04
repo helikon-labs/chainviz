@@ -1,6 +1,6 @@
 interface InactiveNominationsSummary {
     nominationCount: number;
-    totalAmount: BigInt;
+    totalAmount: bigint;
 }
 
 export { InactiveNominationsSummary };

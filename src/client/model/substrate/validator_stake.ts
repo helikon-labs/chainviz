@@ -1,6 +1,6 @@
 interface ValidatorStakeSummary {
-    selfStake: BigInt;
-    totalStake: BigInt;
+    selfStake: bigint;
+    totalStake: bigint;
     nominatorCount: number;
 }
 

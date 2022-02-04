@@ -24,7 +24,7 @@ interface ValidatorSummary {
     blocksAuthored?: number;
     rewardPoints?: number;
     heartbeatReceived?: boolean;
-    validatorStake: ValidatorStakeSummary;
+    validatorStake?: ValidatorStakeSummary;
 }
 
 interface ValidatorSummaryDiff {

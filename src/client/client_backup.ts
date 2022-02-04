@@ -3,8 +3,8 @@ import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls'
 import Stats from 'three/examples/jsm/libs/stats.module'
 import { GUI } from 'dat.gui'
 import * as CANNON from 'cannon-es'
-import CannonDebugRenderer from './util/cannonDebugRenderer'
-import CannonUtils from './util/cannonUtils'
+import CannonDebugRenderer from './util/cannon_debug_renderer'
+import CannonUtils from './util/cannon_util'
 import { OBJLoader } from 'three/examples/jsm/loaders/OBJLoader'
 
 const scene = new THREE.Scene()

@@ -5,7 +5,7 @@ import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
 import { Font, FontLoader } from 'three/examples/jsm/loaders/FontLoader';
 import Stats from 'three/examples/jsm/libs/stats.module';
 import { Block } from '../model/app/block';
-import { Validator } from '../model/app/validator';
+import { Validator, ValidatorMesh } from '../model/app/validator';
 import { ValidatorSummary } from '../model/subvt/validator_summary';
 import AsyncLock = require('async-lock');
 import { Constants } from '../util/constants';
@@ -16,18 +16,24 @@ class ChainVizScene {
     private readonly controls: OrbitControls;
     private readonly renderer: THREE.WebGLRenderer;
     private readonly stats: Stats;
+
     private readonly raycaster: THREE.Raycaster;
     private clickPoint?: THREE.Vec2;
+    private hoverPoint = new THREE.Vector2();
+    private hoverValidator?: Validator;
 
     private readonly fontLoader = new FontLoader();
     private blockNumberFont!: Font;
     private readonly ringSizes = [82, 102, 120, 140, 165, 190, 201, 240];
-    private readonly validators = new Array<Validator>();
+    private readonly validatorMap = new Map<string, Validator>();
     private readonly blocks = new Array<Block>();
     private readonly maxBlocks = 13;
+    private validatorsInited = false;
 
     private readonly lock = new AsyncLock();
     private readonly blockPushLockKey = "block_push";
+
+    private readonly hoverInfoBoard = document.getElementById('hover-info-board')!;
 
     constructor() {
         // init font loader
@@ -68,6 +74,15 @@ class ChainVizScene {
         // ambient light
         const ambientLight = new THREE.AmbientLight(0xFFFFFF, 0.6);
         this.scene.add(ambientLight);
+        // raycaster
+        this.raycaster = new THREE.Raycaster();
+        this.clickPoint = undefined;
+        document.addEventListener('click', (event) => {
+            this.onClick(event);
+        });
+        document.addEventListener( 'mousemove', (event) => {
+            this.onPointerMove(event);
+        });
         // renderer
         this.renderer = new THREE.WebGLRenderer({ antialias: true });
         this.renderer.setSize(window.innerWidth, window.innerHeight);
@@ -83,12 +98,6 @@ class ChainVizScene {
             this.renderer.domElement
         );
         this.controls.screenSpacePanning = true;
-        // raycaster
-        this.raycaster = new THREE.Raycaster();
-        this.clickPoint = undefined;
-        document.addEventListener('click', (event) => {
-            this.onClick(event);
-        });
         window.addEventListener('resize', () => {
             this.onWindowResize();
         }, false);
@@ -97,7 +106,12 @@ class ChainVizScene {
     private onClick(event: MouseEvent) {
         this.clickPoint = new THREE.Vector2();
         this.clickPoint.x = (event.clientX / window.innerWidth) * 2 - 1;
-        this.clickPoint.y = (event.clientY / window.innerHeight) * 2 + 1;
+        this.clickPoint.y = -(event.clientY / window.innerHeight) * 2 + 1;
+    }
+
+    private onPointerMove(event: MouseEvent) {
+        this.hoverPoint.x = (event.clientX / window.innerWidth) * 2 - 1;
+        this.hoverPoint.y = -(event.clientY / window.innerHeight) * 2 + 1;
     }
 
     private onWindowResize() {
@@ -117,14 +131,60 @@ class ChainVizScene {
         this.stats.update();
     }
 
-    private render() {
+    private checkClickRaycast() {
         if (this.clickPoint != undefined) {
             this.raycaster.setFromCamera(this.clickPoint!, this.camera);
-            const intersects = this.raycaster.intersectObjects(this.scene.children);
-            console.log('INTERSECS :: ' + intersects.length);
+            const intersects = this.raycaster.intersectObjects(this.scene.children, false);
             this.clickPoint = undefined;
         }
+    }
 
+    private setPointerCursor() {
+        document.getElementsByTagName("html")[0].style.cursor = "pointer";
+    }
+
+    private setDefaultCursor() {
+        document.getElementsByTagName("html")[0].style.cursor = "default";
+    }
+
+    private checkHoverRaycast() {
+        this.raycaster.setFromCamera(this.hoverPoint, this.camera);
+        const hoverIntersects = this.raycaster.intersectObjects(this.scene.children, false);
+        if (hoverIntersects.length > 0) {
+            const validator = this.validatorMap.get(hoverIntersects[0].object.uuid);
+            this.hoverValidator?.clearHover();
+            if (validator && !validator.isAuthoring()) {
+                validator.onHover();
+                this.hoverValidator = validator;
+                this.setPointerCursor();
+                const position = validator.getMeshOnScreenPosition(
+                    this.renderer,
+                    this.camera,
+                );
+                this.hoverInfoBoard.style.display = "block";
+                this.hoverInfoBoard.classList.remove("block");
+                this.hoverInfoBoard.classList.add("validator-hover-info-board");
+                this.hoverInfoBoard.style.left = (position.x + Constants.HOVER_INFO_BOARD_X_OFFSET) + "px";
+                this.hoverInfoBoard.style.top = (position.y + Constants.HOVER_INFO_BOARD_Y_OFFSET) + "px";
+                this.hoverInfoBoard.innerHTML = validator.getHoverInfoHTML();
+            } else {
+                this.hoverValidator = undefined;
+                this.setDefaultCursor();
+                this.hoverInfoBoard.style.display = "none";
+            }
+        } else {
+            this.hoverValidator?.clearHover();
+            this.hoverValidator = undefined;
+            this.setDefaultCursor();
+            this.hoverInfoBoard.style.display = "none";
+        }
+    }
+
+    private render() {
+        if (this.validatorsInited) {
+            this.checkClickRaycast();
+            this.checkHoverRaycast();
+        }
         this.renderer.render(
             this.scene,
             this.camera
@@ -190,7 +250,7 @@ class ChainVizScene {
                     [ring, i],
                     this.ringSizes[ring],
                 );
-                this.validators.push(validator);
+                this.validatorMap.set(validator.getUUID(), validator);
                 validator.addTo(this.scene);
                 index++;
             }
@@ -199,6 +259,9 @@ class ChainVizScene {
             }
             await new Promise(resolve => { setTimeout(resolve, 150); });
         }
+        setTimeout(() => {
+            this.validatorsInited = true;
+        }, 0);
     }
 
     async initBlocks(signedBlocks: Array<SignedBlock>) {
@@ -230,7 +293,7 @@ class ChainVizScene {
             (done) => {
                 let block = new Block(substrateBlock, this.blockNumberFont);
                 this.blocks.unshift(block);
-                const validator = this.validators.find((validator) => {
+                const validator = Array.from(this.validatorMap.values()).find((validator) => {
                     return validator.getAccountIdHex().toLowerCase() === authorAccountIdHex;
                 });
                 if (validator) {

@@ -10,6 +10,8 @@ export abstract class Constants {
     static readonly BLOCK_SPAWN_SCALE_TIME_MS = 250;
     static readonly BLOCK_TO_ORIGIN_CURVE = TWEEN.Easing.Cubic.Out;
     static readonly BLOCK_TO_ORIGIN_TIME_MS = 1000;
+    // identicon
+    static readonly IDENTICON_SIZE = 30;
     
     // validator colors
     static readonly VALIDATOR_COLOR = new THREE.Color(0.901, 0.0, 0.478);
@@ -23,4 +25,11 @@ export abstract class Constants {
     static readonly VALIDATOR_AUTHORSHIP_TRANSLATE_CURVE = TWEEN.Easing.Exponential.Out;
     static readonly VALIDATOR_AUTHORSHIP_MOVE_TIME_MS = 500;
     static readonly VALIDATOR_AUTHORSHIP_END_DELAY = 500;
+    // hover info board
+    static readonly HOVER_INFO_BOARD_X_OFFSET = 16;
+    static readonly HOVER_INFO_BOARD_Y_OFFSET = -30;
+    // format
+    static readonly BALANCE_FORMAT_DECIMALS = 4;
+    static readonly DECIMAL_SEPARATOR = ".";
+    static readonly THOUSANDS_SEPARATOR = ",";
 }

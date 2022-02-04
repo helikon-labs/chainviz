@@ -1,6 +1,6 @@
 import * as THREE from 'three';
 
-export function rotateAboutPoint(
+function rotateAboutPoint(
     obj: THREE.Object3D,
     point: THREE.Vector3,
     axis: THREE.Vector3,
@@ -26,3 +26,21 @@ export function rotateAboutPoint(
     // rotate the OBJECT
     obj.rotateOnAxis(axis, theta);
 }
+
+function getOnScreenPosition(
+    object: THREE.Object3D,
+    renderer: THREE.WebGLRenderer,
+    camera: THREE.Camera,
+): THREE.Vec2 {
+    const pos = new THREE.Vector3().setFromMatrixPosition(object.matrixWorld);
+    pos.project(camera);
+    const canvas = renderer.domElement;
+    let widthHalf = canvas.clientWidth / 2;
+    let heightHalf = canvas.clientHeight / 2;
+    return new THREE.Vector2(
+        (pos.x * widthHalf) + widthHalf,
+        - (pos.y * heightHalf) + heightHalf,
+    );
+}
+
+export { rotateAboutPoint, getOnScreenPosition };

@@ -51,7 +51,7 @@ body {
     color: #DDDDDD;
     transform: translate(-50%, -50%);
     margin-top: 57px;
-    font-family: "Courier";
+    font-family: "Courier", monospace;
     font-size: 14px;
     text-align: center;
 }
@@ -62,7 +62,13 @@ body {
     left: 10px;
     color: #FFFFFF;
     font-family: "Audiowide", sans-serif;
+}
+#chainviz-logo .chainviz-logo {
     font-size: 20px;
+    font-weight: 800;
+}
+#chainviz-logo .chainviz-version {
+    font-size: 14px;
     font-weight: 800;
 }
 #kusama-logo {
@@ -88,5 +94,59 @@ body {
     position:absolute;
     bottom: 10px;
     left: 74px;
+    width: 26px;
+}
+
+.hover-info-board {
+    position: absolute;
+    top: 0px;
+    left: 0px;
+    background-color: #000000BB;
+    color: #FFFFFFDD;
+    padding: 12px 8px 4px 8px;
+    display: none;
+    border-radius: 6px;
+    border-color: #FFFFFFCC;
+    border-width: 1px;
+    border-style: solid;
+    font-family: "Courier", monospace;
+    font-size: 14px;
+    line-height: 20px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.validator-hover-info-board {
+    width: 260px;
+}
+
+.hover-info-board .identicon {
+    margin-left: 115px;
+}
+
+.hover-info-board .active-title {
+    color: #00FF00;
+}
+
+.hover-info-board .inactive-title {
+    color: #FF0000;
+}
+
+.hover-info-board div.amount-title {
+    float: left;
+    width: 120px;
+}
+
+.hover-info-board div.amount {
+    width: 100%;
+    text-align: right;
+}
+
+.hover-info-board .status-icon-container {
+    text-align: center;
+}
+
+.hover-info-board .status-icon-container img {
     width: 26px;
 }

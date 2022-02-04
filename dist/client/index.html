@@ -2,26 +2,29 @@
 <html>
     <head>
         <title>ChainViz by Helikon</title>
-        <link rel="icon" type="image/x-icon" href="./img/favicon.ico">
+        <link rel="icon" type="image/x-icon" href="./img/icon/favicon.ico">
         <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Audiowide">
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Cutive">
         <link rel="stylesheet" href="./css/chainviz.css">
     </head>
     <body>
         <script src="bundle.js"></script>
         <!-- top logos -->
-        <div id="chainviz-logo">CHAINVIZ</div>
+        <div id="chainviz-logo">
+            <span class="chainviz-logo">CHAINVIZ</span>&nbsp;&nbsp;<span class="chainviz-version">v0.1.0-ALPHA</span>
+        </div>
         <a href="https://kusama.network">
-            <img src="./img/kusama_logo.svg" alt="Kusama" id="kusama-logo">
+            <img src="./img/logo/kusama_logo.svg" alt="Kusama" id="kusama-logo">
         </a>
         <!-- bottom icons -->
         <a href="https://github.com/helikon-labs">
-            <img id="helikon-icon" src="./img/helikon_logo.svg" alt="Developed by Helikon Labs">
+            <img id="helikon-icon" src="./img/icon/helikon_icon.svg" alt="Developed by Helikon Labs">
         </a>
         <a href="https://subvt-test.helikon.io">
-            <img id="subvt-icon" src="./img/subvt_icon.svg" alt="Powered by SubVT">
+            <img id="subvt-icon" src="./img/icon/subvt_icon.svg" alt="Powered by SubVT">
         </a>
         <a href="https://github.com/helikon-labs/chainviz">
-            <img id="github-icon" src="./img/github_icon.svg" alt="ChainViz GitHub Repo">
+            <img id="github-icon" src="./img/icon/github_icon.svg" alt="ChainViz GitHub Repo">
         </a>
         <!-- spinner -->
         <div id="spinner" id="spinner">
@@ -30,5 +33,7 @@
         </div>
         <!-- status -->
         <div id="loading-status"></div>
+        <!-- hover info board -->
+        <div id="hover-info-board" class="hover-info-board"></div>
     </body>
 </html>

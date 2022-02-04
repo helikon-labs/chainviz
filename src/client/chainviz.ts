@@ -7,11 +7,35 @@ import { ChainVizScene } from './scene/scene';
 import { ValidatorListUpdate } from './model/subvt/validator_summary';
 import { ApiPromise, WsProvider } from '@polkadot/api';
 import { Header, SignedBlock } from '@polkadot/types/interfaces';
+import { kusama } from './model/app/network';
+import { NetworkStatusUpdate } from './model/subvt/network_status';
 
 THREE.Cache.enabled = true;
+const network = kusama;
 
 class ChainViz {
-    private readonly scene: ChainVizScene = new ChainVizScene();
+    private scene = new ChainVizScene();
+    private readonly networkStatusListener: RPCSubscriptionServiceListener<NetworkStatusUpdate> = {
+        onConnected: () => {
+            this.networkStatusClient.subscribe();
+        },
+        onSubscribed: (subscriptionId: number) => {
+            // no-op
+        },
+        onUnsubscribed: (subscriptionId: number) => {
+            // no-op
+        },
+        onDisconnected: () => {
+            // no-op
+        },
+        onUpdate: (update: NetworkStatusUpdate) => {
+            console.log(`Received network status #${update.status?.finalizedBlockNumber}`);
+            // this.processValidatorListUpdate(update);
+        },
+        onError: (code: number, message: string) => {
+            console.log(`Network status service error (${code}: ${message}).`);
+        }
+    }
     private readonly validatorListListener: RPCSubscriptionServiceListener<ValidatorListUpdate> = {
         onConnected: () => {
             this.validatorListClientIsConnected = true;
@@ -36,6 +60,12 @@ class ChainViz {
             console.log(`Validator list service error (${code}: ${message}).`);
         }
     }
+    private readonly networkStatusClient = new RPCSubscriptionService(
+        "ws://78.181.100.160:17888",
+        "subscribe_networkStatus",
+        "unsubscribe_networkStatus",
+        this.networkStatusListener,
+    );
     private readonly validatorListClient = new RPCSubscriptionService(
         "ws://78.181.100.160:17889",
         "subscribe_validatorList",
@@ -121,6 +151,7 @@ class ChainViz {
         this.initialBlocks = [];
         // subscribe to finalized blocks
         this.subscribeToFinalizedBlocks();
+        this.networkStatusClient.connect();
     }
 
     private subscribeToFinalizedBlocks() {
@@ -136,4 +167,4 @@ class ChainViz {
     }
 }
 
-export { ChainViz };
+export { ChainViz, network };
