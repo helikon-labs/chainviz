@@ -5,7 +5,7 @@ import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
 import { Font, FontLoader } from 'three/examples/jsm/loaders/FontLoader';
 import Stats from 'three/examples/jsm/libs/stats.module';
 import { Block } from '../model/app/block';
-import { Validator, ValidatorMesh } from '../model/app/validator';
+import { Validator } from '../model/app/validator';
 import { ValidatorSummary } from '../model/subvt/validator_summary';
 import AsyncLock = require('async-lock');
 import { Constants } from '../util/constants';

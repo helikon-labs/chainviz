@@ -9,10 +9,8 @@ import { network } from '../../chainviz';
 import { generateIdenticonSVGHTML } from '../../util/identicon_util';
 import { parachainMap } from '../../data/parachains';
 
-type ValidatorMesh = THREE.Mesh<THREE.CylinderGeometry, THREE.MeshPhongMaterial>;
-
 class Validator {
-    private readonly mesh: ValidatorMesh;
+    private readonly mesh: THREE.Mesh<THREE.CylinderGeometry, THREE.MeshPhongMaterial>;
     private readonly summary: ValidatorSummary;
     readonly index: [number, number];
     readonly ringSize: number;
@@ -40,7 +38,7 @@ class Validator {
         this.mesh = this.createMesh();
     }
 
-    private createMesh(): ValidatorMesh {
+    private createMesh(): THREE.Mesh<THREE.CylinderGeometry, THREE.MeshPhongMaterial> {
         // cylinder
         const cylinderGeometry = new THREE.CylinderGeometry(
             this.radius,
@@ -332,4 +330,4 @@ class Validator {
     }
 }
 
-export { Validator, ValidatorMesh };
+export { Validator };
