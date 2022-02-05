@@ -54,29 +54,7 @@ class ChainVizScene {
         // axes helper :: x is red, y is green, z is blue
         const axesHelper = new THREE.AxesHelper(5);
         // this.scene.add(axesHelper);
-        // point light front
-        {
-            const pointLight = new THREE.PointLight(0x404040);
-            pointLight.intensity = 1.0;
-            pointLight.position.x = 60;
-            pointLight.position.y = 60;
-            pointLight.position.z = 30;
-            pointLight.castShadow = true;
-            this.scene.add(pointLight);
-        }
-        // point light back
-        {
-            const pointLight = new THREE.PointLight(0x404040);
-            pointLight.intensity = 1.0;
-            pointLight.position.x = -20;
-            pointLight.position.y = -40;
-            pointLight.position.z = -30;
-            pointLight.castShadow = true;
-            this.scene.add(pointLight);
-        }
-        // ambient light
-        const ambientLight = new THREE.AmbientLight(0xFFFFFF, 0.6);
-        this.scene.add(ambientLight);
+        this.addLights();
         // raycaster
         this.raycaster = new THREE.Raycaster();
         this.clickPoint = undefined;
@@ -100,6 +78,39 @@ class ChainVizScene {
             this.camera,
             this.renderer.domElement
         );
+        this.limitOrbitControls();
+        window.addEventListener("resize", () => {
+            this.onWindowResize();
+        }, false);
+    }
+
+    private addLights() {
+        // point light front
+        {
+            const pointLight = new THREE.PointLight(0x404040);
+            pointLight.intensity = 1.0;
+            pointLight.position.x = 60;
+            pointLight.position.y = 60;
+            pointLight.position.z = 30;
+            pointLight.castShadow = true;
+            this.scene.add(pointLight);
+        }
+        // point light back
+        {
+            const pointLight = new THREE.PointLight(0x404040);
+            pointLight.intensity = 1.0;
+            pointLight.position.x = -20;
+            pointLight.position.y = -40;
+            pointLight.position.z = -30;
+            pointLight.castShadow = true;
+            this.scene.add(pointLight);
+        }
+        // ambient light
+        const ambientLight = new THREE.AmbientLight(0xFFFFFF, 0.6);
+        this.scene.add(ambientLight);
+    }
+
+    private limitOrbitControls() {
         this.controls.minPolarAngle = Constants.ORBIT_MIN_POLAR_ANGLE;
         this.controls.maxPolarAngle = Constants.ORBIT_MAX_POLAR_ANGLE;
         this.controls.minAzimuthAngle = Constants.ORBIT_MIN_AZIMUTH_ANGLE;
@@ -124,10 +135,6 @@ class ChainVizScene {
             _v.sub(this.controls.target);
             this.camera.position.sub(_v);
         });
-
-        window.addEventListener("resize", () => {
-            this.onWindowResize();
-        }, false);
     }
 
     private onClick(event: MouseEvent) {
