@@ -7,7 +7,6 @@ import { formatNumber, getCondensedAddress } from '../../util/format_util';
 import { Keyring } from '@polkadot/keyring';
 import { network } from '../../chainviz';
 import { generateIdenticonSVGHTML } from '../../util/identicon_util';
-import { parachainMap } from '../../data/parachains';
 
 class Validator {
     private readonly mesh: THREE.Mesh<THREE.CylinderGeometry, THREE.MeshPhongMaterial>;
@@ -136,7 +135,7 @@ class Validator {
             }
             // para validator
             if (this.summary.isParaValidator) {
-                const parachain = parachainMap.get(this.summary.paraId ?? 0);
+                const parachain = network.parachainMap.get(this.summary.paraId ?? 0);
                 if (parachain) {
                     components.push(`Validating for ${parachain.name}`);
                 } else {

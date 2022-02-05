@@ -3,6 +3,13 @@ body {
     margin: 0px;
     background-color: #000000;
 }
+hr {
+    color: #777;
+    background-color: #777;
+    height: 1px;
+    border: none;
+    max-width: 100%;
+}
 #spinner {
     width: 60px;
     height: 60px;
@@ -149,4 +156,48 @@ body {
 
 .hover-info-board .status-icon-container img {
     width: 26px;
+}
+
+#network-status {
+    position: absolute;
+    display: none;
+    top: 40px;
+    left: 0px;
+    width: 230px;
+    height: 130px;
+    background-color: #000000;
+    color: #FFFFFFDD;
+    padding: 0px 0px 0px 10px;
+    z-index: 99999;
+    font-family: "Courier", monospace;
+    font-size: 13px;
+    line-height: 20px;
+}
+
+#network-status #block-progress-bar {
+    margin-bottom: 6px;
+    height: 3px;
+    background-color: #333;
+}
+
+#network-status #block-progress-bar #block-progress {
+    background-color: #CCC;
+    position: relative;
+    top: 0px;
+    left: 0px;
+    height: 3px;
+    width: 60%;
+}
+
+#network-status .row {
+    margin-bottom: 4px;
+}
+
+#network-status .title {
+    float: left;
+}
+
+#network-status .value {
+    width: 100%;
+    text-align: right;
 }

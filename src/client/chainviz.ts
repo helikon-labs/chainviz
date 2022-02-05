@@ -29,8 +29,7 @@ class ChainViz {
             // no-op
         },
         onUpdate: (update: NetworkStatusUpdate) => {
-            console.log(`Received network status #${update.status?.finalizedBlockNumber}`);
-            // this.processValidatorListUpdate(update);
+            this.processNetworkStatusUpdate(update);
         },
         onError: (code: number, message: string) => {
             console.log(`Network status service error (${code}: ${message}).`);
@@ -164,6 +163,14 @@ class ChainViz {
         const extendedHeader = await this.substrateClient.derive.chain.getHeader(header.hash);
         const block = await this.substrateClient.rpc.chain.getBlock(header.hash);
         this.scene.pushBlock(block.block, extendedHeader?.author?.toHex());
+    }
+
+    private processNetworkStatusUpdate(update: NetworkStatusUpdate) {
+        if (update.status) {
+            this.scene.initNetworkStatus(update.status!);
+        } else if (update.diff) {
+            this.scene.updateNetworkStatus(update.diff!);
+        }
     }
 }
 

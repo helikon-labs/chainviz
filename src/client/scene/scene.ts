@@ -9,6 +9,8 @@ import { Validator } from '../model/app/validator';
 import { ValidatorSummary } from '../model/subvt/validator_summary';
 import AsyncLock = require('async-lock');
 import { Constants } from '../util/constants';
+import { NetworkStatus, NetworkStatusDiff } from '../model/subvt/network_status';
+import { NetworkStatusBoard } from '../ui/network_status_board';
 
 class ChainVizScene {
     private readonly scene: THREE.Scene;
@@ -34,6 +36,7 @@ class ChainVizScene {
     private readonly blockPushLockKey = "block_push";
 
     private readonly hoverInfoBoard = document.getElementById('hover-info-board')!;
+    private networkStatusBoard!: NetworkStatusBoard;
 
     constructor() {
         // init font loader
@@ -337,6 +340,16 @@ class ChainVizScene {
             }
         );
     }
+
+    initNetworkStatus(status: NetworkStatus) {
+        this.networkStatusBoard = new NetworkStatusBoard(status);
+    }
+
+    updateNetworkStatus(diff: NetworkStatusDiff) {
+        this.networkStatusBoard.update(diff);
+    }
+
+
 }
 
 export { ChainVizScene };
