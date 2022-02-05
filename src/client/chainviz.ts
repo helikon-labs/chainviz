@@ -149,20 +149,32 @@ class ChainViz {
         this.initialValidatorListUpdate = undefined;
         this.initialBlocks = [];
         // subscribe to finalized blocks
-        this.subscribeToFinalizedBlocks();
+        this.subscribeToFinalizedHeads();
+        // subscribe to new blocks
+        this.subsribeToNewHeads();
         this.networkStatusClient.connect();
     }
 
-    private subscribeToFinalizedBlocks() {
+    private subsribeToNewHeads() {
+        this.substrateClient.rpc.chain.subscribeNewHeads((header) => {
+            this.onNewBlock(header);
+        })
+    }
+
+    private subscribeToFinalizedHeads() {
         this.substrateClient.rpc.chain.subscribeFinalizedHeads((header) => {
             this.onFinalizedBlock(header);
         });
     }
 
-    private async onFinalizedBlock(header: Header) {
+    private async onNewBlock(header: Header) {
         const extendedHeader = await this.substrateClient.derive.chain.getHeader(header.hash);
         const block = await this.substrateClient.rpc.chain.getBlock(header.hash);
         this.scene.pushBlock(block.block, extendedHeader?.author?.toHex());
+    }
+
+    private async onFinalizedBlock(header: Header) {
+        this.scene.onFinalizedBlock(header.hash.toHex());
     }
 
     private processNetworkStatusUpdate(update: NetworkStatusUpdate) {

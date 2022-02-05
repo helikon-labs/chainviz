@@ -347,6 +347,10 @@ class ChainVizScene {
         );
     }
 
+    onFinalizedBlock(hash: string) {
+
+    }
+
     initNetworkStatus(status: NetworkStatus) {
         this.networkStatusBoard = new NetworkStatusBoard(status);
     }

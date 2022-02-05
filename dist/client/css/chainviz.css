@@ -10,6 +10,11 @@ hr {
     border: none;
     max-width: 100%;
 }
+.no-select {
+    user-select: none;
+    -moz-user-select: none;
+    -webkit-user-select: none;
+  }
 #spinner {
     width: 60px;
     height: 60px;

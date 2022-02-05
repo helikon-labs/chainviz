@@ -18,6 +18,7 @@ class Block {
         color: 0x00FF00,
         shininess: 8,
         specular: 0xffffff,
+        wireframe: true,
     });
     private readonly textMaterial = new THREE.MeshBasicMaterial({
         color: 0x00FF00
