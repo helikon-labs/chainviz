@@ -1,5 +1,5 @@
 {
-  "name": "three.js-typescript-boilerplate",
+  "name": "chainviz",
   "version": "1.0.0",
   "description": "Chain visualization for Polkadot and Kusama.",
   "scripts": {
@@ -9,7 +9,7 @@
     "start": "node ./dist/server/server.js",
     "deploy": "gh-pages -d ./dist/client"
   },
-  "author": "Kutsal Kaan Bilgin | Helikon Labs",
+  "author": "kukabi @ Helikon Labs",
   "license": "GPL 3",
   "devDependencies": {
     "@polkadot/api": "^7.6.1",
