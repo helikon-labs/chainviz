@@ -99,18 +99,17 @@ class ChainViz {
         if (this.validatorListClientIsConnected) {
             this.setLoadingStatus(":: connected ::<br>:: waiting for data ::");
         }
-        const finalizedHead = await this.substrateClient.rpc.chain.getFinalizedHead();
-        let finalizedBlock = await this.substrateClient.rpc.chain.getBlock(finalizedHead);
-        this.initialBlocks.push(finalizedBlock)
-        const lastBlockNumber = finalizedBlock.block.header.number.toNumber();
+        const lastHeader = await this.substrateClient.rpc.chain.getHeader();
+        let block = await this.substrateClient.rpc.chain.getBlock(lastHeader.hash);
+        this.initialBlocks.push(block)
+        const lastBlockNumber = block.block.header.number.toNumber();
         for (
             let i = lastBlockNumber - 1;
             i > (lastBlockNumber - this.initialBlockCount);
             i--
         ) {
-            const blockHash = await this.substrateClient.rpc.chain.getBlockHash(i);
-            finalizedBlock = await this.substrateClient.rpc.chain.getBlock(blockHash);
-            this.initialBlocks.push(finalizedBlock)
+            block = await this.substrateClient.rpc.chain.getBlock(block.block.header.parentHash);
+            this.initialBlocks.push(block)
         }
         if (this.initialValidatorListUpdate != undefined) {
             this.startScene();

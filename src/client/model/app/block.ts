@@ -148,6 +148,10 @@ class Block {
         ).start();
     }
 
+    finalize() {
+        this.boxMaterial.wireframe = false;
+    }
+
     removeAndDispose() {
         this.scene.remove(this.mesh);
         this.boxGeometry.dispose();

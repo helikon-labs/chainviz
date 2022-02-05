@@ -10,6 +10,8 @@ export abstract class Constants {
     static readonly ORBIT_DEFAULT_DISTANCE = 340;
     static readonly ORBIT_MIN_DISTANCE = 50;
     static readonly ORBIT_MAX_DISTANCE = 600;
+    static readonly ORBIT_MAX_PAN_X = 50;
+    static readonly ORBIT_MAX_PAN_Y= 50;
     // block animations
     static readonly BLOCK_SHIFT_CURVE = TWEEN.Easing.Cubic.Out;
     static readonly BLOCK_SHIFT_TIME_MS = 500;

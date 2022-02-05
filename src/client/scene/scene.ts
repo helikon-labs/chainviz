@@ -107,7 +107,25 @@ class ChainVizScene {
         this.controls.minDistance = Constants.ORBIT_MIN_DISTANCE;
         this.controls.maxDistance = Constants.ORBIT_MAX_DISTANCE;
         this.controls.screenSpacePanning = true;
-        window.addEventListener('resize', () => {
+        const minPan = new THREE.Vector3(
+            -Constants.ORBIT_MAX_PAN_X,
+            -Constants.ORBIT_MAX_PAN_Y,
+            0
+        );
+        const maxPan = new THREE.Vector3(
+            Constants.ORBIT_MAX_PAN_X,
+            Constants.ORBIT_MAX_PAN_Y,
+            0
+        );
+        const _v = new THREE.Vector3();
+        this.controls.addEventListener("change", () => {
+            _v.copy(this.controls.target);
+            this.controls.target.clamp(minPan, maxPan);
+            _v.sub(this.controls.target);
+            this.camera.position.sub(_v);
+        });
+
+        window.addEventListener("resize", () => {
             this.onWindowResize();
         }, false);
     }
@@ -347,8 +365,10 @@ class ChainVizScene {
         );
     }
 
-    onFinalizedBlock(hash: string) {
-
+    onFinalizedBlock(hashHex: string) {
+        this.blocks.find((block) => {
+            return hashHex == block.substrateBlock.hash.toHex()
+        })?.finalize();
     }
 
     initNetworkStatus(status: NetworkStatus) {
