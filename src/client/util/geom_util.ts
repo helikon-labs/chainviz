@@ -28,18 +28,17 @@ function rotateAboutPoint(
 }
 
 function getOnScreenPosition(
-    object: THREE.Object3D,
+    position: THREE.Vector3,
     renderer: THREE.WebGLRenderer,
     camera: THREE.Camera,
 ): THREE.Vec2 {
-    const pos = new THREE.Vector3().setFromMatrixPosition(object.matrixWorld);
-    pos.project(camera);
+    position.project(camera);
     const canvas = renderer.domElement;
     let widthHalf = canvas.clientWidth / 2;
     let heightHalf = canvas.clientHeight / 2;
     return new THREE.Vector2(
-        (pos.x * widthHalf) + widthHalf,
-        - (pos.y * heightHalf) + heightHalf,
+        (position.x * widthHalf) + widthHalf,
+        - (position.y * heightHalf) + heightHalf,
     );
 }
 

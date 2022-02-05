@@ -11,6 +11,7 @@ import AsyncLock = require('async-lock');
 import { Constants } from '../util/constants';
 import { NetworkStatus, NetworkStatusDiff } from '../model/subvt/network_status';
 import { NetworkStatusBoard } from '../ui/network_status_board';
+import { ValidatorMesh } from '../ui/validator_mesh';
 
 class ChainVizScene {
     private readonly scene: THREE.Scene;
@@ -22,14 +23,13 @@ class ChainVizScene {
     private readonly raycaster: THREE.Raycaster;
     private clickPoint?: THREE.Vec2;
     private hoverPoint = new THREE.Vector2();
-    private hoverValidator?: Validator;
 
     private readonly fontLoader = new FontLoader();
     private blockNumberFont!: Font;
-    private readonly ringSizes = [82, 102, 120, 140, 165, 190, 201, 240];
-    private readonly validatorMap = new Map<string, Validator>();
     private readonly blocks = new Array<Block>();
     private readonly maxBlocks = 13;
+
+    private validatorMesh!: ValidatorMesh;
     private validatorsInited = false;
 
     private readonly lock = new AsyncLock();
@@ -183,32 +183,26 @@ class ChainVizScene {
 
     private checkHoverRaycast() {
         this.raycaster.setFromCamera(this.hoverPoint, this.camera);
-        const hoverIntersects = this.raycaster.intersectObjects(this.scene.children, false);
-        if (hoverIntersects.length > 0) {
-            const validator = this.validatorMap.get(hoverIntersects[0].object.uuid);
-            this.hoverValidator?.clearHover();
-            if (validator && !validator.isAuthoring()) {
-                validator.onHover();
-                this.hoverValidator = validator;
-                this.setPointerCursor();
-                const position = validator.getMeshOnScreenPosition(
-                    this.renderer,
-                    this.camera,
-                );
-                this.hoverInfoBoard.style.display = "block";
-                this.hoverInfoBoard.classList.remove("block");
-                this.hoverInfoBoard.classList.add("validator-hover-info-board");
-                this.hoverInfoBoard.style.left = (position.x + Constants.HOVER_INFO_BOARD_X_OFFSET) + "px";
-                this.hoverInfoBoard.style.top = (position.y + Constants.HOVER_INFO_BOARD_Y_OFFSET) + "px";
-                this.hoverInfoBoard.innerHTML = validator.getHoverInfoHTML();
-            } else {
-                this.hoverValidator = undefined;
-                this.setDefaultCursor();
-                this.hoverInfoBoard.style.display = "none";
-            }
+        const intersects = this.raycaster.intersectObjects(this.scene.children, false);
+        let instanceId = (intersects.length > 0)
+            ? intersects[0].instanceId
+            : undefined;
+        const validator = this.validatorMesh.hover(instanceId);
+        if (validator && !validator.isAuthoring()) {
+            this.setPointerCursor();
+            const position = this.validatorMesh.getOnScreenPositionOfItem(
+                instanceId!,
+                this.renderer,
+                this.camera
+            );
+            this.hoverInfoBoard.style.display = "block";
+            this.hoverInfoBoard.classList.remove("block");
+            this.hoverInfoBoard.classList.add("validator-hover-info-board");
+            this.hoverInfoBoard.style.left = (position.x + Constants.HOVER_INFO_BOARD_X_OFFSET) + "px";
+            this.hoverInfoBoard.style.top = (position.y + Constants.HOVER_INFO_BOARD_Y_OFFSET) + "px";
+            this.hoverInfoBoard.innerHTML = validator.getHoverInfoHTML();
         } else {
-            this.hoverValidator?.clearHover();
-            this.hoverValidator = undefined;
+            this.validatorMesh.clearHover();
             this.setDefaultCursor();
             this.hoverInfoBoard.style.display = "none";
         }
@@ -273,26 +267,8 @@ class ChainVizScene {
                 return 0;
             }
         });
-        let index = 0;
-        for (let ring = 0; ring < 10; ring++) {
-            for (let i = 0; i < this.ringSizes[ring]; i++) {
-                if (index >= summaries.length) {
-                    break;
-                }
-                let validator = new Validator(
-                    summaries[index],
-                    [ring, i],
-                    this.ringSizes[ring],
-                );
-                this.validatorMap.set(validator.getUUID(), validator);
-                validator.addTo(this.scene);
-                index++;
-            }
-            if (index >= summaries.length) {
-                break;
-            }
-            await new Promise(resolve => { setTimeout(resolve, 150); });
-        }
+        this.validatorMesh = new ValidatorMesh(summaries);
+        this.validatorMesh.addTo(this.scene);
         setTimeout(() => {
             this.validatorsInited = true;
         }, 0);
@@ -327,39 +303,37 @@ class ChainVizScene {
             (done) => {
                 let block = new Block(substrateBlock, this.blockNumberFont);
                 this.blocks.unshift(block);
-                const validator = Array.from(this.validatorMap.values()).find((validator) => {
-                    return validator.getAccountIdHex().toLowerCase() === authorAccountIdHex;
-                });
-                if (validator) {
-                    validator.beginAuthorship(() => {
-                        for (let i = 1; i < this.blocks.length; i++) {
-                            const block = this.blocks[i];
-                            block.setIndex(block.getIndex() + 1, true);
-                        }
-                        setTimeout(() => {
-                            // shift blocks
-                            block.spawn(
-                                this.scene,
-                                validator.index,
-                                validator.ringSize,
-                                () => {
-                                    for (let i = this.blocks.length; i >= this.maxBlocks; i--) {
-                                        let blockToRemove = this.blocks.pop();
-                                        blockToRemove?.removeAndDispose()
-                                    }
-                                    done();
+                const authorshipBegan = this.validatorMesh.beginAuthorship(authorAccountIdHex, (validator) => {
+                    for (let i = 1; i < this.blocks.length; i++) {
+                        const block = this.blocks[i];
+                        block.setIndex(block.getIndex() + 1, true);
+                    }
+                    setTimeout(() => {
+                        // shift blocks
+                        block.spawn(
+                            this.scene,
+                            validator.index,
+                            validator.ringSize,
+                            () => {
+                                for (let i = this.blocks.length; i >= this.maxBlocks; i--) {
+                                    let blockToRemove = this.blocks.pop();
+                                    blockToRemove?.removeAndDispose();
                                 }
-                            );
-                            setTimeout(() => {
-                                validator.endAuthorship();
-                            }, Constants.VALIDATOR_AUTHORSHIP_END_DELAY);
-                        }, Constants.BLOCK_SPAWN_DELAY);
-                    });
-                } else {
+                                done();
+                            }
+                        );
+                        setTimeout(() => {
+                            console.log('end');
+                            this.validatorMesh.endAuthorship();
+                        }, Constants.VALIDATOR_AUTHORSHIP_END_DELAY);
+                    }, Constants.BLOCK_SPAWN_DELAY);
+                })
+                if (!authorshipBegan) {
                     // shift blocks
                     for (const block of this.blocks) {
                         block.setIndex(block.getIndex() + 1, true);
                     }
+                    // insert block
                     setTimeout(() => {
                         block.addTo(this.scene);
                         done();

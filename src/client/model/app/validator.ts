@@ -9,15 +9,11 @@ import { network } from '../../chainviz';
 import { generateIdenticonSVGHTML } from '../../util/identicon_util';
 
 class Validator {
-    private readonly mesh: THREE.Mesh<THREE.CylinderGeometry, THREE.MeshPhongMaterial>;
+    private readonly object = new THREE.Object3D();
     private readonly summary: ValidatorSummary;
     readonly index: [number, number];
     readonly ringSize: number;
     private readonly color: THREE.Color;
-
-    private readonly radius = 0.6;
-    private readonly segments = 16;
-    private readonly height = 2.8;
 
     private static readonly keyring = new Keyring();
 
@@ -34,65 +30,41 @@ class Validator {
             : Constants.VALIDATOR_COLOR;
         this.index = index;
         this.ringSize = ringSize;
-        this.mesh = this.createMesh();
+        this.updateMatrix();
     }
 
-    private createMesh(): THREE.Mesh<THREE.CylinderGeometry, THREE.MeshPhongMaterial> {
-        // cylinder
-        const cylinderGeometry = new THREE.CylinderGeometry(
-            this.radius,
-            this.radius,
-            this.height,
-            this.segments
-        );
-        const material = new THREE.MeshPhongMaterial({
-            color: this.color,
-            shininess: 6,
-            specular: Constants.VALIDATOR_SPECULAR_COLOR,
-        });
-        const cylinder = new THREE.Mesh(
-            cylinderGeometry,
-            material,
-        );
-        cylinder.receiveShadow = true;
-        return cylinder;
-    }
-
-    addTo(scene: THREE.Scene) {
+    private updateMatrix() {
         const [ring, i] = this.index;
-        this.mesh.position.x = -22 - (ring * 5);
-        this.mesh.rotation.z = Math.PI / 2;
+        this.object.position.x = -22 - (ring * 5);
+        this.object.rotation.z = Math.PI / 2;
         rotateAboutPoint(
-            this.mesh,
+            this.object,
             new THREE.Vector3(0, 0, 0),
             new THREE.Vector3(0, 0, 1),
             -(Math.PI / 10.5) - i * ((11 * Math.PI / 6) / this.ringSize),
             false,
         );
-        scene.add(this.mesh);
+        this.object.updateMatrix();
+    }
+
+    getMatrix(): THREE.Matrix4 {
+        return this.object.matrix;
+    }
+
+    getColor(): THREE.Color {
+        return this.color;
     }
 
     getAccountIdHex(): string {
         return this.summary.accountId;
     }
 
-    getUUID(): string {
-        return this.mesh.uuid;
-    }
-
     onHover() {
-        this.mesh.material.color.setHex(0xFFFF00);
+        // this.mesh.material.color.setHex(0xFFFF00);
     }
 
     clearHover() {
-        this.mesh.material.color.set(this.color);
-    }
-
-    getMeshOnScreenPosition(
-        renderer: THREE.WebGLRenderer,
-        camera: THREE.Camera,
-    ): THREE.Vec2 {
-        return getOnScreenPosition(this.mesh, renderer, camera);
+        // this.mesh.material.color.set(this.color);
     }
 
     getSS58Address(): string {
@@ -246,10 +218,14 @@ class Validator {
         return sections.join("\n<hr>\n");
     }
 
-    beginAuthorship(onComplete: () => void) {
+    beginAuthorship(
+        onColorUpdate: (color: THREE.Color) => void,
+        onMatrixUpdate: (matrix: THREE.Matrix4) => void,
+        onComplete: () => void,
+    ) {
         this._isAuthoring = true;
         const scaleTween = createTween(
-            this.mesh.scale,
+            this.object.scale,
             {
                 x: Constants.VALIDATOR_AUTHORSHIP_SCALE,
                 y: Constants.VALIDATOR_AUTHORSHIP_SCALE,
@@ -257,21 +233,27 @@ class Validator {
             },
             Constants.VALIDATOR_AUTHORSHIP_SCALE_CURVE,
             Constants.VALIDATOR_AUTHORSHIP_MOVE_TIME_MS,
+            undefined,
+            () => {
+                this.object.updateMatrix();
+                onMatrixUpdate(this.getMatrix());
+            }
         );
         const translateTween = createTween(
-            this.mesh.position,
+            this.object.position,
             { z: Constants.VALIDATOR_AUTHORSHIP_TRANSLATE_Z },
             Constants.VALIDATOR_AUTHORSHIP_TRANSLATE_CURVE,
             Constants.VALIDATOR_AUTHORSHIP_MOVE_TIME_MS,
+            () => { scaleTween.start(); },
             () => {
-                scaleTween.start();
+                this.object.updateMatrix();
+                onMatrixUpdate(this.getMatrix());
             },
-            () => {
-                onComplete();
-            },
+            () => { onComplete(); },
         );
+        const color = this.color.clone();
         createTween(
-            this.mesh.material.color,
+            color,
             {
                 r: 0.0,
                 g: 1.0,
@@ -281,46 +263,56 @@ class Validator {
             Constants.VALIDATOR_AUTHORSHIP_MOVE_TIME_MS,
             undefined,
             () => {
-                translateTween.start();
+                onColorUpdate(color);
+            },
+            () => {
+                setTimeout(() => {
+                    translateTween.start();
+                }, 100);
             }
         ).start();
     }
 
-    endAuthorship(onComplete?: () => void) {
+    endAuthorship(
+        onColorUpdate: (color: THREE.Color) => void,
+        onMatrixUpdate: (matrix: THREE.Matrix4) => void,
+        onComplete: () => void,
+    ) {
+        const color = new THREE.Color().setHex(0x00FF00);
         const colorTween = createTween(
-            this.mesh.material.color,
+            color,
             this.color,
             Constants.VALIDATOR_AUTHORSHIP_SCALE_CURVE,
             Constants.VALIDATOR_AUTHORSHIP_MOVE_TIME_MS,
             undefined,
+            () => { onColorUpdate(color); },
             () => {
                 this._isAuthoring = false;
-                if (onComplete) {
-                    onComplete();
-                }
+                if (onComplete) onComplete();
             }
         );
         const scaleTween = createTween(
-            this.mesh.scale,
-            {
-                x: 1,
-                y: 1,
-                z: 1,
-            },
+            this.object.scale,
+            { x: 1, y: 1, z: 1 },
             Constants.VALIDATOR_AUTHORSHIP_SCALE_CURVE,
             Constants.VALIDATOR_AUTHORSHIP_MOVE_TIME_MS,
+            undefined,
+            () => {
+                this.object.updateMatrix();
+                onMatrixUpdate(this.getMatrix());
+            }
         );
         createTween(
-            this.mesh.position,
+            this.object.position,
             { z: 0 },
             Constants.VALIDATOR_AUTHORSHIP_TRANSLATE_CURVE,
             Constants.VALIDATOR_AUTHORSHIP_MOVE_TIME_MS,
+            () => { scaleTween.start(); },
             () => {
-                scaleTween.start();
+                this.object.updateMatrix();
+                onMatrixUpdate(this.getMatrix());
             },
-            () => {
-                colorTween.start();
-            }
+            () => { colorTween.start(); }
         ).start();
     }
 

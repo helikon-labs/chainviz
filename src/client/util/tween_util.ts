@@ -8,6 +8,7 @@ export function createTween<T, U>(
     curve: EasingFunction,
     durationMs: number,
     onStart?: () => void,
+    onUpdate?: () => void,
     onComplete?: () => void,
 ) {
     return new TWEEN.Tween(property).to(
@@ -16,6 +17,10 @@ export function createTween<T, U>(
     ).easing(curve).onStart(() => {
         if (onStart) {
             onStart();
+        }
+    }).onUpdate((object, elapsed) => {
+        if (onUpdate) {
+            onUpdate();
         }
     }).onComplete(() => {
         if (onComplete) {

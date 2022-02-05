@@ -102,6 +102,7 @@ class Block {
             Constants.BLOCK_SPAWN_SCALE_CURVE,
             Constants.BLOCK_SPAWN_SCALE_TIME_MS,
             undefined,
+            undefined,
             () => {
                 setTimeout(() => {
                     this.resetToOrigin(onComplete);
@@ -123,6 +124,7 @@ class Block {
             Constants.BLOCK_TO_ORIGIN_CURVE,
             Constants.BLOCK_TO_ORIGIN_TIME_MS,
             () => { rotationTween.start(); },
+            undefined,
             () => { onComplete(); },
         ).start();
     }
