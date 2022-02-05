@@ -50,7 +50,7 @@ class ChainVizScene {
             0.1,
             1000
         );
-        this.camera.position.z = 340;
+        this.camera.position.z = Constants.ORBIT_DEFAULT_DISTANCE;
         // axes helper :: x is red, y is green, z is blue
         const axesHelper = new THREE.AxesHelper(5);
         // this.scene.add(axesHelper);
@@ -100,6 +100,12 @@ class ChainVizScene {
             this.camera,
             this.renderer.domElement
         );
+        this.controls.minPolarAngle = Constants.ORBIT_MIN_POLAR_ANGLE;
+        this.controls.maxPolarAngle = Constants.ORBIT_MAX_POLAR_ANGLE;
+        this.controls.minAzimuthAngle = Constants.ORBIT_MIN_AZIMUTH_ANGLE;
+        this.controls.maxAzimuthAngle = Constants.ORBIT_MAX_AZIMUTH_ANGLE;
+        this.controls.minDistance = Constants.ORBIT_MIN_DISTANCE;
+        this.controls.maxDistance = Constants.ORBIT_MAX_DISTANCE;
         this.controls.screenSpacePanning = true;
         window.addEventListener('resize', () => {
             this.onWindowResize();

@@ -2,6 +2,14 @@ import * as TWEEN from '@tweenjs/tween.js';
 import * as THREE from 'three';
 
 export abstract class Constants {
+    // orbit control
+    static readonly ORBIT_MIN_POLAR_ANGLE = Math.PI / 12;
+    static readonly ORBIT_MAX_POLAR_ANGLE = Math.PI * 11 / 12;
+    static readonly ORBIT_MIN_AZIMUTH_ANGLE = -5 * Math.PI / 12;
+    static readonly ORBIT_MAX_AZIMUTH_ANGLE = 5 * Math.PI / 12;
+    static readonly ORBIT_DEFAULT_DISTANCE = 340;
+    static readonly ORBIT_MIN_DISTANCE = 50;
+    static readonly ORBIT_MAX_DISTANCE = 600;
     // block animations
     static readonly BLOCK_SHIFT_CURVE = TWEEN.Easing.Cubic.Out;
     static readonly BLOCK_SHIFT_TIME_MS = 500;

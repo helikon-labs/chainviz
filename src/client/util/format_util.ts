@@ -1,5 +1,13 @@
 import { Constants } from "./constants";
 
+function insertAtIndex(
+    actual: string,
+    index: number,
+    insert: string,
+): string {
+    return actual.substring(0, index) + insert + actual.substring(index);
+}
+
 function formatNumber(
     value: bigint,
     decimals: number,
@@ -14,9 +22,13 @@ function formatNumber(
         0,
         formatted.length - decimals + formatDecimals
     );
-    formatted = formatted.substring(0, formatted.length - formatDecimals) 
-        + Constants.DECIMAL_SEPARATOR
-        + formatted.substring(formatted.length - formatDecimals);
+    let integerPart = formatted.substring(0, formatted.length - formatDecimals);
+    for (let i = integerPart.length - 3; i > 0; i -= 3) {
+        integerPart = insertAtIndex(integerPart, i, Constants.THOUSANDS_SEPARATOR);
+    }
+
+    let decimalPart = formatted.substring(formatted.length - formatDecimals);
+    formatted = `${integerPart}${Constants.DECIMAL_SEPARATOR}${decimalPart}`;
     if (ticker) {
         return `${formatted} ${ticker}`
     } else {
