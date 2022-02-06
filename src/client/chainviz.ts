@@ -9,6 +9,7 @@ import { ApiPromise, WsProvider } from '@polkadot/api';
 import { Header, SignedBlock } from '@polkadot/types/interfaces';
 import { kusama } from './model/app/network';
 import { NetworkStatusUpdate } from './model/subvt/network_status';
+import { getSS58Address } from './util/ss58';
 
 THREE.Cache.enabled = true;
 const network = kusama;
@@ -83,6 +84,10 @@ class ChainViz {
     private initialValidatorListUpdate?: ValidatorListUpdate = undefined;
 
     private processValidatorListUpdate(update: ValidatorListUpdate) {
+        // calculate addresses
+        for (const summary of update.insert) {
+            summary.address = getSS58Address(summary.accountId);
+        }
         if (!this.sceneStarted && this.initialValidatorListUpdate == undefined) {
             this.initialValidatorListUpdate = update;
             if (this.initialBlocks.length == this.initialBlockCount) {

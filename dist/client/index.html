@@ -4,8 +4,10 @@
         <title>ChainViz by Helikon</title>
         <link rel="icon" type="image/x-icon" href="./img/icon/favicon.ico">
         <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Audiowide">
-        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Cutive">
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=IBM Plex Mono">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
         <link rel="stylesheet" href="./css/chainviz.css">
+        <script src="https://kit.fontawesome.com/ebf2cd1147.js" crossorigin="anonymous"></script>
     </head>
     <body>
         <script src="bundle.js"></script>
@@ -64,7 +66,10 @@
                 <hr>
             </div>
             <div id="validator-list-container" class="no-select">
-                <div class="validator-list-title">VALIDATORS</div>
+                <div id="validator-list-title-container">
+                    <div id="validator-list-title">VALIDATORS</div>
+                    <i id="validator-list-toggle" class="fas fa-chevron-down rotate"></i>
+                </div>
                 <div id="validator-list"></div>
             </div>
             <div id="icon-container">

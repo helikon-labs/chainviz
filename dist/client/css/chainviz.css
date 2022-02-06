@@ -18,6 +18,18 @@ hr {
     -webkit-user-select: none;
 }
 
+.rotate {
+    -moz-transition: all .2s linear;
+    -webkit-transition: all .2s linear;
+    transition: all .2s linear;
+}
+
+.rotate.up {
+    -moz-transform:rotate(-180deg);
+    -webkit-transform:rotate(-180deg);
+    transform:rotate(-180deg);
+}
+
 #spinner {
     width: 60px;
     height: 60px;
@@ -71,7 +83,7 @@ hr {
     color: #DDDDDD;
     transform: translate(-50%, -50%);
     margin-top: 57px;
-    font-family: Courier, monospace;
+    font-family: "IBM Plex Mono", Courier, monospace;
     font-size: 14px;
     text-align: center;
 }
@@ -96,7 +108,7 @@ hr {
     border-color: #FFFFFFCC;
     border-width: 1px;
     border-style: solid;
-    font-family: Courier, monospace;
+    font-family: "IBM Plex Mono", Courier, monospace;
     font-size: 14px;
     line-height: 20px;
     white-space: nowrap;
@@ -108,7 +120,7 @@ hr {
     width: 260px;
 }
 
-.validator-hover-info-board .id-confirmed-icon {
+.validator-hover-info-board .id-confirmation-icon {
     width: 14px;
     margin-right: 8px;
 }
@@ -172,10 +184,10 @@ hr {
 #left-panel #network-status {
     opacity: 0;
     width: 100%;
-    color: #FFFFFFDD;
+    color: #FFFFFFCC;
     z-index: 99999;
-    font-family: Courier, monospace;
-    font-size: 13px;
+    font-family: "IBM Plex Mono", Courier, monospace;
+    font-size: 12px;
     line-height: 20px;
     margin-top: 4px;
 }
@@ -209,22 +221,40 @@ hr {
 }
 
 #left-panel #validator-list-container {
+    visibility: hidden;
+    display: flex;
     flex-grow: 1;
     display: flex;
     flex-flow: column;
     min-height: 0;
-    font-family: Courier, monospace;
+    font-family: "IBM Plex Mono", Courier, monospace;
     font-size: 12px;
     color: #FFFFFFDD;
 }
 
-#left-panel #validator-list-container .validator-list-title {
-    margin-top: 8px;
+#left-panel #validator-list-container #validator-list-title-container {
+    display: flex;
+    flex-flow: row nowrap;
+    padding: 6px 4px 6px 4px;
+    cursor: pointer;
+    align-items: center;
+    border-style: solid;
+    border-width: 0px 0px 1px 0px;
+    border-color: #777;
+}
+
+#left-panel #validator-list-container #validator-list-title-container:hover {
+    background-color: #FFFFFF33;
+}
+
+#validator-list-title-container #validator-list-title {
     font-size: 14px;
+    flex-grow: 1;
 }
 
 #left-panel #validator-list-container #validator-list {
-    margin-top: 8px;
+    visibility: hidden;
+    margin-top: 4px;
     flex-grow: 1;
     overflow: scroll;
 }
@@ -248,11 +278,6 @@ hr {
 
 #validator-list .validator-list-display {
     min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
-}
-
-#validator-list .validator .id-confirmed-icon {
-    width: 18px;
-    margin-right: 6px;
 }
 
 #left-panel #icon-container {

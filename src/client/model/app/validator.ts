@@ -1,12 +1,14 @@
 import * as THREE from 'three';
 import { getOnScreenPosition, rotateAboutPoint } from '../../util/geometry';
-import { getValidatorSummaryDisplayHTML, ValidatorSummary } from "../subvt/validator_summary";
+//import { getValidatorSummaryIdentityHTML } from "../../util/ui";
 import { createTween } from '../../util/tween';
 import { Constants } from '../../util/constants';
 import { formatNumber, getCondensedAddress } from '../../util/format';
 import { network } from '../../chainviz';
 import { generateIdenticonSVGHTML } from '../../util/identicon';
 import { getSS58Address } from '../../util/ss58';
+import { ValidatorSummary } from '../subvt/validator_summary';
+import { getValidatorIdentityIconHTML, getValidatorSummaryDisplay } from '../../util/ui';
 
 class Validator {
     private readonly object = new THREE.Object3D();
@@ -74,7 +76,11 @@ class Validator {
                 )
             );
             // display
-            components.push(getValidatorSummaryDisplayHTML(this.summary));
+            components.push(
+                getValidatorIdentityIconHTML(this.summary)
+                    + getValidatorSummaryDisplay(this.summary)
+            );
+            // components.push(getValidatorSummaryIdentityHTML(this.summary));
             // para validator
             if (this.summary.isParaValidator) {
                 const parachain = network.parachainMap.get(this.summary.paraId ?? 0);

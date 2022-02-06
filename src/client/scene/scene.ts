@@ -5,13 +5,13 @@ import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
 import { Font, FontLoader } from 'three/examples/jsm/loaders/FontLoader';
 import Stats from 'three/examples/jsm/libs/stats.module';
 import { Block } from '../model/app/block';
-import { Validator } from '../model/app/validator';
-import { getValidatorSummaryDisplayHTML, ValidatorSummary } from '../model/subvt/validator_summary';
+import { ValidatorSummary } from '../model/subvt/validator_summary';
 import AsyncLock = require('async-lock');
 import { Constants } from '../util/constants';
 import { NetworkStatus, NetworkStatusDiff } from '../model/subvt/network_status';
 import { NetworkStatusBoard } from '../ui/network_status_board';
 import { ValidatorMesh } from '../ui/validator_mesh';
+import { ValidatorList } from '../ui/validator_list';
 
 class ChainVizScene {
     private readonly scene: THREE.Scene;
@@ -31,7 +31,7 @@ class ChainVizScene {
 
     private validatorMesh!: ValidatorMesh;
     private validatorsInited = false;
-    private validatorSummaries = new Array<ValidatorSummary>();
+    private validatorList: ValidatorList;
 
     private readonly lock = new AsyncLock();
     private readonly blockPushLockKey = "block_push";
@@ -83,6 +83,8 @@ class ChainVizScene {
         window.addEventListener("resize", () => {
             this.onWindowResize();
         }, false);
+        // validator list
+        this.validatorList = new ValidatorList();
     }
 
     private addLights() {
@@ -270,14 +272,7 @@ class ChainVizScene {
         });
         this.validatorMesh = new ValidatorMesh(summaries.length);
         await this.validatorMesh.addTo(this.scene, summaries);
-        this.validatorSummaries.push(...summaries);
-        setTimeout(() => {
-            let html = "";
-            for (const summary of this.validatorSummaries) {
-                html +=  `<div class="validator">${getValidatorSummaryDisplayHTML(summary)}</div>`;
-            }
-            document.getElementById("validator-list")!.innerHTML = html;
-        }, 250);
+        this.validatorList.init(summaries);
         this.validatorsInited = true;
     }
 
