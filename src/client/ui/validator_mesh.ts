@@ -126,11 +126,9 @@ class ValidatorMesh {
         this.authorValidatorIndex = index;
         const validator = this.validators[index];
         validator.beginAuthorship(
-            (color) => { this.setColorAt(index, color); },
-            (matrix) => { this.setMatrixAt(index, matrix); },
-            () => {
-                if (onComplete) onComplete(this.validators[index]);
-            }
+            this.mesh,
+            index,
+            () => { if (onComplete) onComplete(this.validators[index]); }
         )
         return true;
     }
@@ -143,8 +141,8 @@ class ValidatorMesh {
         const index = this.authorValidatorIndex;
         this.authorValidatorIndex = -1;
         this.validators[index].endAuthorship(
-            (color) => { this.setColorAt(index, color); },
-            (matrix) => { this.setMatrixAt(index, matrix); },
+            this.mesh,
+            index,
             () => { if (onComplete) onComplete(); }
         )
     }

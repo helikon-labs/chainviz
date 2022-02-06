@@ -195,8 +195,8 @@ class Validator {
     }
 
     beginAuthorship(
-        onColorUpdate: (color: THREE.Color) => void,
-        onMatrixUpdate: (matrix: THREE.Matrix4) => void,
+        validatorMesh: THREE.InstancedMesh,
+        index: number,
         onComplete: () => void,
     ) {
         this._isAuthoring = true;
@@ -212,7 +212,10 @@ class Validator {
             undefined,
             () => {
                 this.object.updateMatrix();
-                onMatrixUpdate(this.getMatrix());
+                validatorMesh.setMatrixAt(index, this.getMatrix());
+                if (validatorMesh.instanceMatrix) {
+                    validatorMesh.instanceMatrix.needsUpdate = true;
+                }
             }
         );
         const translateTween = createTween(
@@ -223,7 +226,10 @@ class Validator {
             () => { scaleTween.start(); },
             () => {
                 this.object.updateMatrix();
-                onMatrixUpdate(this.getMatrix());
+                validatorMesh.setMatrixAt(index, this.getMatrix());
+                if (validatorMesh.instanceMatrix) {
+                    validatorMesh.instanceMatrix.needsUpdate = true;
+                }
             },
             () => { onComplete(); },
         );
@@ -239,7 +245,10 @@ class Validator {
             Constants.VALIDATOR_AUTHORSHIP_MOVE_TIME_MS,
             undefined,
             () => {
-                onColorUpdate(color);
+                validatorMesh.setColorAt(index, color);
+                if (validatorMesh.instanceColor) {
+                    validatorMesh.instanceColor.needsUpdate = true;
+                }
             },
             () => {
                 setTimeout(() => {
@@ -250,8 +259,8 @@ class Validator {
     }
 
     endAuthorship(
-        onColorUpdate: (color: THREE.Color) => void,
-        onMatrixUpdate: (matrix: THREE.Matrix4) => void,
+        validatorMesh: THREE.InstancedMesh,
+        index: number,
         onComplete: () => void,
     ) {
         const color = new THREE.Color().setHex(0x00FF00);
@@ -261,7 +270,12 @@ class Validator {
             Constants.VALIDATOR_AUTHORSHIP_SCALE_CURVE,
             Constants.VALIDATOR_AUTHORSHIP_MOVE_TIME_MS,
             undefined,
-            () => { onColorUpdate(color); },
+            () => { 
+                validatorMesh.setColorAt(index, color);
+                if (validatorMesh.instanceColor) {
+                    validatorMesh.instanceColor.needsUpdate = true;
+                }
+             },
             () => {
                 this._isAuthoring = false;
                 if (onComplete) onComplete();
@@ -275,7 +289,10 @@ class Validator {
             undefined,
             () => {
                 this.object.updateMatrix();
-                onMatrixUpdate(this.getMatrix());
+                validatorMesh.setMatrixAt(index, this.getMatrix());
+                if (validatorMesh.instanceMatrix) {
+                    validatorMesh.instanceMatrix.needsUpdate = true;
+                }
             }
         );
         createTween(
@@ -286,7 +303,10 @@ class Validator {
             () => { scaleTween.start(); },
             () => {
                 this.object.updateMatrix();
-                onMatrixUpdate(this.getMatrix());
+                validatorMesh.setMatrixAt(index, this.getMatrix());
+                if (validatorMesh.instanceMatrix) {
+                    validatorMesh.instanceMatrix.needsUpdate = true;
+                }
             },
             () => { colorTween.start(); }
         ).start();

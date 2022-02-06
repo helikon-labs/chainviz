@@ -19,7 +19,7 @@ export abstract class Constants {
     static readonly BLOCK_SPAWN_SCALE_CURVE = TWEEN.Easing.Back.InOut;
     static readonly BLOCK_SPAWN_SCALE_TIME_MS = 250;
     static readonly BLOCK_TO_ORIGIN_CURVE = TWEEN.Easing.Cubic.Out;
-    static readonly BLOCK_TO_ORIGIN_TIME_MS = 1000;
+    static readonly BLOCK_TO_ORIGIN_TIME_MS = 750;
     // identicon
     static readonly IDENTICON_SIZE = 30;
     // validator geometry
@@ -37,8 +37,8 @@ export abstract class Constants {
     static readonly VALIDATOR_AUTHORSHIP_TRANSLATE_Z = 10;
     static readonly VALIDATOR_AUTHORSHIP_SCALE_CURVE = TWEEN.Easing.Linear.None;
     static readonly VALIDATOR_AUTHORSHIP_TRANSLATE_CURVE = TWEEN.Easing.Exponential.Out;
-    static readonly VALIDATOR_AUTHORSHIP_MOVE_TIME_MS = 500;
-    static readonly VALIDATOR_AUTHORSHIP_END_DELAY = 500;
+    static readonly VALIDATOR_AUTHORSHIP_MOVE_TIME_MS = 350;
+    static readonly VALIDATOR_AUTHORSHIP_END_DELAY = 800;
     // hover info board
     static readonly HOVER_INFO_BOARD_X_OFFSET = 16;
     static readonly HOVER_INFO_BOARD_Y_OFFSET = -30;

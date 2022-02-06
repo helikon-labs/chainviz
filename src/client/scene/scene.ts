@@ -325,7 +325,6 @@ class ChainVizScene {
                             }
                         );
                         setTimeout(() => {
-                            console.log('end');
                             this.validatorMesh.endAuthorship();
                         }, Constants.VALIDATOR_AUTHORSHIP_END_DELAY);
                     }, Constants.BLOCK_SPAWN_DELAY);
