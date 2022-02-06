@@ -1,6 +1,6 @@
 import { network } from "../chainviz";
 import { NetworkStatus, NetworkStatusDiff } from "../model/subvt/network_status";
-import { formatNumber } from "../util/format_util";
+import { formatNumber } from "../util/format";
 
 interface UI {
     root: HTMLElement,
@@ -37,7 +37,7 @@ class NetworkStatusBoard {
         };
         this.status = status;
         this.updateUI();
-        this.ui.root.style.display = "block";
+        this.ui.root.style.opacity = "1";
         this.updateProgressBar();
     }
 

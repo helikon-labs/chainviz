@@ -2,7 +2,8 @@ import * as THREE from 'three';
 import { Validator } from '../model/app/validator';
 import { ValidatorSummary } from '../model/subvt/validator_summary';
 import { Constants } from "../util/constants";
-import { getOnScreenPosition } from '../util/geom_util';
+import { getOnScreenPosition } from '../util/geometry';
+import { cloneJSONSafeObject } from '../util/object';
 
 class ValidatorMesh {
     private mesh: THREE.InstancedMesh;
@@ -23,25 +24,25 @@ class ValidatorMesh {
     private hoverValidatorIndex = -1;
     private authorValidatorIndex = -1;
 
-    constructor(summaries: [ValidatorSummary]) {
+    constructor(validatorCount: number) {
         this.mesh = new THREE.InstancedMesh(
             this.geometry,
             this.material,
-            summaries.length
+            validatorCount,
         );
         this.mesh.instanceMatrix.setUsage(THREE.DynamicDrawUsage);
-        this.initValidators(summaries);
     }
 
-    private async initValidators(summaries: [ValidatorSummary]) {
+    async addTo(scene: THREE.Scene, summaries: [ValidatorSummary]) {
+        scene.add(this.mesh);
         let index = 0;
-        for (let ring = 0; ring < 10; ring++) {
+        for (let ring = 0; ring < this.ringSizes.length; ring++) {
             for (let i = 0; i < this.ringSizes[ring]; i++) {
                 if (index >= summaries.length) {
                     break;
                 }
                 let validator = new Validator(
-                    summaries[index],
+                    cloneJSONSafeObject(summaries[index]),
                     [ring, i],
                     this.ringSizes[ring],
                 );
@@ -69,10 +70,6 @@ class ValidatorMesh {
         if (this.mesh.instanceMatrix) {
             this.mesh.instanceMatrix.needsUpdate = true;
         }
-    }
-
-    addTo(scene: THREE.Scene) {
-        scene.add(this.mesh);
     }
 
     hover(index?: number): Validator | undefined {

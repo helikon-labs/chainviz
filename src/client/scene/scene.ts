@@ -6,7 +6,7 @@ import { Font, FontLoader } from 'three/examples/jsm/loaders/FontLoader';
 import Stats from 'three/examples/jsm/libs/stats.module';
 import { Block } from '../model/app/block';
 import { Validator } from '../model/app/validator';
-import { ValidatorSummary } from '../model/subvt/validator_summary';
+import { getValidatorSummaryDisplayHTML, ValidatorSummary } from '../model/subvt/validator_summary';
 import AsyncLock = require('async-lock');
 import { Constants } from '../util/constants';
 import { NetworkStatus, NetworkStatusDiff } from '../model/subvt/network_status';
@@ -31,6 +31,7 @@ class ChainVizScene {
 
     private validatorMesh!: ValidatorMesh;
     private validatorsInited = false;
+    private validatorSummaries = new Array<ValidatorSummary>();
 
     private readonly lock = new AsyncLock();
     private readonly blockPushLockKey = "block_push";
@@ -267,11 +268,17 @@ class ChainVizScene {
                 return 0;
             }
         });
-        this.validatorMesh = new ValidatorMesh(summaries);
-        this.validatorMesh.addTo(this.scene);
+        this.validatorMesh = new ValidatorMesh(summaries.length);
+        await this.validatorMesh.addTo(this.scene, summaries);
+        this.validatorSummaries.push(...summaries);
         setTimeout(() => {
-            this.validatorsInited = true;
-        }, 0);
+            let html = "";
+            for (const summary of this.validatorSummaries) {
+                html +=  `<div class="validator">${getValidatorSummaryDisplayHTML(summary)}</div>`;
+            }
+            document.getElementById("validator-list")!.innerHTML = html;
+        }, 250);
+        this.validatorsInited = true;
     }
 
     async initBlocks(signedBlocks: Array<SignedBlock>) {
@@ -359,8 +366,6 @@ class ChainVizScene {
     updateNetworkStatus(diff: NetworkStatusDiff) {
         this.networkStatusBoard.update(diff);
     }
-
-
 }
 
 export { ChainVizScene };

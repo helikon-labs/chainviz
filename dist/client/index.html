@@ -9,73 +9,76 @@
     </head>
     <body>
         <script src="bundle.js"></script>
-        <!-- top logos -->
-        <div id="chainviz-logo">
-            <span class="chainviz-logo">CHAINVIZ</span>&nbsp;&nbsp;<span class="chainviz-version">v0.1.0-ALPHA</span>
-        </div>
         <a href="https://kusama.network">
             <img src="./img/logo/kusama_logo.svg" alt="Kusama" id="kusama-logo">
         </a>
-        <!-- bottom icons -->
-        <a href="https://github.com/helikon-labs">
-            <img id="helikon-icon" src="./img/icon/helikon_icon.svg" alt="Developed by Helikon Labs">
-        </a>
-        <a href="https://subvt-test.helikon.io">
-            <img id="subvt-icon" src="./img/icon/subvt_icon.svg" alt="Powered by SubVT">
-        </a>
-        <a href="https://github.com/helikon-labs/chainviz">
-            <img id="github-icon" src="./img/icon/github_icon.svg" alt="ChainViz GitHub Repo">
-        </a>
-        <!-- spinner -->
         <div id="spinner" id="spinner">
             <div id="double-bounce1"></div>
             <div id="double-bounce2"></div>
         </div>
-        <!-- status -->
         <div id="loading-status"></div>
-        <!-- network status -->
-        <div id="network-status" class="no-select">
-            <div id="block-progress-bar"><div id="block-progress"></div></div>
-            <div class="row">
-                <div class="title">Best Block</div>
-                <div class="value" id="network-best-block">&nbsp;</div>
+        <div id="left-panel">
+            <div id="chainviz-logo">
+                <span class="chainviz-logo">CHAINVIZ</span>&nbsp;&nbsp;<span class="chainviz-version">v0.1.0-ALPHA</span>
             </div>
-            <div class="row">
-                <div class="title">Finalized Block</div>
-                <div class="value" id="network-finalized-block">&nbsp;</div>
+            <div id="network-status" class="no-select">
+                <div id="block-progress-bar"><div id="block-progress"></div></div>
+                <div class="row">
+                    <div class="title">Best Block</div>
+                    <div class="value" id="network-best-block">&nbsp;</div>
+                </div>
+                <div class="row">
+                    <div class="title">Finalized Block</div>
+                    <div class="value" id="network-finalized-block">&nbsp;</div>
+                </div>
+                <hr>
+                <div class="row">
+                    <div class="title">Era</div>
+                    <div class="value" id="network-era-index">&nbsp;</div>
+                </div>
+                <div class="row">
+                    <div class="title">Reward Points</div>
+                    <div class="value" id="network-era-reward-points">&nbsp;</div>
+                </div>
+                <div class="row">
+                    <div class="title">Return</div>
+                    <div class="value" id="network-return">&nbsp;</div>
+                </div>
+                <div class="row">
+                    <div class="title">Total Stake</div>
+                    <div class="value" id="network-total-stake">&nbsp;</div>
+                </div>
+                <hr>
+                <div class="row">
+                    <div class="title">Min. Stake</div>
+                    <div class="value" id="network-min-stake">&nbsp;</div>
+                </div>
+                <div class="row">
+                    <div class="title">Avg. Stake</div>
+                    <div class="value" id="network-average-stake">&nbsp;</div>
+                </div>
+                <div class="row">
+                    <div class="title">Max. Stake</div>
+                    <div class="value" id="network-max-stake">&nbsp;</div>
+                </div>
+                <hr>
             </div>
-            <hr>
-            <div class="row">
-                <div class="title">Era</div>
-                <div class="value" id="network-era-index">&nbsp;</div>
+            <div id="validator-list-container" class="no-select">
+                <div class="validator-list-title">VALIDATORS</div>
+                <div id="validator-list"></div>
             </div>
-            <div class="row">
-                <div class="title">Reward Points</div>
-                <div class="value" id="network-era-reward-points">&nbsp;</div>
-            </div>
-            <div class="row">
-                <div class="title">Return</div>
-                <div class="value" id="network-return">&nbsp;</div>
-            </div>
-            <div class="row">
-                <div class="title">Total Stake</div>
-                <div class="value" id="network-total-stake">&nbsp;</div>
-            </div>
-            <hr>
-            <div class="row">
-                <div class="title">Min. Stake</div>
-                <div class="value" id="network-min-stake">&nbsp;</div>
-            </div>
-            <div class="row">
-                <div class="title">Avg. Stake</div>
-                <div class="value" id="network-average-stake">&nbsp;</div>
-            </div>
-            <div class="row">
-                <div class="title">Max. Stake</div>
-                <div class="value" id="network-max-stake">&nbsp;</div>
+            <div id="icon-container">
+                <a href="https://github.com/helikon-labs">
+                    <img id="helikon-icon" src="/img/icon/helikon_icon.svg" alt="Developed by Helikon Labs">
+                </a>
+                <a href="https://subvt-test.helikon.io">
+                    <img id="subvt-icon" src="/img/icon/subvt_icon.svg" alt="Powered by SubVT">
+                </a>
+                <a href="https://github.com/helikon-labs/chainviz">
+                    <img id="github-icon" src="/img/icon/github_icon.svg" alt="ChainViz GitHub Repo">
+                </a>
             </div>
         </div>
-        <!-- hover info board -->
         <div id="hover-info-board" class="hover-info-board no-select"></div>
     </body>
 </html>

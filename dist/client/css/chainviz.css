@@ -3,6 +3,7 @@ body {
     margin: 0px;
     background-color: #000000;
 }
+
 hr {
     color: #777;
     background-color: #777;
@@ -10,11 +11,13 @@ hr {
     border: none;
     max-width: 100%;
 }
+
 .no-select {
     user-select: none;
     -moz-user-select: none;
     -webkit-user-select: none;
-  }
+}
+
 #spinner {
     width: 60px;
     height: 60px;
@@ -24,6 +27,7 @@ hr {
     left: 50%;
     transform: translate(-50%, -50%);
 }
+
 #double-bounce1, #double-bounce2 {
     width: 100%;
     height: 100%;
@@ -37,14 +41,17 @@ hr {
     -webkit-animation: sk-bounce 2.0s infinite ease-in-out;
     animation: sk-bounce 2.0s infinite ease-in-out;
 }
+
 #double-bounce2 {
     -webkit-animation-delay: -1.0s;
     animation-delay: -1.0s;
 }
+
 @-webkit-keyframes sk-bounce {
     0%, 100% { -webkit-transform: scale(0.0) }
     50% { -webkit-transform: scale(1.0) }
 }
+
 @keyframes sk-bounce {
     0%, 100% { 
         transform: scale(0.0);
@@ -54,6 +61,7 @@ hr {
         -webkit-transform: scale(1.0);
     }
 }
+
 #loading-status {
     display: inline;
     position: absolute;
@@ -63,50 +71,17 @@ hr {
     color: #DDDDDD;
     transform: translate(-50%, -50%);
     margin-top: 57px;
-    font-family: "Courier", monospace;
+    font-family: Courier, monospace;
     font-size: 14px;
     text-align: center;
 }
 
-#chainviz-logo {
-    position: absolute;
-    top: 8px;
-    left: 10px;
-    color: #FFFFFF;
-    font-family: "Audiowide", sans-serif;
-}
-#chainviz-logo .chainviz-logo {
-    font-size: 20px;
-    font-weight: 800;
-}
-#chainviz-logo .chainviz-version {
-    font-size: 14px;
-    font-weight: 800;
-}
 #kusama-logo {
     position:absolute;
     top: -24px;
     right: 2px;
     filter: invert(1);
     width: 120px;
-}
-#helikon-icon {
-    position:absolute;
-    bottom: 0px;
-    left: 4px;
-    width: 36px;
-}
-#subvt-icon {
-    position:absolute;
-    bottom: -14px;
-    left: 0px;
-    width: 110px;
-}
-#github-icon {
-    position:absolute;
-    bottom: 10px;
-    left: 74px;
-    width: 26px;
 }
 
 .hover-info-board {
@@ -121,7 +96,7 @@ hr {
     border-color: #FFFFFFCC;
     border-width: 1px;
     border-style: solid;
-    font-family: "Courier", monospace;
+    font-family: Courier, monospace;
     font-size: 14px;
     line-height: 20px;
     white-space: nowrap;
@@ -131,6 +106,11 @@ hr {
 
 .validator-hover-info-board {
     width: 260px;
+}
+
+.validator-hover-info-board .id-confirmed-icon {
+    width: 14px;
+    margin-right: 8px;
 }
 
 .hover-info-board .identicon {
@@ -163,19 +143,41 @@ hr {
     width: 26px;
 }
 
-#network-status {
+#left-panel {
     position: absolute;
-    display: none;
-    top: 40px;
-    left: 0px;
-    width: 230px;
-    height: 130px;
+    width: 240px;
+    height: 100%;
+    background-color: #00000077;
+    padding: 10px 10px 0px 10px;
+    display: flex;
+    flex-flow: column nowrap;
+    min-width: 0;
+}
+
+#left-panel #chainviz-logo {
+    color: #FFFFFF;
+    font-family: "Audiowide", sans-serif;
+}
+
+#left-panel #chainviz-logo .chainviz-logo {
+    font-size: 20px;
+    font-weight: 800;
+}
+
+#left-panel #chainviz-logo .chainviz-version {
+    font-size: 14px;
+    font-weight: 800;
+}
+
+#left-panel #network-status {
+    opacity: 0;
+    width: 100%;
     color: #FFFFFFDD;
-    padding: 0px 0px 0px 10px;
     z-index: 99999;
-    font-family: "Courier", monospace;
+    font-family: Courier, monospace;
     font-size: 13px;
     line-height: 20px;
+    margin-top: 4px;
 }
 
 #network-status #block-progress-bar {
@@ -204,4 +206,72 @@ hr {
 #network-status .value {
     width: 100%;
     text-align: right;
+}
+
+#left-panel #validator-list-container {
+    flex-grow: 1;
+    display: flex;
+    flex-flow: column;
+    min-height: 0;
+    font-family: Courier, monospace;
+    font-size: 12px;
+    color: #FFFFFFDD;
+}
+
+#left-panel #validator-list-container .validator-list-title {
+    margin-top: 8px;
+    font-size: 14px;
+}
+
+#left-panel #validator-list-container #validator-list {
+    margin-top: 8px;
+    flex-grow: 1;
+    overflow: scroll;
+}
+
+#validator-list .validator {
+    display: flex;
+    font-size: 13px;
+    padding: 4px 8px;
+    background-color: #FFFFFF1D;
+    margin-top: 3px;
+    cursor: pointer;
+    height: 30px;
+    align-items: center;
+    flex-flow: row nowrap;
+    border-radius: 6px;
+}
+
+#validator-list .validator:hover {
+    background-color: #FFFFFF33;
+}
+
+#validator-list .validator-list-display {
+    min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+
+#validator-list .validator .id-confirmed-icon {
+    width: 18px;
+    margin-right: 6px;
+}
+
+#left-panel #icon-container {
+    margin-top: 10px;
+    margin-bottom: 20px;
+    display: flex;
+    flex-direction: row;
+}
+
+#left-panel #icon-container img {
+    width: 26px;
+    height: 26px;
+}
+
+#left-panel #icon-container #subvt-icon {
+    filter: invert(1);
+    margin-left: 8px;
+}
+
+#left-panel #icon-container #github-icon {
+    margin-left: 8px;
 }

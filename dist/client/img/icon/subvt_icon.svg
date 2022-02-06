@@ -1,11 +1,11 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1079.24 713.28">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="413.36 228.99 255.29 255.29">
     <defs>
         <style>
-            .cls-1{fill:#FFFFFF;}
-            .cls-2{fill:#000000;}
+            .cls-1{fill:#000000;}
+            .cls-2{fill:#ffffff;}
         </style>
     </defs>
-    <g id="xnmr_1" data-name="xnmr_1">
+    <g id="ahxps_1" data-name="ahxps_1">
         <rect class="cls-1" x="413.36" y="228.99" width="255.29" height="255.29" rx="60.21"/>
         <path class="cls-2" d="M626.78,299.31H598.33V270.86H483.68v28.45H455.23V414h28.45v28.45H598.33V414h28.45Zm-28.67.22v40.25H557.86V299.53Zm-74,40.25H483.89V299.53h40.25Zm-40.25,74V373.5h40.25v40.25Zm74-40.25h40.25v40.25H557.86Z"/>
     </g>

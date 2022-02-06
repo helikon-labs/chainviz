@@ -1,12 +1,12 @@
 import * as THREE from 'three';
-import { getOnScreenPosition, rotateAboutPoint } from '../../util/geom_util';
-import { ValidatorSummary } from "../subvt/validator_summary";
-import { createTween } from '../../util/tween_util';
+import { getOnScreenPosition, rotateAboutPoint } from '../../util/geometry';
+import { getValidatorSummaryDisplayHTML, ValidatorSummary } from "../subvt/validator_summary";
+import { createTween } from '../../util/tween';
 import { Constants } from '../../util/constants';
-import { formatNumber, getCondensedAddress } from '../../util/format_util';
-import { Keyring } from '@polkadot/keyring';
+import { formatNumber, getCondensedAddress } from '../../util/format';
 import { network } from '../../chainviz';
-import { generateIdenticonSVGHTML } from '../../util/identicon_util';
+import { generateIdenticonSVGHTML } from '../../util/identicon';
+import { getSS58Address } from '../../util/ss58';
 
 class Validator {
     private readonly object = new THREE.Object3D();
@@ -14,8 +14,6 @@ class Validator {
     readonly index: [number, number];
     readonly ringSize: number;
     private readonly color: THREE.Color;
-
-    private static readonly keyring = new Keyring();
 
     private _isAuthoring = false;
 
@@ -25,6 +23,9 @@ class Validator {
         ringSize: number,
     ) {
         this.summary = summary;
+        if (summary.isParaValidator) {
+            console.log('PARA');
+        }
         this.color = summary.isParaValidator
             ? Constants.PARA_VALIDATOR_COLOR
             : Constants.VALIDATOR_COLOR;
@@ -59,27 +60,12 @@ class Validator {
         return this.summary.accountId;
     }
 
-    onHover() {
-        // this.mesh.material.color.setHex(0xFFFF00);
-    }
-
-    clearHover() {
-        // this.mesh.material.color.set(this.color);
-    }
-
-    getSS58Address(): string {
-        return Validator.keyring.encodeAddress(
-            this.summary.accountId,
-            network.ss58Prefix
-        );
-    }
-
     getHoverInfoHTML(): string {
         const sections = []
         // general
         {
             const components = [];
-            const address = this.getSS58Address();
+            const address = getSS58Address(this.summary.accountId);
             // identicon
             components.push(
                 generateIdenticonSVGHTML(
@@ -87,24 +73,8 @@ class Validator {
                     Constants.IDENTICON_SIZE
                 )
             );
-            // identity
-            let identity = "";
-            if (this.summary.confirmed) {
-                identity += "✅ ";
-            }
-            if (this.summary.display) {
-                identity += this.summary.display;
-            } else if (this.summary.parentDisplay) {
-                identity += this.summary.parentDisplay;
-                if (this.summary.childDisplay) {
-                    identity += ' / ' + this.summary.childDisplay;
-                }
-            }
-            if (identity.length > 0) {
-                components.push(identity);
-            } else {
-                components.push(getCondensedAddress(address));
-            }
+            // display
+            components.push(getValidatorSummaryDisplayHTML(this.summary));
             // para validator
             if (this.summary.isParaValidator) {
                 const parachain = network.parachainMap.get(this.summary.paraId ?? 0);

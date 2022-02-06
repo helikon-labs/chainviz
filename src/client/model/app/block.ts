@@ -4,8 +4,8 @@ import * as TWEEN from '@tweenjs/tween.js';
 import { Font } from 'three/examples/jsm/loaders/FontLoader';
 import { TextGeometry } from 'three/examples/jsm/geometries/TextGeometry';
 import { Constants } from '../../util/constants';
-import { createTween } from '../../util/tween_util';
-import { rotateAboutPoint } from '../../util/geom_util';
+import { createTween } from '../../util/tween';
+import { rotateAboutPoint } from '../../util/geometry';
 
 class Block {
     private readonly mesh: THREE.Group;
