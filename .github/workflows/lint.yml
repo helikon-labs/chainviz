@@ -1,31 +1,31 @@
 name: TS Lint
 
 on:
-  push:
-    branches:
-      - development
-      - main
-  pull_request:
-    types:
-      - opened
-      - reopened
-      - synchronize
+    push:
+        branches:
+            - development
+            - main
+    pull_request:
+        types:
+            - opened
+            - reopened
+            - synchronize
 
 concurrency:
-  group: ${{ github.ref }}
-  cancel-in-progress: true
+    group: ${{ github.ref }}
+    cancel-in-progress: true
 
 jobs:
-  ts-lint:
-    name: TS Lint
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v1
-      - name: Prepare
-        run: npm ci
-      - name: Lint
-        uses: wearerequired/lint-action@v1
-        with:
-          eslint: true
-          prettier: true
-          eslint_extensions: js,ts
+    ts-lint:
+        name: TS Lint
+        runs-on: ubuntu-latest
+        steps:
+            - uses: actions/checkout@v1
+            - name: Prepare
+              run: npm ci
+            - name: Lint
+              uses: wearerequired/lint-action@v1
+              with:
+                  eslint: true
+                  prettier: true
+                  eslint_extensions: js,ts

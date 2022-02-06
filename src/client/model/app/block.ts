@@ -1,11 +1,10 @@
-import { Block as SubstrateBlock, SignedBlock } from '@polkadot/types/interfaces';
-import * as THREE from 'three';
-import * as TWEEN from '@tweenjs/tween.js';
-import { Font } from 'three/examples/jsm/loaders/FontLoader';
-import { TextGeometry } from 'three/examples/jsm/geometries/TextGeometry';
-import { Constants } from '../../util/constants';
-import { createTween } from '../../util/tween';
-import { rotateAboutPoint } from '../../util/geometry';
+import { Block as SubstrateBlock } from "@polkadot/types/interfaces";
+import * as THREE from "three";
+import { Font } from "three/examples/jsm/loaders/FontLoader";
+import { TextGeometry } from "three/examples/jsm/geometries/TextGeometry";
+import { Constants } from "../../util/constants";
+import { createTween } from "../../util/tween";
+import { rotateAboutPoint } from "../../util/geometry";
 
 class Block {
     private readonly mesh: THREE.Group;
@@ -15,13 +14,13 @@ class Block {
     private readonly indexXOffset = 5;
     private readonly sideLength = 2.5;
     private readonly boxMaterial = new THREE.MeshPhongMaterial({
-        color: 0x00FF00,
+        color: 0x00ff00,
         shininess: 8,
         specular: 0xffffff,
         wireframe: true,
     });
     private readonly textMaterial = new THREE.MeshBasicMaterial({
-        color: 0x00FF00
+        color: 0x00ff00,
     });
     private boxGeometry!: THREE.BoxGeometry;
     private textGeometry!: TextGeometry;
@@ -43,9 +42,7 @@ class Block {
                 this.sideLength,
                 this.sideLength
             );
-            group.add(
-                new THREE.Mesh(this.boxGeometry, this.boxMaterial)
-            );
+            group.add(new THREE.Mesh(this.boxGeometry, this.boxMaterial));
         }
         // text
         {
@@ -77,20 +74,20 @@ class Block {
         scene: THREE.Scene,
         validatorIndex: [number, number],
         ringSize: number,
-        onComplete: () => void,
+        onComplete: () => void
     ) {
         this.scene = scene;
         this.index = 0;
         this.mesh.rotation.z = Math.PI / 2;
         this.mesh.position.z = Constants.VALIDATOR_AUTHORSHIP_TRANSLATE_Z;
         const [ringIndex, index] = validatorIndex;
-        this.mesh.position.x = -22 - (ringIndex * 5) + 6;
+        this.mesh.position.x = -22 - ringIndex * 5 + 6;
         rotateAboutPoint(
             this.mesh,
             new THREE.Vector3(0, 0, 0),
             new THREE.Vector3(0, 0, 1),
-            -(Math.PI / 10.5) - index * ((11 * Math.PI / 6) / ringSize),
-            false,
+            -(Math.PI / 10.5) - index * ((11 * Math.PI) / 6 / ringSize),
+            false
         );
         this.mesh.scale.x = 0;
         this.mesh.scale.y = 0;
@@ -112,20 +109,24 @@ class Block {
     }
 
     private resetToOrigin(onComplete: () => void) {
-        let rotationTween = createTween(
+        const rotationTween = createTween(
             this.mesh.rotation,
             { x: 0, y: 0, z: 0 },
             Constants.BLOCK_TO_ORIGIN_CURVE,
-            Constants.BLOCK_TO_ORIGIN_TIME_MS,
+            Constants.BLOCK_TO_ORIGIN_TIME_MS
         );
         createTween(
             this.mesh.position,
             { x: 0, y: 0, z: 0 },
             Constants.BLOCK_TO_ORIGIN_CURVE,
             Constants.BLOCK_TO_ORIGIN_TIME_MS,
-            () => { rotationTween.start(); },
+            () => {
+                rotationTween.start();
+            },
             undefined,
-            () => { onComplete(); },
+            () => {
+                onComplete();
+            }
         ).start();
     }
 
@@ -133,10 +134,7 @@ class Block {
         return this.index;
     }
 
-    setIndex(
-        newIndex: number,
-        animated: boolean = false
-    ) {
+    setIndex(newIndex: number, animated = false) {
         this.index = newIndex;
         if (!animated) {
             this.mesh.position.x = -newIndex * 5;
@@ -146,7 +144,7 @@ class Block {
             this.mesh.position,
             { x: -newIndex * this.indexXOffset },
             Constants.BLOCK_SHIFT_CURVE,
-            Constants.BLOCK_SHIFT_TIME_MS,
+            Constants.BLOCK_SHIFT_TIME_MS
         ).start();
     }
 

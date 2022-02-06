@@ -1,17 +1,17 @@
-import * as THREE from 'three';
-import * as TWEEN from '@tweenjs/tween.js';
-import { Block as SubstrateBlock, SignedBlock } from '@polkadot/types/interfaces';
-import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
-import { Font, FontLoader } from 'three/examples/jsm/loaders/FontLoader';
-import Stats from 'three/examples/jsm/libs/stats.module';
-import { Block } from '../model/app/block';
-import { ValidatorSummary } from '../model/subvt/validator_summary';
-import AsyncLock = require('async-lock');
-import { Constants } from '../util/constants';
-import { NetworkStatus, NetworkStatusDiff } from '../model/subvt/network_status';
-import { NetworkStatusBoard } from '../ui/network_status_board';
-import { ValidatorMesh } from '../ui/validator_mesh';
-import { ValidatorList } from '../ui/validator_list';
+import * as THREE from "three";
+import * as TWEEN from "@tweenjs/tween.js";
+import { Block as SubstrateBlock, SignedBlock } from "@polkadot/types/interfaces";
+import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
+import { Font, FontLoader } from "three/examples/jsm/loaders/FontLoader";
+import Stats from "three/examples/jsm/libs/stats.module";
+import { Block } from "../model/app/block";
+import { ValidatorSummary } from "../model/subvt/validator_summary";
+import AsyncLock = require("async-lock");
+import { Constants } from "../util/constants";
+import { NetworkStatus, NetworkStatusDiff } from "../model/subvt/network_status";
+import { NetworkStatusBoard } from "../ui/network_status_board";
+import { ValidatorMesh } from "../ui/validator_mesh";
+import { ValidatorList } from "../ui/validator_list";
 
 class ChainVizScene {
     private readonly scene: THREE.Scene;
@@ -36,12 +36,12 @@ class ChainVizScene {
     private readonly lock = new AsyncLock();
     private readonly blockPushLockKey = "block_push";
 
-    private readonly hoverInfoBoard = document.getElementById('hover-info-board')!;
+    private readonly hoverInfoBoard = <HTMLElement>document.getElementById("hover-info-board");
     private networkStatusBoard!: NetworkStatusBoard;
 
     constructor() {
         // init font loader
-        this.fontLoader.load( './font/fira_mono_regular.typeface.json', (font) => {
+        this.fontLoader.load("./font/fira_mono_regular.typeface.json", (font) => {
             this.blockNumberFont = font;
         });
         this.scene = new THREE.Scene();
@@ -53,16 +53,16 @@ class ChainVizScene {
         );
         this.camera.position.z = Constants.ORBIT_DEFAULT_DISTANCE;
         // axes helper :: x is red, y is green, z is blue
-        const axesHelper = new THREE.AxesHelper(5);
+        const _axesHelper = new THREE.AxesHelper(5);
         // this.scene.add(axesHelper);
         this.addLights();
         // raycaster
         this.raycaster = new THREE.Raycaster();
         this.clickPoint = undefined;
-        document.addEventListener('click', (event) => {
+        document.addEventListener("click", (event) => {
             this.onClick(event);
         });
-        document.addEventListener( 'mousemove', (event) => {
+        document.addEventListener("mousemove", (event) => {
             this.onPointerMove(event);
         });
         // renderer
@@ -75,14 +75,15 @@ class ChainVizScene {
         this.stats = Stats();
         document.body.appendChild(this.stats.dom);
         this.stats.domElement.style.cssText = "position:absolute; bottom:0px; right:0px;";
-        this.controls = new OrbitControls(
-            this.camera,
-            this.renderer.domElement
-        );
+        this.controls = new OrbitControls(this.camera, this.renderer.domElement);
         this.limitOrbitControls();
-        window.addEventListener("resize", () => {
-            this.onWindowResize();
-        }, false);
+        window.addEventListener(
+            "resize",
+            () => {
+                this.onWindowResize();
+            },
+            false
+        );
         // validator list
         this.validatorList = new ValidatorList();
     }
@@ -109,7 +110,7 @@ class ChainVizScene {
             this.scene.add(pointLight);
         }
         // ambient light
-        const ambientLight = new THREE.AmbientLight(0xFFFFFF, 0.6);
+        const ambientLight = new THREE.AmbientLight(0xffffff, 0.6);
         this.scene.add(ambientLight);
     }
 
@@ -121,16 +122,8 @@ class ChainVizScene {
         this.controls.minDistance = Constants.ORBIT_MIN_DISTANCE;
         this.controls.maxDistance = Constants.ORBIT_MAX_DISTANCE;
         this.controls.screenSpacePanning = true;
-        const minPan = new THREE.Vector3(
-            -Constants.ORBIT_MAX_PAN_X,
-            -Constants.ORBIT_MAX_PAN_Y,
-            0
-        );
-        const maxPan = new THREE.Vector3(
-            Constants.ORBIT_MAX_PAN_X,
-            Constants.ORBIT_MAX_PAN_Y,
-            0
-        );
+        const minPan = new THREE.Vector3(-Constants.ORBIT_MAX_PAN_X, -Constants.ORBIT_MAX_PAN_Y, 0);
+        const maxPan = new THREE.Vector3(Constants.ORBIT_MAX_PAN_X, Constants.ORBIT_MAX_PAN_Y, 0);
         const _v = new THREE.Vector3();
         this.controls.addEventListener("change", () => {
             _v.copy(this.controls.target);
@@ -170,8 +163,8 @@ class ChainVizScene {
 
     private checkClickRaycast() {
         if (this.clickPoint != undefined) {
-            this.raycaster.setFromCamera(this.clickPoint!, this.camera);
-            const intersects = this.raycaster.intersectObjects(this.scene.children, false);
+            this.raycaster.setFromCamera(this.clickPoint, this.camera);
+            const _intersects = this.raycaster.intersectObjects(this.scene.children, false);
             this.clickPoint = undefined;
         }
     }
@@ -187,22 +180,21 @@ class ChainVizScene {
     private checkHoverRaycast() {
         this.raycaster.setFromCamera(this.hoverPoint, this.camera);
         const intersects = this.raycaster.intersectObjects(this.scene.children, false);
-        let instanceId = (intersects.length > 0)
-            ? intersects[0].instanceId
-            : undefined;
-        const validator = this.validatorMesh.hover(instanceId);
-        if (validator && !validator.isAuthoring()) {
+        const instanceId = intersects.length > 0 ? intersects[0].instanceId : undefined;
+        const validator = instanceId ? this.validatorMesh.hover(instanceId) : undefined;
+        if (instanceId && validator && !validator.isAuthoring()) {
             this.setPointerCursor();
             const position = this.validatorMesh.getOnScreenPositionOfItem(
-                instanceId!,
+                instanceId,
                 this.renderer,
                 this.camera
             );
             this.hoverInfoBoard.style.display = "block";
             this.hoverInfoBoard.classList.remove("block");
             this.hoverInfoBoard.classList.add("validator-hover-info-board");
-            this.hoverInfoBoard.style.left = (position.x + Constants.HOVER_INFO_BOARD_X_OFFSET) + "px";
-            this.hoverInfoBoard.style.top = (position.y + Constants.HOVER_INFO_BOARD_Y_OFFSET) + "px";
+            this.hoverInfoBoard.style.left =
+                position.x + Constants.HOVER_INFO_BOARD_X_OFFSET + "px";
+            this.hoverInfoBoard.style.top = position.y + Constants.HOVER_INFO_BOARD_Y_OFFSET + "px";
             this.hoverInfoBoard.innerHTML = validator.getHoverInfoHTML();
         } else {
             this.validatorMesh.clearHover();
@@ -216,10 +208,7 @@ class ChainVizScene {
             this.checkClickRaycast();
             this.checkHoverRaycast();
         }
-        this.renderer.render(
-            this.scene,
-            this.camera
-        );
+        this.renderer.render(this.scene, this.camera);
     }
 
     start() {
@@ -230,37 +219,30 @@ class ChainVizScene {
 
     private addChainRing() {
         const geometry = new THREE.RingGeometry(
-            18, 19,
-            120, 1,
-            Math.PI + Math.PI / 12, Math.PI * 11 / 6
+            18,
+            19,
+            120,
+            1,
+            Math.PI + Math.PI / 12,
+            (Math.PI * 11) / 6
         );
         const material = new THREE.MeshBasicMaterial({
-            color: 0x6D7379,
-            side: THREE.DoubleSide
+            color: 0x6d7379,
+            side: THREE.DoubleSide,
         });
-        this.scene.add(
-            new THREE.Mesh(
-                geometry,
-                material
-            )
-        );
+        this.scene.add(new THREE.Mesh(geometry, material));
     }
 
     private addChainLine() {
         const points = [];
-        points.push( new THREE.Vector3(0, 0, 0));
-        points.push( new THREE.Vector3(-(this.maxBlocks - 1) * 5, 0, 0));
+        points.push(new THREE.Vector3(0, 0, 0));
+        points.push(new THREE.Vector3(-(this.maxBlocks - 1) * 5, 0, 0));
         const geometry = new THREE.BufferGeometry().setFromPoints(points);
-        const material = new THREE.LineBasicMaterial( { color: 0x005500 } );
-        this.scene.add(
-            new THREE.Line(
-                geometry,
-                material
-            )
-        );
+        const material = new THREE.LineBasicMaterial({ color: 0x005500 });
+        this.scene.add(new THREE.Line(geometry, material));
     }
 
-    async initValidators(summaries: [ValidatorSummary]) {
+    async initValidators(summaries: Array<ValidatorSummary>) {
         summaries.sort((a, b) => {
             if (a.isParaValidator && !b.isParaValidator) {
                 return 1;
@@ -278,24 +260,25 @@ class ChainVizScene {
 
     async initBlocks(signedBlocks: Array<SignedBlock>) {
         for (let i = signedBlocks.length - 1; i >= 0; i--) {
-            let block = new Block(signedBlocks[i].block, this.blockNumberFont);
+            const block = new Block(signedBlocks[i].block, this.blockNumberFont);
             this.blocks.unshift(block);
             block.addTo(this.scene);
             block.setIndex(i, true);
-            await new Promise(resolve => { setTimeout(resolve, 50); });
+            await new Promise((resolve) => {
+                setTimeout(resolve, 50);
+            });
         }
     }
 
     private hasBlock(substrateBlock: SubstrateBlock): boolean {
-        return this.blocks.filter((block) => {
-            block.substrateBlock.header.hash.toHex() == substrateBlock.header.hash.toHex()
-        }).length > 0
+        return (
+            this.blocks.filter((block) => {
+                block.substrateBlock.header.hash.toHex() == substrateBlock.header.hash.toHex();
+            }).length > 0
+        );
     }
 
-    async pushBlock(
-        substrateBlock: SubstrateBlock,
-        authorAccountIdHex?: string,
-    ) {
+    async pushBlock(substrateBlock: SubstrateBlock, authorAccountIdHex?: string) {
         if (this.hasBlock(substrateBlock)) {
             // skip duplicate block
             return;
@@ -303,32 +286,30 @@ class ChainVizScene {
         this.lock.acquire(
             this.blockPushLockKey,
             (done) => {
-                let block = new Block(substrateBlock, this.blockNumberFont);
+                const block = new Block(substrateBlock, this.blockNumberFont);
                 this.blocks.unshift(block);
-                const authorshipBegan = this.validatorMesh.beginAuthorship(authorAccountIdHex, (validator) => {
-                    for (let i = 1; i < this.blocks.length; i++) {
-                        const block = this.blocks[i];
-                        block.setIndex(block.getIndex() + 1, true);
-                    }
-                    setTimeout(() => {
-                        // shift blocks
-                        block.spawn(
-                            this.scene,
-                            validator.index,
-                            validator.ringSize,
-                            () => {
+                const authorshipBegan = this.validatorMesh.beginAuthorship(
+                    authorAccountIdHex,
+                    (validator) => {
+                        for (let i = 1; i < this.blocks.length; i++) {
+                            const block = this.blocks[i];
+                            block.setIndex(block.getIndex() + 1, true);
+                        }
+                        setTimeout(() => {
+                            // shift blocks
+                            block.spawn(this.scene, validator.index, validator.ringSize, () => {
                                 for (let i = this.blocks.length; i >= this.maxBlocks; i--) {
-                                    let blockToRemove = this.blocks.pop();
+                                    const blockToRemove = this.blocks.pop();
                                     blockToRemove?.removeAndDispose();
                                 }
                                 done();
-                            }
-                        );
-                        setTimeout(() => {
-                            this.validatorMesh.endAuthorship();
-                        }, Constants.VALIDATOR_AUTHORSHIP_END_DELAY);
-                    }, Constants.BLOCK_SPAWN_DELAY);
-                })
+                            });
+                            setTimeout(() => {
+                                this.validatorMesh.endAuthorship();
+                            }, Constants.VALIDATOR_AUTHORSHIP_END_DELAY);
+                        }, Constants.BLOCK_SPAWN_DELAY);
+                    }
+                );
                 if (!authorshipBegan) {
                     // shift blocks
                     for (const block of this.blocks) {
@@ -341,16 +322,18 @@ class ChainVizScene {
                     }, Constants.BLOCK_SHIFT_TIME_MS);
                 }
             },
-            (err, _) => {
+            (_err, _) => {
                 // lock released
             }
         );
     }
 
     onFinalizedBlock(hashHex: string) {
-        this.blocks.find((block) => {
-            return hashHex == block.substrateBlock.hash.toHex()
-        })?.finalize();
+        this.blocks
+            .find((block) => {
+                return hashHex == block.substrateBlock.hash.toHex();
+            })
+            ?.finalize();
     }
 
     initNetworkStatus(status: NetworkStatus) {

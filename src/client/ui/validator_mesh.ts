@@ -1,9 +1,9 @@
-import * as THREE from 'three';
-import { Validator } from '../model/app/validator';
-import { ValidatorSummary } from '../model/subvt/validator_summary';
+import * as THREE from "three";
+import { Validator } from "../model/app/validator";
+import { ValidatorSummary } from "../model/subvt/validator_summary";
 import { Constants } from "../util/constants";
-import { getOnScreenPosition } from '../util/geometry';
-import { cloneJSONSafeObject } from '../util/object';
+import { getOnScreenPosition } from "../util/geometry";
+import { cloneJSONSafeObject } from "../util/object";
 
 class ValidatorMesh {
     private mesh: THREE.InstancedMesh;
@@ -11,7 +11,7 @@ class ValidatorMesh {
         Constants.VALIDATOR_GEOM_RADIUS,
         Constants.VALIDATOR_GEOM_RADIUS,
         Constants.VALIDATOR_GEOM_HEIGHT,
-        Constants.VALIDATOR_GEOM_SEGMENTS,
+        Constants.VALIDATOR_GEOM_SEGMENTS
     );
     private readonly material = new THREE.MeshPhongMaterial({
         color: new THREE.Color(),
@@ -25,15 +25,11 @@ class ValidatorMesh {
     private authorValidatorIndex = -1;
 
     constructor(validatorCount: number) {
-        this.mesh = new THREE.InstancedMesh(
-            this.geometry,
-            this.material,
-            validatorCount,
-        );
+        this.mesh = new THREE.InstancedMesh(this.geometry, this.material, validatorCount);
         this.mesh.instanceMatrix.setUsage(THREE.DynamicDrawUsage);
     }
 
-    async addTo(scene: THREE.Scene, summaries: [ValidatorSummary]) {
+    async addTo(scene: THREE.Scene, summaries: Array<ValidatorSummary>) {
         scene.add(this.mesh);
         let index = 0;
         for (let ring = 0; ring < this.ringSizes.length; ring++) {
@@ -41,10 +37,10 @@ class ValidatorMesh {
                 if (index >= summaries.length) {
                     break;
                 }
-                let validator = new Validator(
+                const validator = new Validator(
                     cloneJSONSafeObject(summaries[index]),
                     [ring, i],
-                    this.ringSizes[ring],
+                    this.ringSizes[ring]
                 );
                 this.validators.push(validator);
                 this.mesh.setMatrixAt(index, validator.getMatrix());
@@ -56,7 +52,9 @@ class ValidatorMesh {
             if (index >= summaries.length) {
                 break;
             }
-            await new Promise(resolve => { setTimeout(resolve, 150); });
+            await new Promise((resolve) => {
+                setTimeout(resolve, 150);
+            });
         }
     }
 
@@ -72,18 +70,14 @@ class ValidatorMesh {
         }
     }
 
-    hover(index?: number): Validator | undefined {
-        if (index) {
-            if (this.hoverValidatorIndex == index) {
-                return this.validators[index];
-            }
-            this.clearHover();
-            this.hoverValidatorIndex = index;
-            this.setColorAt(index, new THREE.Color().setHex(0xFFFF00));
+    hover(index: number): Validator {
+        if (this.hoverValidatorIndex == index) {
             return this.validators[index];
-        } else {
-            return undefined;
         }
+        this.clearHover();
+        this.hoverValidatorIndex = index;
+        this.setColorAt(index, new THREE.Color().setHex(0xffff00));
+        return this.validators[index];
     }
 
     clearHover() {
@@ -99,7 +93,7 @@ class ValidatorMesh {
     getOnScreenPositionOfItem(
         index: number,
         renderer: THREE.WebGLRenderer,
-        camera: THREE.Camera,
+        camera: THREE.Camera
     ): THREE.Vec2 {
         const matrix = new THREE.Matrix4();
         this.mesh.getMatrixAt(index, matrix);
@@ -125,11 +119,9 @@ class ValidatorMesh {
         if (index < 0) return false;
         this.authorValidatorIndex = index;
         const validator = this.validators[index];
-        validator.beginAuthorship(
-            this.mesh,
-            index,
-            () => { if (onComplete) onComplete(this.validators[index]); }
-        )
+        validator.beginAuthorship(this.mesh, index, () => {
+            if (onComplete) onComplete(this.validators[index]);
+        });
         return true;
     }
 
@@ -140,11 +132,9 @@ class ValidatorMesh {
         }
         const index = this.authorValidatorIndex;
         this.authorValidatorIndex = -1;
-        this.validators[index].endAuthorship(
-            this.mesh,
-            index,
-            () => { if (onComplete) onComplete(); }
-        )
+        this.validators[index].endAuthorship(this.mesh, index, () => {
+            if (onComplete) onComplete();
+        });
     }
 }
 

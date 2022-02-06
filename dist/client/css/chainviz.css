@@ -19,15 +19,15 @@ hr {
 }
 
 .rotate {
-    -moz-transition: all .2s linear;
-    -webkit-transition: all .2s linear;
-    transition: all .2s linear;
+    -moz-transition: all 0.2s linear;
+    -webkit-transition: all 0.2s linear;
+    transition: all 0.2s linear;
 }
 
 .rotate.up {
-    -moz-transform:rotate(-180deg);
-    -webkit-transform:rotate(-180deg);
-    transform:rotate(-180deg);
+    -moz-transform: rotate(-180deg);
+    -webkit-transform: rotate(-180deg);
+    transform: rotate(-180deg);
 }
 
 #spinner {
@@ -40,37 +40,45 @@ hr {
     transform: translate(-50%, -50%);
 }
 
-#double-bounce1, #double-bounce2 {
+#double-bounce1,
+#double-bounce2 {
     width: 100%;
     height: 100%;
     border-radius: 50%;
-    background-color: #FFF;
+    background-color: #fff;
     opacity: 0.8;
     position: absolute;
     top: 0;
     left: 0;
 
-    -webkit-animation: sk-bounce 2.0s infinite ease-in-out;
-    animation: sk-bounce 2.0s infinite ease-in-out;
+    -webkit-animation: sk-bounce 2s infinite ease-in-out;
+    animation: sk-bounce 2s infinite ease-in-out;
 }
 
 #double-bounce2 {
-    -webkit-animation-delay: -1.0s;
-    animation-delay: -1.0s;
+    -webkit-animation-delay: -1s;
+    animation-delay: -1s;
 }
 
 @-webkit-keyframes sk-bounce {
-    0%, 100% { -webkit-transform: scale(0.0) }
-    50% { -webkit-transform: scale(1.0) }
+    0%,
+    100% {
+        -webkit-transform: scale(0);
+    }
+    50% {
+        -webkit-transform: scale(1);
+    }
 }
 
 @keyframes sk-bounce {
-    0%, 100% { 
-        transform: scale(0.0);
-        -webkit-transform: scale(0.0);
-    } 50% { 
-        transform: scale(1.0);
-        -webkit-transform: scale(1.0);
+    0%,
+    100% {
+        transform: scale(0);
+        -webkit-transform: scale(0);
+    }
+    50% {
+        transform: scale(1);
+        -webkit-transform: scale(1);
     }
 }
 
@@ -80,7 +88,7 @@ hr {
     line-height: 22px;
     top: 50%;
     left: 50%;
-    color: #DDDDDD;
+    color: #dddddd;
     transform: translate(-50%, -50%);
     margin-top: 57px;
     font-family: "IBM Plex Mono", Courier, monospace;
@@ -89,7 +97,7 @@ hr {
 }
 
 #kusama-logo {
-    position:absolute;
+    position: absolute;
     top: -24px;
     right: 2px;
     filter: invert(1);
@@ -100,12 +108,12 @@ hr {
     position: absolute;
     top: 0px;
     left: 0px;
-    background-color: #000000BB;
-    color: #FFFFFFDD;
+    background-color: #000000bb;
+    color: #ffffffdd;
     padding: 12px 8px 4px 8px;
     display: none;
     border-radius: 6px;
-    border-color: #FFFFFFCC;
+    border-color: #ffffffcc;
     border-width: 1px;
     border-style: solid;
     font-family: "IBM Plex Mono", Courier, monospace;
@@ -130,11 +138,11 @@ hr {
 }
 
 .hover-info-board .active-title {
-    color: #00FF00;
+    color: #00ff00;
 }
 
 .hover-info-board .inactive-title {
-    color: #FF0000;
+    color: #ff0000;
 }
 
 .hover-info-board div.amount-title {
@@ -167,7 +175,7 @@ hr {
 }
 
 #left-panel #chainviz-logo {
-    color: #FFFFFF;
+    color: #ffffff;
     font-family: "Audiowide", sans-serif;
 }
 
@@ -184,7 +192,7 @@ hr {
 #left-panel #network-status {
     opacity: 0;
     width: 100%;
-    color: #FFFFFFCC;
+    color: #ffffffcc;
     z-index: 99999;
     font-family: "IBM Plex Mono", Courier, monospace;
     font-size: 12px;
@@ -199,7 +207,7 @@ hr {
 }
 
 #network-status #block-progress-bar #block-progress {
-    background-color: #CCC;
+    background-color: #ccc;
     position: relative;
     top: 0px;
     left: 0px;
@@ -229,7 +237,7 @@ hr {
     min-height: 0;
     font-family: "IBM Plex Mono", Courier, monospace;
     font-size: 12px;
-    color: #FFFFFFDD;
+    color: #ffffffdd;
 }
 
 #left-panel #validator-list-container #validator-list-title-container {
@@ -244,7 +252,7 @@ hr {
 }
 
 #left-panel #validator-list-container #validator-list-title-container:hover {
-    background-color: #FFFFFF33;
+    background-color: #ffffff33;
 }
 
 #validator-list-title-container #validator-list-title {
@@ -263,7 +271,7 @@ hr {
     display: flex;
     font-size: 13px;
     padding: 4px 8px;
-    background-color: #FFFFFF1D;
+    background-color: #ffffff1d;
     margin-top: 3px;
     cursor: pointer;
     height: 30px;
@@ -273,11 +281,14 @@ hr {
 }
 
 #validator-list .validator:hover {
-    background-color: #FFFFFF33;
+    background-color: #ffffff33;
 }
 
 #validator-list .validator-list-display {
-    min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    min-width: 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 #left-panel #icon-container {

@@ -1,4 +1,4 @@
-import * as TWEEN from '@tweenjs/tween.js';
+import * as TWEEN from "@tweenjs/tween.js";
 
 declare type EasingFunction = (amount: number) => number;
 
@@ -9,22 +9,24 @@ export function createTween<T, U>(
     durationMs: number,
     onStart?: () => void,
     onUpdate?: () => void,
-    onComplete?: () => void,
+    onComplete?: () => void
 ) {
-    return new TWEEN.Tween(property).to(
-        targetProperties,
-        durationMs,
-    ).easing(curve).onStart(() => {
-        if (onStart) {
-            onStart();
-        }
-    }).onUpdate((object, elapsed) => {
-        if (onUpdate) {
-            onUpdate();
-        }
-    }).onComplete(() => {
-        if (onComplete) {
-            onComplete();
-        }
-    });
+    return new TWEEN.Tween(property)
+        .to(targetProperties, durationMs)
+        .easing(curve)
+        .onStart(() => {
+            if (onStart) {
+                onStart();
+            }
+        })
+        .onUpdate((_object, _elapsed) => {
+            if (onUpdate) {
+                onUpdate();
+            }
+        })
+        .onComplete(() => {
+            if (onComplete) {
+                onComplete();
+            }
+        });
 }

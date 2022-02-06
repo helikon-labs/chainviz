@@ -1,7 +1,7 @@
 interface Era {
-    index: number,
-    startTimestamp: number,
-    endTimestamp: number,
+    index: number;
+    startTimestamp: number;
+    endTimestamp: number;
 }
 
 export { Era };

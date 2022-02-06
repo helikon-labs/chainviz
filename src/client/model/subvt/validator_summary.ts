@@ -59,8 +59,4 @@ interface ValidatorListUpdate {
     removeIds: [string];
 }
 
-export {
-    ValidatorSummary,
-    ValidatorSummaryDiff,
-    ValidatorListUpdate,
-};
+export { ValidatorSummary, ValidatorSummaryDiff, ValidatorListUpdate };

@@ -1,29 +1,27 @@
-import * as THREE from 'three'
-import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls'
-import Stats from 'three/examples/jsm/libs/stats.module'
-import { GUI } from 'dat.gui'
-import * as CANNON from 'cannon-es'
-import CannonDebugRenderer from './util/cannon_debug_renderer'
-import CannonUtils from './util/cannon_util'
-import { OBJLoader } from 'three/examples/jsm/loaders/OBJLoader'
+import * as THREE from "three";
+import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
+import Stats from "three/examples/jsm/libs/stats.module";
+import { GUI } from "dat.gui";
+import * as CANNON from "cannon-es";
+import CannonDebugRenderer from "./util/cannon_debug_renderer";
 
-const scene = new THREE.Scene()
+const scene = new THREE.Scene();
 
 /*
 const axesHelper = new THREE.AxesHelper(5)
 scene.add(axesHelper)
 */
 
-const light1 = new THREE.SpotLight()
-light1.position.set(2.5, 5, 5)
-light1.angle = Math.PI / 4
-light1.penumbra = 0.5
-light1.castShadow = true
-light1.shadow.mapSize.width = 1024
-light1.shadow.mapSize.height = 1024
-light1.shadow.camera.near = 0.5
-light1.shadow.camera.far = 20
-scene.add(light1)
+const light1 = new THREE.SpotLight();
+light1.position.set(2.5, 5, 5);
+light1.angle = Math.PI / 4;
+light1.penumbra = 0.5;
+light1.castShadow = true;
+light1.shadow.mapSize.width = 1024;
+light1.shadow.mapSize.height = 1024;
+light1.shadow.camera.near = 0.5;
+light1.shadow.camera.far = 20;
+scene.add(light1);
 
 /*
 const light2 = new THREE.SpotLight()
@@ -38,29 +36,29 @@ light2.shadow.camera.far = 20
 scene.add(light2)
 */
 
-const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000)
-camera.position.y = 4
-camera.position.z = 4
+const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+camera.position.y = 4;
+camera.position.z = 4;
 
-const renderer = new THREE.WebGLRenderer()
-renderer.setSize(window.innerWidth, window.innerHeight)
-renderer.shadowMap.enabled = true
-renderer.shadowMap.type = THREE.PCFSoftShadowMap
-document.body.appendChild(renderer.domElement)
+const renderer = new THREE.WebGLRenderer();
+renderer.setSize(window.innerWidth, window.innerHeight);
+renderer.shadowMap.enabled = true;
+renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+document.body.appendChild(renderer.domElement);
 
-const controls = new OrbitControls(camera, renderer.domElement)
-controls.screenSpacePanning = true
-controls.target.y = 2
+const controls = new OrbitControls(camera, renderer.domElement);
+controls.screenSpacePanning = true;
+controls.target.y = 2;
 
-const world = new CANNON.World()
-world.gravity.set(0, -9.82, 0)
+const world = new CANNON.World();
+world.gravity.set(0, -9.82, 0);
 
 //world.broadphase = new CANNON.NaiveBroadphase() //
 //world.solver.iterations = 10
 //world.allowSleep = true
 
-const normalMaterial = new THREE.MeshNormalMaterial()
-const phongMaterial = new THREE.MeshPhongMaterial()
+const normalMaterial = new THREE.MeshNormalMaterial();
+const _phongMaterial = new THREE.MeshPhongMaterial();
 
 /*
 // CUBE
@@ -181,20 +179,19 @@ objLoader.load(
 )
 */
 
-const cubeGeometry = new THREE.BoxGeometry(1, 1, 1)
-const cubeMesh = new THREE.Mesh(cubeGeometry, normalMaterial)
-cubeMesh.position.x = 0
-cubeMesh.position.y = 0
-cubeMesh.castShadow = true
-scene.add(cubeMesh)
-const cubeShape = new CANNON.Box(new CANNON.Vec3(0.5, 0.5, 0.5))
-const cubeBody = new CANNON.Body({ mass: 1 })
-cubeBody.addShape(cubeShape)
-cubeBody.position.x = cubeMesh.position.x
-cubeBody.position.y = cubeMesh.position.y
-cubeBody.position.z = cubeMesh.position.z
-world.addBody(cubeBody)
-
+const cubeGeometry = new THREE.BoxGeometry(1, 1, 1);
+const cubeMesh = new THREE.Mesh(cubeGeometry, normalMaterial);
+cubeMesh.position.x = 0;
+cubeMesh.position.y = 0;
+cubeMesh.castShadow = true;
+scene.add(cubeMesh);
+const cubeShape = new CANNON.Box(new CANNON.Vec3(0.5, 0.5, 0.5));
+const cubeBody = new CANNON.Body({ mass: 1 });
+cubeBody.addShape(cubeShape);
+cubeBody.position.x = cubeMesh.position.x;
+cubeBody.position.y = cubeMesh.position.y;
+cubeBody.position.z = cubeMesh.position.z;
+world.addBody(cubeBody);
 
 /*
 const planeGeometry = new THREE.PlaneGeometry(25, 25)
@@ -209,37 +206,37 @@ planeBody.quaternion.setFromAxisAngle(new CANNON.Vec3(1, 0, 0), -Math.PI / 2)
 world.addBody(planeBody)
 */
 
-window.addEventListener('resize', onWindowResize, false)
+window.addEventListener("resize", onWindowResize, false);
 function onWindowResize() {
-    camera.aspect = window.innerWidth / window.innerHeight
-    camera.updateProjectionMatrix()
-    renderer.setSize(window.innerWidth, window.innerHeight)
-    render()
+    camera.aspect = window.innerWidth / window.innerHeight;
+    camera.updateProjectionMatrix();
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    render();
 }
 
-const stats = Stats()
-document.body.appendChild(stats.dom)
+const stats = Stats();
+document.body.appendChild(stats.dom);
 
-const gui = new GUI()
-const physicsFolder = gui.addFolder('Physics')
-physicsFolder.add(world.gravity, 'x', -10.0, 10.0, 0.1)
-physicsFolder.add(world.gravity, 'y', -10.0, 10.0, 0.1)
-physicsFolder.add(world.gravity, 'z', -10.0, 10.0, 0.1)
-physicsFolder.open()
+const gui = new GUI();
+const physicsFolder = gui.addFolder("Physics");
+physicsFolder.add(world.gravity, "x", -10.0, 10.0, 0.1);
+physicsFolder.add(world.gravity, "y", -10.0, 10.0, 0.1);
+physicsFolder.add(world.gravity, "z", -10.0, 10.0, 0.1);
+physicsFolder.open();
 
-const clock = new THREE.Clock()
+const clock = new THREE.Clock();
 
-const cannonDebugRenderer = new CannonDebugRenderer(scene, world)
+const cannonDebugRenderer = new CannonDebugRenderer(scene, world);
 
 function animate() {
-    requestAnimationFrame(animate)
+    requestAnimationFrame(animate);
 
-    controls.update()
+    controls.update();
 
-    let delta = clock.getDelta()
-    if (delta > 0.1) delta = 0.1
-    world.step(delta)
-    cannonDebugRenderer.update()
+    let delta = clock.getDelta();
+    if (delta > 0.1) delta = 0.1;
+    world.step(delta);
+    cannonDebugRenderer.update();
 
     /*
     // Copy coordinates from Cannon.js to Three.js
@@ -300,13 +297,13 @@ function animate() {
         )
     }
     */
-    render()
+    render();
 
-    stats.update()
+    stats.update();
 }
 
 function render() {
-    renderer.render(scene, camera)
+    renderer.render(scene, camera);
 }
 
-animate()
+animate();

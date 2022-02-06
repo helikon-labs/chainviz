@@ -1,17 +1,13 @@
-import ReconnectingWebSocket from 'reconnecting-websocket';
-import camelcaseKeysDeep = require('camelcase-keys-deep');
+import ReconnectingWebSocket from "reconnecting-websocket";
+import camelcaseKeysDeep = require("camelcase-keys-deep");
 
 class RPCRequest {
     id: number;
     jsonrpc: string;
     method: string;
-    params: any[];
+    params: unknown[];
 
-    constructor(
-        id: number,
-        method: string,
-        params: any[]
-    ) {
+    constructor(id: number, method: string, params: unknown[]) {
         this.id = id;
         this.jsonrpc = "2.0";
         this.method = method;
@@ -41,8 +37,8 @@ class RPCSubscriptionService<T> {
     private readonly unsubscribeMethod: string;
     private readonly listener: RPCSubscriptionServiceListener<T>;
     private connection?: ReconnectingWebSocket = undefined;
-    private rpcId: number = 0;
-    private subscriptionId: number = 0;
+    private rpcId = 0;
+    private subscriptionId = 0;
     private state: RPCSubscriptionServiceState;
 
     constructor(
@@ -65,15 +61,12 @@ class RPCSubscriptionService<T> {
 
     private onError(message: string) {
         this.state = RPCSubscriptionServiceState.Error;
-        this.listener.onError(
-            0,
-            message
-        );
+        this.listener.onError(0, message);
     }
 
     private onMessage(event: MessageEvent) {
         const json = JSON.parse(event.data);
-        if (json.hasOwnProperty("result")) {
+        if (Object.prototype.hasOwnProperty.call(json, "result")) {
             if (isNaN(json["result"])) {
                 this.state = RPCSubscriptionServiceState.Connected;
                 this.listener.onUnsubscribed(this.subscriptionId);
@@ -83,16 +76,11 @@ class RPCSubscriptionService<T> {
                 this.subscriptionId = json["result"];
                 this.listener.onSubscribed(this.subscriptionId);
             }
-        } else if (json.hasOwnProperty("params")) {
-            const update: T = camelcaseKeysDeep(
-                json["params"]["result"]
-            ) as T;
+        } else if (Object.prototype.hasOwnProperty.call(json, "params")) {
+            const update: T = camelcaseKeysDeep(json["params"]["result"]) as T;
             this.listener.onUpdate(update);
-        } else if (json.hasOwnProperty("error")) {
-            this.listener.onError(
-                json["error"]["code"],
-                json["error"]["message"]
-            )
+        } else if (Object.prototype.hasOwnProperty.call(json, "error")) {
+            this.listener.onError(json["error"]["code"], json["error"]["message"]);
         }
     }
 
@@ -103,7 +91,7 @@ class RPCSubscriptionService<T> {
     connect() {
         this.connection = new ReconnectingWebSocket(
             this.url,
-            [],
+            []
             /*{ WebSocket: WebSocket }*/
         );
         this.connection.onopen = () => {
@@ -111,13 +99,13 @@ class RPCSubscriptionService<T> {
         };
         this.connection.onerror = (error) => {
             this.onError(error.message);
-        }
+        };
         this.connection.onmessage = (message) => {
             this.onMessage(message);
-        } 
+        };
         this.connection.onclose = () => {
             this.onClose();
-        }
+        };
     }
 
     disconnect() {
@@ -125,32 +113,19 @@ class RPCSubscriptionService<T> {
     }
 
     subscribe() {
-        this.rpcId = Math.round(Math.random() * 1_000_000_000)
-        const request = new RPCRequest(
-            this.rpcId,
-            this.subscribeMethod,
-            []
-        );
-        this.connection!.send(JSON.stringify(request));
+        this.rpcId = Math.round(Math.random() * 1_000_000_000);
+        const request = new RPCRequest(this.rpcId, this.subscribeMethod, []);
+        this.connection?.send(JSON.stringify(request));
     }
 
     unsubscribe() {
-        const request = new RPCRequest(
-            this.rpcId,
-            this.unsubscribeMethod,
-            [this.subscriptionId]
-        );
-        this.connection!.send(JSON.stringify(request));
+        const request = new RPCRequest(this.rpcId, this.unsubscribeMethod, [this.subscriptionId]);
+        this.connection?.send(JSON.stringify(request));
     }
 
     getState(): RPCSubscriptionServiceState {
         return this.state;
     }
-
 }
 
-export { 
-    RPCSubscriptionService,
-    RPCSubscriptionServiceListener,
-    RPCSubscriptionServiceState,
-};
+export { RPCSubscriptionService, RPCSubscriptionServiceListener, RPCSubscriptionServiceState };

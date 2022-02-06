@@ -1,3 +1,3 @@
 # Helikon ChainViz
 
-Chain visualization for Polkadot and Kusama.
+Realtime 3D chain visualization WebGL application for Polkadot and Kusama.

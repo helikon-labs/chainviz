@@ -1,15 +1,15 @@
-import * as THREE from 'three';
+import * as THREE from "three";
 
 function rotateAboutPoint(
     obj: THREE.Object3D,
     point: THREE.Vector3,
     axis: THREE.Vector3,
     theta: number,
-    pointIsWorld: boolean,
-){
-    pointIsWorld = (pointIsWorld === undefined)? false : pointIsWorld;
+    pointIsWorld: boolean
+) {
+    pointIsWorld = pointIsWorld === undefined ? false : pointIsWorld;
 
-    if(pointIsWorld){
+    if (pointIsWorld) {
         // compensate for world coordinate
         obj.parent?.localToWorld(obj.position);
     }
@@ -19,9 +19,9 @@ function rotateAboutPoint(
     obj.position.applyAxisAngle(axis, theta);
     // re-add the offset
     obj.position.add(point);
-    if(pointIsWorld){
+    if (pointIsWorld) {
         // undo world coordinates compensation
-        obj.parent?.worldToLocal(obj.position); 
+        obj.parent?.worldToLocal(obj.position);
     }
     // rotate the OBJECT
     obj.rotateOnAxis(axis, theta);
@@ -30,15 +30,15 @@ function rotateAboutPoint(
 function getOnScreenPosition(
     position: THREE.Vector3,
     renderer: THREE.WebGLRenderer,
-    camera: THREE.Camera,
+    camera: THREE.Camera
 ): THREE.Vec2 {
     position.project(camera);
     const canvas = renderer.domElement;
-    let widthHalf = canvas.clientWidth / 2;
-    let heightHalf = canvas.clientHeight / 2;
+    const widthHalf = canvas.clientWidth / 2;
+    const heightHalf = canvas.clientHeight / 2;
     return new THREE.Vector2(
-        (position.x * widthHalf) + widthHalf,
-        - (position.y * heightHalf) + heightHalf,
+        position.x * widthHalf + widthHalf,
+        -(position.y * heightHalf) + heightHalf
     );
 }
 

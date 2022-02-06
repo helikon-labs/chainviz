@@ -1,15 +1,15 @@
-import * as THREE from 'three';
+import * as THREE from "three";
 import {
     RPCSubscriptionService,
     RPCSubscriptionServiceListener,
-} from './service/rpc/RPCSubscriptionService';
-import { ChainVizScene } from './scene/scene';
-import { ValidatorListUpdate } from './model/subvt/validator_summary';
-import { ApiPromise, WsProvider } from '@polkadot/api';
-import { Header, SignedBlock } from '@polkadot/types/interfaces';
-import { kusama } from './model/app/network';
-import { NetworkStatusUpdate } from './model/subvt/network_status';
-import { getSS58Address } from './util/ss58';
+} from "./service/rpc/RPCSubscriptionService";
+import { ChainVizScene } from "./scene/scene";
+import { ValidatorListUpdate, ValidatorSummary } from "./model/subvt/validator_summary";
+import { ApiPromise, WsProvider } from "@polkadot/api";
+import { Header, SignedBlock } from "@polkadot/types/interfaces";
+import { kusama } from "./model/app/network";
+import { NetworkStatusUpdate } from "./model/subvt/network_status";
+import { getSS58Address } from "./util/ss58";
 
 THREE.Cache.enabled = true;
 const network = kusama;
@@ -20,10 +20,10 @@ class ChainViz {
         onConnected: () => {
             this.networkStatusClient.subscribe();
         },
-        onSubscribed: (subscriptionId: number) => {
+        onSubscribed: (_subscriptionId: number) => {
             // no-op
         },
-        onUnsubscribed: (subscriptionId: number) => {
+        onUnsubscribed: (_subscriptionId: number) => {
             // no-op
         },
         onDisconnected: () => {
@@ -34,8 +34,8 @@ class ChainViz {
         },
         onError: (code: number, message: string) => {
             console.log(`Network status service error (${code}: ${message}).`);
-        }
-    }
+        },
+    };
     private readonly validatorListListener: RPCSubscriptionServiceListener<ValidatorListUpdate> = {
         onConnected: () => {
             this.validatorListClientIsConnected = true;
@@ -44,10 +44,10 @@ class ChainViz {
             }
             this.subscribeToValidatorList();
         },
-        onSubscribed: (subscriptionId: number) => {
+        onSubscribed: (_subscriptionId: number) => {
             // no-op
         },
-        onUnsubscribed: (subscriptionId: number) => {
+        onUnsubscribed: (_subscriptionId: number) => {
             // no-op
         },
         onDisconnected: () => {
@@ -58,38 +58,40 @@ class ChainViz {
         },
         onError: (code: number, message: string) => {
             console.log(`Validator list service error (${code}: ${message}).`);
-        }
-    }
+        },
+    };
     private readonly networkStatusClient = new RPCSubscriptionService(
         "ws://78.181.100.160:17888",
         "subscribe_networkStatus",
         "unsubscribe_networkStatus",
-        this.networkStatusListener,
+        this.networkStatusListener
     );
     private readonly validatorListClient = new RPCSubscriptionService(
         "ws://78.181.100.160:17889",
         "subscribe_validatorList",
         "unsubscribe_validatorList",
-        this.validatorListListener,
+        this.validatorListListener
     );
     private validatorListClientIsConnected = false;
     private substrateClient: ApiPromise = new ApiPromise({
-        provider: new WsProvider('wss://kusama-rpc.polkadot.io')
+        provider: new WsProvider("wss://kusama-rpc.polkadot.io"),
     });
     private substrateClientIsConnected = false;
 
     private sceneStarted = false;
     private readonly initialBlockCount = 10;
     private initialBlocks = new Array<SignedBlock>();
-    private initialValidatorListUpdate?: ValidatorListUpdate = undefined;
+    private hasReceivedValidatorList = false;
+    private initialValidators = new Array<ValidatorSummary>();
 
     private processValidatorListUpdate(update: ValidatorListUpdate) {
         // calculate addresses
         for (const summary of update.insert) {
             summary.address = getSS58Address(summary.accountId);
         }
-        if (!this.sceneStarted && this.initialValidatorListUpdate == undefined) {
-            this.initialValidatorListUpdate = update;
+        if (!this.sceneStarted && this.initialValidators.length == 0) {
+            this.hasReceivedValidatorList = true;
+            this.initialValidators.push(...update.insert);
             if (this.initialBlocks.length == this.initialBlockCount) {
                 this.startScene();
             }
@@ -106,17 +108,13 @@ class ChainViz {
         }
         const lastHeader = await this.substrateClient.rpc.chain.getHeader();
         let block = await this.substrateClient.rpc.chain.getBlock(lastHeader.hash);
-        this.initialBlocks.push(block)
+        this.initialBlocks.push(block);
         const lastBlockNumber = block.block.header.number.toNumber();
-        for (
-            let i = lastBlockNumber - 1;
-            i > (lastBlockNumber - this.initialBlockCount);
-            i--
-        ) {
+        for (let i = lastBlockNumber - 1; i > lastBlockNumber - this.initialBlockCount; i--) {
             block = await this.substrateClient.rpc.chain.getBlock(block.block.header.parentHash);
-            this.initialBlocks.push(block)
+            this.initialBlocks.push(block);
         }
-        if (this.initialValidatorListUpdate != undefined) {
+        if (this.hasReceivedValidatorList) {
             this.startScene();
         }
     }
@@ -124,7 +122,8 @@ class ChainViz {
     private setLoadingStatus(status: string) {
         const element = document.getElementById("loading-status");
         if (element != undefined) {
-            (element as HTMLElement).innerHTML = status;
+            const htmlElement = element as HTMLElement;
+            htmlElement.innerHTML = status;
         }
     }
 
@@ -147,11 +146,10 @@ class ChainViz {
         this.sceneStarted = true;
         this.removeLoadingStatus();
         this.scene.start();
-        await this.scene.initValidators(this.initialValidatorListUpdate!.insert);
+        await this.scene.initValidators(this.initialValidators);
         await this.scene.initBlocks(this.initialBlocks);
-        // clear data
-        this.initialValidatorListUpdate = undefined;
         this.initialBlocks = [];
+        this.initialValidators = [];
         // subscribe to finalized blocks
         this.subscribeToFinalizedHeads();
         // subscribe to new blocks
@@ -162,7 +160,7 @@ class ChainViz {
     private subsribeToNewHeads() {
         this.substrateClient.rpc.chain.subscribeNewHeads((header) => {
             this.onNewBlock(header);
-        })
+        });
     }
 
     private subscribeToFinalizedHeads() {
@@ -183,9 +181,9 @@ class ChainViz {
 
     private processNetworkStatusUpdate(update: NetworkStatusUpdate) {
         if (update.status) {
-            this.scene.initNetworkStatus(update.status!);
+            this.scene.initNetworkStatus(update.status);
         } else if (update.diff) {
-            this.scene.updateNetworkStatus(update.diff!);
+            this.scene.updateNetworkStatus(update.diff);
         }
     }
 }

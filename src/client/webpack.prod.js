@@ -1,14 +1,14 @@
-const { merge } = require('webpack-merge');
-const common = require('./webpack.common.js');
+const { merge } = require("webpack-merge");
+const common = require("./webpack.common.js");
 
 module.exports = merge(common, {
-    mode: 'production',
+    mode: "production",
     performance: {
-        hints: false
+        hints: false,
     },
     resolve: {
         fallback: {
-            "fs": false
+            fs: false,
         },
-    }
+    },
 });
