@@ -14,6 +14,8 @@ import { ValidatorMesh } from "../ui/validator_mesh";
 import { ValidatorList, ValidatorListDelegate } from "../ui/validator_list";
 import { ValidatorSummaryBoard } from "../ui/validator_summary_board";
 import { Validator } from "../model/app/validator";
+import { cloneJSONSafeArray, cloneJSONSafeObject } from "../util/object";
+import { ValidatorDetailsBoard } from "../ui/validator_details_board";
 
 class ChainVizScene {
     private readonly scene: THREE.Scene;
@@ -34,7 +36,7 @@ class ChainVizScene {
     private validatorsInited = false;
     private validatorList: ValidatorList;
     private readonly validatorSummaryBoard: ValidatorSummaryBoard;
-
+    private readonly validatorDetailsBoard: ValidatorDetailsBoard;
     private networkStatusBoard!: NetworkStatusBoard;
 
     private readonly lock = new AsyncLock();
@@ -109,9 +111,21 @@ class ChainVizScene {
                 this.validatorMesh.clearHover();
                 this.validatorSummaryBoard.hide();
             },
+            onClick: (accountIdHex) => {
+                const index = this.validatorMesh.getIndexOf(accountIdHex);
+                if (index) {
+                    const validator = this.validatorMesh.select(index);
+                    if (validator) {
+                        this.validatorDetailsBoard.show(
+                            cloneJSONSafeObject(validator.getSummary())
+                        );
+                        this.validatorSummaryBoard.hide();
+                    }
+                }
+            },
         });
-        // validator summary board
         this.validatorSummaryBoard = new ValidatorSummaryBoard();
+        this.validatorDetailsBoard = new ValidatorDetailsBoard();
     }
 
     private addLights() {
@@ -169,7 +183,14 @@ class ChainVizScene {
         );
         this.raycaster.setFromCamera(clickPoint, this.camera);
         const intersects = this.raycaster.intersectObjects(this.scene.children, false);
-        console.log("CLICK INT : " + intersects.length);
+        const index = intersects.length > 0 ? intersects[0].instanceId : undefined;
+        if (index) {
+            const validator = this.validatorMesh.select(index);
+            if (validator) {
+                this.validatorDetailsBoard.show(cloneJSONSafeObject(validator.getSummary()));
+                this.validatorSummaryBoard.hide();
+            }
+        }
     }
 
     private onMouseMove(event: MouseEvent) {
@@ -212,7 +233,9 @@ class ChainVizScene {
         const validator = index ? this.validatorMesh.hover(index) : undefined;
         if (index && validator && !validator.isAuthoring()) {
             this.setPointerCursor();
-            this.showValidatorSummaryBoard(index, validator);
+            if (!this.validatorMesh.isSelected(index)) {
+                this.showValidatorSummaryBoard(index, validator);
+            }
         } else {
             this.validatorMesh.clearHover();
             this.setDefaultCursor();
@@ -226,7 +249,7 @@ class ChainVizScene {
             this.renderer,
             this.camera
         );
-        this.validatorSummaryBoard.show(validator.getSummary());
+        this.validatorSummaryBoard.show(cloneJSONSafeObject(validator.getSummary()));
         this.validatorSummaryBoard.setPosition(position.x, position.y);
     }
 
@@ -279,8 +302,8 @@ class ChainVizScene {
             }
         });
         this.validatorMesh = new ValidatorMesh(summaries.length);
-        await this.validatorMesh.addTo(this.scene, summaries);
-        this.validatorList.init(summaries);
+        await this.validatorMesh.addTo(this.scene, cloneJSONSafeArray(summaries));
+        this.validatorList.init(cloneJSONSafeArray(summaries));
         this.validatorsInited = true;
     }
 
@@ -363,7 +386,7 @@ class ChainVizScene {
     }
 
     initNetworkStatus(status: NetworkStatus) {
-        this.networkStatusBoard = new NetworkStatusBoard(status);
+        this.networkStatusBoard = new NetworkStatusBoard(cloneJSONSafeObject(status));
     }
 
     updateNetworkStatus(diff: NetworkStatusDiff) {

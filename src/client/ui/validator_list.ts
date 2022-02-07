@@ -4,6 +4,7 @@ import { getValidatorSummaryDisplay } from "../util/ui";
 interface ValidatorListDelegate {
     onMouseOver(accountIdHex: string): void;
     onMouseLeave(accountIdHex: string): void;
+    onClick(accountIdHex: string): void;
 }
 
 class ValidatorList {
@@ -103,6 +104,10 @@ class ValidatorList {
             rowElement.addEventListener("mouseleave", (event) => {
                 const accountIdHex = (<HTMLElement>event.target).id;
                 this.delegate.onMouseLeave(accountIdHex);
+            });
+            rowElement.addEventListener("click", (event) => {
+                const accountIdHex = (<HTMLElement>event.target).id;
+                this.delegate.onClick(accountIdHex);
             });
         }
     }

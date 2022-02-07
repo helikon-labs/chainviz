@@ -3,7 +3,6 @@ import { Validator } from "../model/app/validator";
 import { ValidatorSummary } from "../model/subvt/validator_summary";
 import { Constants } from "../util/constants";
 import { getOnScreenPosition } from "../util/geometry";
-import { cloneJSONSafeObject } from "../util/object";
 
 class ValidatorMesh {
     private mesh: THREE.InstancedMesh;
@@ -23,6 +22,7 @@ class ValidatorMesh {
     private readonly validators = new Array<Validator>();
     private hoverValidatorIndex = -1;
     private authorValidatorIndex = -1;
+    private selectedValidatorIndex = -1;
 
     constructor(validatorCount: number) {
         this.mesh = new THREE.InstancedMesh(this.geometry, this.material, validatorCount);
@@ -37,11 +37,7 @@ class ValidatorMesh {
                 if (index >= summaries.length) {
                     break;
                 }
-                const validator = new Validator(
-                    cloneJSONSafeObject(summaries[index]),
-                    [ring, i],
-                    this.ringSizes[ring]
-                );
+                const validator = new Validator(summaries[index], [ring, i], this.ringSizes[ring]);
                 this.validators.push(validator);
                 this.mesh.setMatrixAt(index, validator.getMatrix());
                 this.mesh.setColorAt(index, validator.getColor());
@@ -79,13 +75,17 @@ class ValidatorMesh {
         return undefined;
     }
 
+    isSelected(index: number): boolean {
+        return this.selectedValidatorIndex == index;
+    }
+
     hover(index: number): Validator {
-        if (this.hoverValidatorIndex == index) {
+        if (this.hoverValidatorIndex == index || this.selectedValidatorIndex == index) {
             return this.validators[index];
         }
         this.clearHover();
         this.hoverValidatorIndex = index;
-        this.setColorAt(index, new THREE.Color().setHex(0xffff00));
+        this.setColorAt(index, new THREE.Color().setHex(Constants.VALIDATOR_HOVER_COLOR));
         return this.validators[index];
     }
 
@@ -97,6 +97,23 @@ class ValidatorMesh {
             );
             this.hoverValidatorIndex = -1;
         }
+    }
+
+    select(index: number): Validator | undefined {
+        if (this.selectedValidatorIndex == index) {
+            return undefined;
+        }
+        const validator = this.validators[index];
+        validator.select();
+        this.setMatrixAt(index, validator.getMatrix());
+        this.setColorAt(index, new THREE.Color().setHex(Constants.VALIDATOR_SELECT_COLOR));
+        this.selectedValidatorIndex = index;
+        this.hoverValidatorIndex = -1;
+        return validator;
+    }
+
+    clearSelection() {
+        console.log("clear selection");
     }
 
     getOnScreenPositionOfItem(

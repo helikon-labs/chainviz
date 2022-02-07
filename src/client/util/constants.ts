@@ -21,7 +21,8 @@ export abstract class Constants {
     static readonly BLOCK_TO_ORIGIN_CURVE = TWEEN.Easing.Cubic.Out;
     static readonly BLOCK_TO_ORIGIN_TIME_MS = 750;
     // identicon
-    static readonly IDENTICON_SIZE = 30;
+    static readonly SUMMARY_BOARD_IDENTICON_SIZE = 30;
+    static readonly DETAILS_BOARD_IDENTICON_SIZE = 36;
     // validator geometry
     static readonly VALIDATOR_GEOM_RADIUS = 0.6;
     static readonly VALIDATOR_GEOM_SEGMENTS = 16;
@@ -32,6 +33,10 @@ export abstract class Constants {
     static readonly PARA_VALIDATOR_COLOR = new THREE.Color(0.556, 0.874, 1.0);
     static readonly AUTHOR_VALIDATOR_COLOR = 0xffff00;
     static readonly VALIDATOR_SPECULAR_COLOR = 0xffffff;
+    static readonly VALIDATOR_HOVER_COLOR = 0xffff00;
+    static readonly VALIDATOR_AUTHOR_COLOR = 0x00ff00;
+    static readonly VALIDATOR_AUTHOR_COLOR_RGB = { r: 0.0, g: 1.0, b: 0.0 };
+    static readonly VALIDATOR_SELECT_COLOR = 0xffff00;
     // validator animations
     static readonly VALIDATOR_AUTHORSHIP_SCALE = 2.5;
     static readonly VALIDATOR_AUTHORSHIP_TRANSLATE_Z = 10;
@@ -39,6 +44,8 @@ export abstract class Constants {
     static readonly VALIDATOR_AUTHORSHIP_TRANSLATE_CURVE = TWEEN.Easing.Exponential.Out;
     static readonly VALIDATOR_AUTHORSHIP_MOVE_TIME_MS = 350;
     static readonly VALIDATOR_AUTHORSHIP_END_DELAY = 800;
+    static readonly VALIDATOR_SELECT_SCALE = 1.5;
+    static readonly VALIDATOR_SELECT_TRANSLATE_Z = 2;
     // hover info board
     static readonly HOVER_INFO_BOARD_X_OFFSET = 30;
     static readonly HOVER_INFO_BOARD_Y_OFFSET = -30;

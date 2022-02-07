@@ -3,7 +3,6 @@ import { ValidatorSummary } from "../model/subvt/validator_summary";
 import { Constants } from "../util/constants";
 import { formatNumber } from "../util/format";
 import { generateIdenticonSVGHTML } from "../util/identicon";
-import { cloneJSONSafeObject } from "../util/object";
 import { getValidatorIdentityIconHTML, getValidatorSummaryDisplay } from "../util/ui";
 
 interface UI {
@@ -77,9 +76,10 @@ class ValidatorSummaryBoard {
     }
 
     show(summary: ValidatorSummary) {
+        this.summary = summary;
         this.ui.identiconContainer.innerHTML = generateIdenticonSVGHTML(
             summary.address,
-            Constants.IDENTICON_SIZE
+            Constants.SUMMARY_BOARD_IDENTICON_SIZE
         );
         // identity & para
         {
@@ -194,7 +194,6 @@ class ValidatorSummaryBoard {
                 this.ui.oversubscribedIcon.style.display = "none";
             }
         }
-        this.summary = cloneJSONSafeObject(summary);
         this.ui.root.style.visibility = "visible";
     }
 

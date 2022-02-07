@@ -2,6 +2,8 @@ body {
     overflow: hidden;
     margin: 0px;
     background-color: #000000;
+    font-family: "IBM Plex Mono", Courier, monospace;
+    font-size: 14px;
 }
 
 hr {
@@ -10,6 +12,7 @@ hr {
     height: 1px;
     border: none;
     max-width: 100%;
+    width: 100%;
 }
 
 .no-select {
@@ -91,8 +94,6 @@ hr {
     color: #dddddd;
     transform: translate(-50%, -50%);
     margin-top: 57px;
-    font-family: "IBM Plex Mono", Courier, monospace;
-    font-size: 14px;
     text-align: center;
 }
 
@@ -126,7 +127,6 @@ hr {
 }
 
 #left-panel #chainviz-logo .chainviz-version {
-    font-size: 14px;
     font-weight: 800;
 }
 
@@ -135,7 +135,6 @@ hr {
     width: 100%;
     color: #ffffffcc;
     z-index: 99999;
-    font-family: "IBM Plex Mono", Courier, monospace;
     font-size: 12px;
     line-height: 20px;
     margin-top: 4px;
@@ -176,7 +175,6 @@ hr {
     display: flex;
     flex-flow: column;
     min-height: 0;
-    font-family: "IBM Plex Mono", Courier, monospace;
     font-size: 12px;
     color: #ffffffdd;
 }
@@ -212,7 +210,6 @@ hr {
     background-color: transparent;
     border: none;
     color: #ffffffdd;
-    font-family: "IBM Plex Mono", Courier, monospace;
     font-size: 12px;
     line-height: 26px;
 }
@@ -310,13 +307,7 @@ hr {
     border-color: #ffffffcc;
     border-width: 1px;
     border-style: solid;
-    font-family: "IBM Plex Mono", Courier, monospace;
-    font-size: 14px;
     line-height: 20px;
-}
-
-#validator-summary-board hr {
-    width: 100%;
 }
 
 #validator-summary-board div {
@@ -389,4 +380,23 @@ hr {
 
 #validator-summary-board #status-icon-container img {
     width: 26px;
+}
+
+/* validator details board */
+#validator-details-board {
+    position: absolute;
+    top: 0px;
+    right: 0px;
+    width: 280px;
+    display: none;
+    flex-flow: column nowrap;
+    align-items: center;
+    background-color: #00000077;
+    padding: 10px 10px 0px 10px;
+    color: #ffffffdd;
+    /* border-radius: 6px;
+    border-color: #ffffffcc;
+    border-width: 1px;
+    border-style: solid; */
+    line-height: 20px;
 }
