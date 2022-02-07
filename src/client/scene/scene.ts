@@ -17,7 +17,7 @@ import {
 } from "../model/subvt/network_status";
 import { NetworkStatusBoard } from "../ui/network_status_board";
 import { ValidatorMesh } from "../ui/validator_mesh";
-import { ValidatorList } from "../ui/validator_list";
+import { ValidatorList, ValidatorListDelegate } from "../ui/validator_list";
 
 class ChainVizScene {
     private readonly scene: THREE.Scene;
@@ -27,8 +27,7 @@ class ChainVizScene {
     private readonly stats: Stats;
 
     private readonly raycaster: THREE.Raycaster;
-    private clickPoint?: THREE.Vec2;
-    private hoverPoint = new THREE.Vector2();
+    private readonly hoverPoint: THREE.Vector2 = new THREE.Vector2();
 
     private readonly fontLoader = new FontLoader();
     private blockNumberFont!: Font;
@@ -45,6 +44,10 @@ class ChainVizScene {
     private readonly hoverInfoBoard = <HTMLElement>(
         document.getElementById("hover-info-board")
     );
+    private readonly leftPanel = <HTMLElement>(
+        document.getElementById("left-panel")
+    );
+    private mouseIsInLeftPanel = false;
     private networkStatusBoard!: NetworkStatusBoard;
 
     constructor() {
@@ -69,19 +72,28 @@ class ChainVizScene {
         this.addLights();
         // raycaster
         this.raycaster = new THREE.Raycaster();
-        this.clickPoint = undefined;
-        document.addEventListener("click", (event) => {
-            this.onClick(event);
-        });
-        document.addEventListener("mousemove", (event) => {
-            this.onPointerMove(event);
-        });
         // renderer
         this.renderer = new THREE.WebGLRenderer({ antialias: true });
         this.renderer.setSize(window.innerWidth, window.innerHeight);
         this.renderer.shadowMap.enabled = true;
         this.renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+        this.renderer.domElement.addEventListener;
         document.body.appendChild(this.renderer.domElement);
+        document.addEventListener("click", (event) => {
+            this.onClick(event);
+        });
+        document.addEventListener("mousemove", (event) => {
+            this.onMouseMove(event);
+        });
+        this.leftPanel.addEventListener("mouseenter", (_event) => {
+            if (this.validatorMesh) {
+                this.validatorMesh.clearHover();
+            }
+            this.mouseIsInLeftPanel = true;
+        });
+        this.leftPanel.addEventListener("mouseleave", (_event) => {
+            this.mouseIsInLeftPanel = false;
+        });
         // stats
         this.stats = Stats();
         document.body.appendChild(this.stats.dom);
@@ -100,7 +112,14 @@ class ChainVizScene {
             false
         );
         // validator list
-        this.validatorList = new ValidatorList();
+        this.validatorList = new ValidatorList(<ValidatorListDelegate>{
+            onMouseOver: (accountIdHex) => {
+                this.validatorMesh.hoverByAccountIdHex(accountIdHex);
+            },
+            onMouseLeave: (_accountIdHex) => {
+                this.validatorMesh.clearHover();
+            },
+        });
     }
 
     private addLights() {
@@ -157,12 +176,22 @@ class ChainVizScene {
     }
 
     private onClick(event: MouseEvent) {
-        this.clickPoint = new THREE.Vector2();
-        this.clickPoint.x = (event.clientX / window.innerWidth) * 2 - 1;
-        this.clickPoint.y = -(event.clientY / window.innerHeight) * 2 + 1;
+        if (this.mouseIsInLeftPanel) {
+            return;
+        }
+        const clickPoint = new THREE.Vector2(
+            (event.clientX / window.innerWidth) * 2 - 1,
+            -(event.clientY / window.innerHeight) * 2 + 1
+        );
+        this.raycaster.setFromCamera(clickPoint, this.camera);
+        const intersects = this.raycaster.intersectObjects(
+            this.scene.children,
+            false
+        );
+        console.log("CLICK INT : " + intersects.length);
     }
 
-    private onPointerMove(event: MouseEvent) {
+    private onMouseMove(event: MouseEvent) {
         this.hoverPoint.x = (event.clientX / window.innerWidth) * 2 - 1;
         this.hoverPoint.y = -(event.clientY / window.innerHeight) * 2 + 1;
     }
@@ -184,17 +213,6 @@ class ChainVizScene {
         this.stats.update();
     }
 
-    private checkClickRaycast() {
-        if (this.clickPoint != undefined) {
-            this.raycaster.setFromCamera(this.clickPoint, this.camera);
-            const _intersects = this.raycaster.intersectObjects(
-                this.scene.children,
-                false
-            );
-            this.clickPoint = undefined;
-        }
-    }
-
     private setPointerCursor() {
         document.getElementsByTagName("html")[0].style.cursor = "pointer";
     }
@@ -204,20 +222,23 @@ class ChainVizScene {
     }
 
     private checkHoverRaycast() {
+        if (this.mouseIsInLeftPanel) {
+            return;
+        }
         this.raycaster.setFromCamera(this.hoverPoint, this.camera);
         const intersects = this.raycaster.intersectObjects(
             this.scene.children,
             false
         );
-        const instanceId =
+        const index =
             intersects.length > 0 ? intersects[0].instanceId : undefined;
-        const validator = instanceId
-            ? this.validatorMesh.hover(instanceId)
+        const validator = index
+            ? this.validatorMesh.hoverByIndex(index)
             : undefined;
-        if (instanceId && validator && !validator.isAuthoring()) {
+        if (index && validator && !validator.isAuthoring()) {
             this.setPointerCursor();
             const position = this.validatorMesh.getOnScreenPositionOfItem(
-                instanceId,
+                index,
                 this.renderer,
                 this.camera
             );
@@ -238,7 +259,6 @@ class ChainVizScene {
 
     private render() {
         if (this.validatorsInited) {
-            this.checkClickRaycast();
             this.checkHoverRaycast();
         }
         this.renderer.render(this.scene, this.camera);

@@ -74,7 +74,16 @@ class ValidatorMesh {
         }
     }
 
-    hover(index: number): Validator {
+    hoverByAccountIdHex(accountIdHex: string): Validator | undefined {
+        for (let i = 0; i < this.validators.length; i++) {
+            if (this.validators[i].getAccountIdHex() == accountIdHex) {
+                return this.hoverByIndex(i);
+            }
+        }
+        return undefined;
+    }
+
+    hoverByIndex(index: number): Validator {
         if (this.hoverValidatorIndex == index) {
             return this.validators[index];
         }

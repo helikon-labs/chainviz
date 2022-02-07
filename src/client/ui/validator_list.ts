@@ -1,7 +1,13 @@
 import { ValidatorSummary } from "../model/subvt/validator_summary";
 import { getValidatorSummaryDisplay } from "../util/ui";
 
+interface ValidatorListDelegate {
+    onMouseOver(accountIdHex: string): void;
+    onMouseLeave(accountIdHex: string): void;
+}
+
 class ValidatorList {
+    private readonly delegate: ValidatorListDelegate;
     private readonly container: HTMLElement;
     private readonly titleContainer: HTMLElement;
     private readonly title: HTMLElement;
@@ -11,7 +17,8 @@ class ValidatorList {
     private readonly list: HTMLElement;
     private items = new Array<ValidatorSummary>();
 
-    constructor() {
+    constructor(delegate: ValidatorListDelegate) {
+        this.delegate = delegate;
         this.container = <HTMLElement>(
             document.getElementById("validator-list-container")
         );
@@ -44,7 +51,7 @@ class ValidatorList {
             }
         });
         this.searchInput.oninput = (_event) => {
-            this.filter(this.searchInput.value);
+            this.filter();
         };
     }
 
@@ -71,13 +78,28 @@ class ValidatorList {
         });
         setTimeout(() => {
             this.title.innerHTML = `ACTIVE VALIDATORS (${this.items.length})`;
-            this.populateList(this.items);
+            this.filter();
+            this.container.style.visibility = "visible";
         }, 1000);
     }
 
-    private populateList(items: Array<ValidatorSummary>) {
+    private filter() {
+        const query = this.searchInput.value
+            .toLocaleLowerCase()
+            .replace(" ", "");
+        let filteredItems;
+        if (query.length == 0) {
+            filteredItems = this.items;
+        } else {
+            filteredItems = this.items.filter((item) => {
+                const text = (
+                    getValidatorSummaryDisplay(item) + item.address
+                ).toLocaleLowerCase();
+                return text.indexOf(query) >= 0;
+            });
+        }
         let html = "";
-        for (const item of items) {
+        for (const item of filteredItems) {
             html += `<div class="validator" id="${
                 item.accountId
             }"><span class="validator-list-display">${getValidatorSummaryDisplay(
@@ -85,23 +107,19 @@ class ValidatorList {
             )}</span></div>`;
         }
         this.list.innerHTML = html;
-        this.container.style.visibility = "visible";
-    }
-
-    private filter(filter: string) {
-        const query = filter.toLocaleLowerCase().replace(" ", "");
-        if (filter.trim().length == 0) {
-            this.populateList(this.items);
-            return;
+        const rows = Array.from(document.getElementsByClassName("validator"));
+        for (const row of rows) {
+            const rowElement = <HTMLElement>row;
+            rowElement.addEventListener("mouseover", (event) => {
+                const accountIdHex = (<HTMLElement>event.target).id;
+                this.delegate.onMouseOver(accountIdHex);
+            });
+            rowElement.addEventListener("mouseleave", (event) => {
+                const accountIdHex = (<HTMLElement>event.target).id;
+                this.delegate.onMouseLeave(accountIdHex);
+            });
         }
-        const filteredItems = this.items.filter((item) => {
-            const text = (
-                getValidatorSummaryDisplay(item) + item.address
-            ).toLocaleLowerCase();
-            return text.indexOf(query) >= 0;
-        });
-        this.populateList(filteredItems);
     }
 }
 
-export { ValidatorList };
+export { ValidatorListDelegate, ValidatorList };
