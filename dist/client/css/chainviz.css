@@ -240,6 +240,46 @@ hr {
     color: #ffffffdd;
 }
 
+#validator-list-container #validator-search-container {
+    visibility: hidden;
+    margin-top: 8px;
+}
+
+#validator-search-container #validator-search {
+    margin: 0px 4px;
+    height: 28px;
+    border-style: solid;
+    border-radius: 16px;
+    border-width: 1px;
+    border-color: #777;
+    padding: 0px 16px 0px 12px;
+    display: flex;
+    flex-flow: row nowrap;
+    align-items: center;
+}
+
+#validator-search i {
+    color: #ffffffdd;
+    font-size: 12px;
+    margin-top: 2px;
+}
+
+#validator-search input {
+    flex-grow: 1;
+    margin-left: 8px;
+    height: 26px;
+    background-color: transparent;
+    border: none;
+    color: #ffffffdd;
+    font-family: "IBM Plex Mono", Courier, monospace;
+    font-size: 12px;
+    line-height: 26px;
+}
+
+#validator-search-container input:focus {
+    outline: none;
+}
+
 #left-panel #validator-list-container #validator-list-title-container {
     display: flex;
     flex-flow: row nowrap;

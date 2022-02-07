@@ -6,6 +6,7 @@ class ValidatorList {
     private readonly titleContainer: HTMLElement;
     private readonly title: HTMLElement;
     private readonly toggle: HTMLElement;
+    private readonly searchContainer: HTMLElement;
     private readonly list: HTMLElement;
     private summaries = new Array<ValidatorSummary>();
 
@@ -16,15 +17,18 @@ class ValidatorList {
         );
         this.title = <HTMLElement>document.getElementById("validator-list-title");
         this.toggle = <HTMLElement>document.getElementById("validator-list-toggle");
+        this.searchContainer = <HTMLElement>document.getElementById("validator-search-container");
         this.list = <HTMLElement>document.getElementById("validator-list");
 
         this.titleContainer.addEventListener("click", (_event) => {
             if (this.toggle.classList.contains("up")) {
                 this.toggle.classList.remove("up");
                 this.list.style.visibility = "hidden";
+                this.searchContainer.style.visibility = "hidden";
             } else {
                 this.toggle.classList.add("up");
                 this.list.style.visibility = "visible";
+                this.searchContainer.style.visibility = "visible";
             }
         });
     }
