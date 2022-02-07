@@ -30,4 +30,9 @@ interface NetworkStatusUpdate {
     diff?: NetworkStatusDiff;
 }
 
-export { NetworkStatus, NetworkStatusDiff, NetworkStatusUpdate, NetworkStatusKeys };
+export {
+    NetworkStatus,
+    NetworkStatusDiff,
+    NetworkStatusUpdate,
+    NetworkStatusKeys,
+};

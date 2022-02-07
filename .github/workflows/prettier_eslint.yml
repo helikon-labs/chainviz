@@ -1,4 +1,4 @@
-name: TS Lint
+name: Prettier & ESLint
 
 on:
     push:
@@ -17,7 +17,7 @@ concurrency:
 
 jobs:
     ts-lint:
-        name: TS Lint
+        name: Prettier & ESLint
         runs-on: ubuntu-latest
         steps:
             - uses: actions/checkout@v1

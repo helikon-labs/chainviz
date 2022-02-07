@@ -13,7 +13,11 @@ class App {
     constructor(port) {
         this.port = port;
         const app = express_1.default();
-        app.use(express_1.default.static(path_1.default.join(__dirname, "../client")));
+        app.use(
+            express_1.default.static(
+                path_1.default.join(__dirname, "../client")
+            )
+        );
         // In the webpack version of the boilerplate, it is not necessary
         // to add static references to the libs in node_modules if
         // you are using module specifiers in your client.ts imports.

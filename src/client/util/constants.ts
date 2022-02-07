@@ -36,7 +36,8 @@ export abstract class Constants {
     static readonly VALIDATOR_AUTHORSHIP_SCALE = 2.5;
     static readonly VALIDATOR_AUTHORSHIP_TRANSLATE_Z = 10;
     static readonly VALIDATOR_AUTHORSHIP_SCALE_CURVE = TWEEN.Easing.Linear.None;
-    static readonly VALIDATOR_AUTHORSHIP_TRANSLATE_CURVE = TWEEN.Easing.Exponential.Out;
+    static readonly VALIDATOR_AUTHORSHIP_TRANSLATE_CURVE =
+        TWEEN.Easing.Exponential.Out;
     static readonly VALIDATOR_AUTHORSHIP_MOVE_TIME_MS = 350;
     static readonly VALIDATOR_AUTHORSHIP_END_DELAY = 800;
     // hover info board

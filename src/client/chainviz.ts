@@ -4,7 +4,10 @@ import {
     RPCSubscriptionServiceListener,
 } from "./service/rpc/RPCSubscriptionService";
 import { ChainVizScene } from "./scene/scene";
-import { ValidatorListUpdate, ValidatorSummary } from "./model/subvt/validator_summary";
+import {
+    ValidatorListUpdate,
+    ValidatorSummary,
+} from "./model/subvt/validator_summary";
 import { ApiPromise, WsProvider } from "@polkadot/api";
 import { Header, SignedBlock } from "@polkadot/types/interfaces";
 import { kusama } from "./model/app/network";
@@ -16,50 +19,58 @@ const network = kusama;
 
 class ChainViz {
     private scene = new ChainVizScene();
-    private readonly networkStatusListener: RPCSubscriptionServiceListener<NetworkStatusUpdate> = {
-        onConnected: () => {
-            this.networkStatusClient.subscribe();
-        },
-        onSubscribed: (_subscriptionId: number) => {
-            // no-op
-        },
-        onUnsubscribed: (_subscriptionId: number) => {
-            // no-op
-        },
-        onDisconnected: () => {
-            // no-op
-        },
-        onUpdate: (update: NetworkStatusUpdate) => {
-            this.processNetworkStatusUpdate(update);
-        },
-        onError: (code: number, message: string) => {
-            console.log(`Network status service error (${code}: ${message}).`);
-        },
-    };
-    private readonly validatorListListener: RPCSubscriptionServiceListener<ValidatorListUpdate> = {
-        onConnected: () => {
-            this.validatorListClientIsConnected = true;
-            if (this.substrateClientIsConnected) {
-                this.setLoadingStatus(":: connected ::<br>:: waiting for data ::");
-            }
-            this.subscribeToValidatorList();
-        },
-        onSubscribed: (_subscriptionId: number) => {
-            // no-op
-        },
-        onUnsubscribed: (_subscriptionId: number) => {
-            // no-op
-        },
-        onDisconnected: () => {
-            // no-op
-        },
-        onUpdate: (update: ValidatorListUpdate) => {
-            this.processValidatorListUpdate(update);
-        },
-        onError: (code: number, message: string) => {
-            console.log(`Validator list service error (${code}: ${message}).`);
-        },
-    };
+    private readonly networkStatusListener: RPCSubscriptionServiceListener<NetworkStatusUpdate> =
+        {
+            onConnected: () => {
+                this.networkStatusClient.subscribe();
+            },
+            onSubscribed: (_subscriptionId: number) => {
+                // no-op
+            },
+            onUnsubscribed: (_subscriptionId: number) => {
+                // no-op
+            },
+            onDisconnected: () => {
+                // no-op
+            },
+            onUpdate: (update: NetworkStatusUpdate) => {
+                this.processNetworkStatusUpdate(update);
+            },
+            onError: (code: number, message: string) => {
+                console.log(
+                    `Network status service error (${code}: ${message}).`
+                );
+            },
+        };
+    private readonly validatorListListener: RPCSubscriptionServiceListener<ValidatorListUpdate> =
+        {
+            onConnected: () => {
+                this.validatorListClientIsConnected = true;
+                if (this.substrateClientIsConnected) {
+                    this.setLoadingStatus(
+                        ":: connected ::<br>:: waiting for data ::"
+                    );
+                }
+                this.subscribeToValidatorList();
+            },
+            onSubscribed: (_subscriptionId: number) => {
+                // no-op
+            },
+            onUnsubscribed: (_subscriptionId: number) => {
+                // no-op
+            },
+            onDisconnected: () => {
+                // no-op
+            },
+            onUpdate: (update: ValidatorListUpdate) => {
+                this.processValidatorListUpdate(update);
+            },
+            onError: (code: number, message: string) => {
+                console.log(
+                    `Validator list service error (${code}: ${message}).`
+                );
+            },
+        };
     private readonly networkStatusClient = new RPCSubscriptionService(
         "ws://78.181.100.160:17888",
         "subscribe_networkStatus",
@@ -107,11 +118,19 @@ class ChainViz {
             this.setLoadingStatus(":: connected ::<br>:: waiting for data ::");
         }
         const lastHeader = await this.substrateClient.rpc.chain.getHeader();
-        let block = await this.substrateClient.rpc.chain.getBlock(lastHeader.hash);
+        let block = await this.substrateClient.rpc.chain.getBlock(
+            lastHeader.hash
+        );
         this.initialBlocks.push(block);
         const lastBlockNumber = block.block.header.number.toNumber();
-        for (let i = lastBlockNumber - 1; i > lastBlockNumber - this.initialBlockCount; i--) {
-            block = await this.substrateClient.rpc.chain.getBlock(block.block.header.parentHash);
+        for (
+            let i = lastBlockNumber - 1;
+            i > lastBlockNumber - this.initialBlockCount;
+            i--
+        ) {
+            block = await this.substrateClient.rpc.chain.getBlock(
+                block.block.header.parentHash
+            );
             this.initialBlocks.push(block);
         }
         if (this.hasReceivedValidatorList) {
@@ -170,8 +189,11 @@ class ChainViz {
     }
 
     private async onNewBlock(header: Header) {
-        const extendedHeader = await this.substrateClient.derive.chain.getHeader(header.hash);
-        const block = await this.substrateClient.rpc.chain.getBlock(header.hash);
+        const extendedHeader =
+            await this.substrateClient.derive.chain.getHeader(header.hash);
+        const block = await this.substrateClient.rpc.chain.getBlock(
+            header.hash
+        );
         this.scene.pushBlock(block.block, extendedHeader?.author?.toHex());
     }
 

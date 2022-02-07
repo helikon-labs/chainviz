@@ -7,17 +7,29 @@ class ValidatorList {
     private readonly title: HTMLElement;
     private readonly toggle: HTMLElement;
     private readonly searchContainer: HTMLElement;
+    private readonly searchInput: HTMLInputElement;
     private readonly list: HTMLElement;
-    private summaries = new Array<ValidatorSummary>();
+    private items = new Array<ValidatorSummary>();
 
     constructor() {
-        this.container = <HTMLElement>document.getElementById("validator-list-container");
+        this.container = <HTMLElement>(
+            document.getElementById("validator-list-container")
+        );
         this.titleContainer = <HTMLElement>(
             document.getElementById("validator-list-title-container")
         );
-        this.title = <HTMLElement>document.getElementById("validator-list-title");
-        this.toggle = <HTMLElement>document.getElementById("validator-list-toggle");
-        this.searchContainer = <HTMLElement>document.getElementById("validator-search-container");
+        this.title = <HTMLElement>(
+            document.getElementById("validator-list-title")
+        );
+        this.toggle = <HTMLElement>(
+            document.getElementById("validator-list-toggle")
+        );
+        this.searchContainer = <HTMLElement>(
+            document.getElementById("validator-search-container")
+        );
+        this.searchInput = <HTMLInputElement>(
+            document.getElementById("validator-search-input")
+        );
         this.list = <HTMLElement>document.getElementById("validator-list");
 
         this.titleContainer.addEventListener("click", (_event) => {
@@ -31,11 +43,14 @@ class ValidatorList {
                 this.searchContainer.style.visibility = "visible";
             }
         });
+        this.searchInput.oninput = (_event) => {
+            this.filter(this.searchInput.value);
+        };
     }
 
     init(summaries: Array<ValidatorSummary>) {
-        this.summaries.push(...summaries);
-        this.summaries.sort((a, b) => {
+        this.items.push(...summaries);
+        this.items.sort((a, b) => {
             if (a.display || a.parentDisplay) {
                 if (b.display || b.parentDisplay) {
                     return getValidatorSummaryDisplay(a).localeCompare(
@@ -55,16 +70,37 @@ class ValidatorList {
             }
         });
         setTimeout(() => {
-            let html = "";
-            for (const summary of this.summaries) {
-                html += `<div class="validator"><span class="validator-list-display">${getValidatorSummaryDisplay(
-                    summary
-                )}</span></div>`;
-            }
-            this.list.innerHTML = html;
-            this.title.innerHTML = `VALIDATORS (${this.summaries.length})`;
-            this.container.style.visibility = "visible";
+            this.title.innerHTML = `ACTIVE VALIDATORS (${this.items.length})`;
+            this.populateList(this.items);
         }, 1000);
+    }
+
+    private populateList(items: Array<ValidatorSummary>) {
+        let html = "";
+        for (const item of items) {
+            html += `<div class="validator" id="${
+                item.accountId
+            }"><span class="validator-list-display">${getValidatorSummaryDisplay(
+                item
+            )}</span></div>`;
+        }
+        this.list.innerHTML = html;
+        this.container.style.visibility = "visible";
+    }
+
+    private filter(filter: string) {
+        const query = filter.toLocaleLowerCase().replace(" ", "");
+        if (filter.trim().length == 0) {
+            this.populateList(this.items);
+            return;
+        }
+        const filteredItems = this.items.filter((item) => {
+            const text = (
+                getValidatorSummaryDisplay(item) + item.address
+            ).toLocaleLowerCase();
+            return text.indexOf(query) >= 0;
+        });
+        this.populateList(filteredItems);
     }
 }
 

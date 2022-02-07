@@ -80,7 +80,10 @@ class RPCSubscriptionService<T> {
             const update: T = camelcaseKeysDeep(json["params"]["result"]) as T;
             this.listener.onUpdate(update);
         } else if (Object.prototype.hasOwnProperty.call(json, "error")) {
-            this.listener.onError(json["error"]["code"], json["error"]["message"]);
+            this.listener.onError(
+                json["error"]["code"],
+                json["error"]["message"]
+            );
         }
     }
 
@@ -119,7 +122,9 @@ class RPCSubscriptionService<T> {
     }
 
     unsubscribe() {
-        const request = new RPCRequest(this.rpcId, this.unsubscribeMethod, [this.subscriptionId]);
+        const request = new RPCRequest(this.rpcId, this.unsubscribeMethod, [
+            this.subscriptionId,
+        ]);
         this.connection?.send(JSON.stringify(request));
     }
 
@@ -128,4 +133,8 @@ class RPCSubscriptionService<T> {
     }
 }
 
-export { RPCSubscriptionService, RPCSubscriptionServiceListener, RPCSubscriptionServiceState };
+export {
+    RPCSubscriptionService,
+    RPCSubscriptionServiceListener,
+    RPCSubscriptionServiceState,
+};

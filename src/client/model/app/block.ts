@@ -55,7 +55,10 @@ class Block {
                     curveSegments: 6,
                 }
             );
-            const textMesh = new THREE.Mesh(this.textGeometry, this.textMaterial);
+            const textMesh = new THREE.Mesh(
+                this.textGeometry,
+                this.textMaterial
+            );
             textMesh.position.x = -1.5;
             textMesh.position.y = -2.2;
             group.add(textMesh);

@@ -1,5 +1,8 @@
 import { network } from "../chainviz";
-import { NetworkStatus, NetworkStatusDiff } from "../model/subvt/network_status";
+import {
+    NetworkStatus,
+    NetworkStatusDiff,
+} from "../model/subvt/network_status";
 import { formatNumber } from "../util/format";
 
 interface UI {
@@ -25,15 +28,25 @@ class NetworkStatusBoard {
         this.ui = {
             root: <HTMLElement>document.getElementById("network-status"),
             progress: <HTMLElement>document.getElementById("block-progress"),
-            bestBlock: <HTMLElement>document.getElementById("network-best-block"),
-            finalizedBlock: <HTMLElement>document.getElementById("network-finalized-block"),
+            bestBlock: <HTMLElement>(
+                document.getElementById("network-best-block")
+            ),
+            finalizedBlock: <HTMLElement>(
+                document.getElementById("network-finalized-block")
+            ),
             eraIndex: <HTMLElement>document.getElementById("network-era-index"),
-            eraRewardPoints: <HTMLElement>document.getElementById("network-era-reward-points"),
+            eraRewardPoints: <HTMLElement>(
+                document.getElementById("network-era-reward-points")
+            ),
             return: <HTMLElement>document.getElementById("network-return"),
-            totalStake: <HTMLElement>document.getElementById("network-total-stake"),
+            totalStake: <HTMLElement>(
+                document.getElementById("network-total-stake")
+            ),
             minStake: <HTMLElement>document.getElementById("network-min-stake"),
             maxStake: <HTMLElement>document.getElementById("network-max-stake"),
-            averageStake: <HTMLElement>document.getElementById("network-average-stake"),
+            averageStake: <HTMLElement>(
+                document.getElementById("network-average-stake")
+            ),
         };
         this.status = status;
         this.updateUI();
@@ -42,7 +55,10 @@ class NetworkStatusBoard {
     }
 
     updateProgressBar() {
-        const elapsed = Math.min(network.blockTimeMs, Date.now() - this.lastBlockTime);
+        const elapsed = Math.min(
+            network.blockTimeMs,
+            Date.now() - this.lastBlockTime
+        );
         const progressPercent = (elapsed * 100) / network.blockTimeMs;
         this.ui.progress.style.width = progressPercent + "%";
         setTimeout(() => {
@@ -58,9 +74,11 @@ class NetworkStatusBoard {
     updateUI() {
         this.lastBlockTime = Date.now();
         this.ui.bestBlock.innerHTML = this.status.bestBlockNumber.toString();
-        this.ui.finalizedBlock.innerHTML = this.status.finalizedBlockNumber.toString();
+        this.ui.finalizedBlock.innerHTML =
+            this.status.finalizedBlockNumber.toString();
         this.ui.eraIndex.innerHTML = this.status.activeEra.index.toString();
-        this.ui.eraRewardPoints.innerHTML = this.status.eraRewardPoints.toString();
+        this.ui.eraRewardPoints.innerHTML =
+            this.status.eraRewardPoints.toString();
         this.ui.return.innerHTML =
             formatNumber(BigInt(this.status.returnRatePerMillion), 4, 2) + "%";
         this.ui.totalStake.innerHTML = formatNumber(
