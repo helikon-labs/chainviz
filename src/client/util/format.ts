@@ -14,17 +14,10 @@ function formatNumber(
     while (formatted.length < decimals + 1) {
         formatted = "0" + formatted;
     }
-    formatted = formatted.substring(
-        0,
-        formatted.length - decimals + formatDecimals
-    );
+    formatted = formatted.substring(0, formatted.length - decimals + formatDecimals);
     let integerPart = formatted.substring(0, formatted.length - formatDecimals);
     for (let i = integerPart.length - 3; i > 0; i -= 3) {
-        integerPart = insertAtIndex(
-            integerPart,
-            i,
-            Constants.THOUSANDS_SEPARATOR
-        );
+        integerPart = insertAtIndex(integerPart, i, Constants.THOUSANDS_SEPARATOR);
     }
 
     const decimalPart = formatted.substring(formatted.length - formatDecimals);

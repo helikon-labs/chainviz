@@ -7,10 +7,7 @@ import { network } from "../../chainviz";
 import { generateIdenticonSVGHTML } from "../../util/identicon";
 import { getSS58Address } from "../../util/ss58";
 import { ValidatorSummary } from "../subvt/validator_summary";
-import {
-    getValidatorIdentityIconHTML,
-    getValidatorSummaryDisplay,
-} from "../../util/ui";
+import { getValidatorIdentityIconHTML, getValidatorSummaryDisplay } from "../../util/ui";
 
 class Validator {
     private readonly object = new THREE.Object3D();
@@ -21,11 +18,7 @@ class Validator {
 
     private _isAuthoring = false;
 
-    constructor(
-        summary: ValidatorSummary,
-        index: [number, number],
-        ringSize: number
-    ) {
+    constructor(summary: ValidatorSummary, index: [number, number], ringSize: number) {
         this.summary = summary;
         this.color = summary.isParaValidator
             ? Constants.PARA_VALIDATOR_COLOR
@@ -61,6 +54,10 @@ class Validator {
         return this.summary.accountId;
     }
 
+    getSummary(): ValidatorSummary {
+        return this.summary;
+    }
+
     getHoverInfoHTML(): string {
         const sections = [];
         // general
@@ -68,9 +65,7 @@ class Validator {
             const components = [];
             const address = getSS58Address(this.summary.accountId);
             // identicon
-            components.push(
-                generateIdenticonSVGHTML(address, Constants.IDENTICON_SIZE)
-            );
+            components.push(generateIdenticonSVGHTML(address, Constants.IDENTICON_SIZE));
             // display
             components.push(
                 getValidatorIdentityIconHTML(this.summary) +
@@ -79,9 +74,7 @@ class Validator {
             // components.push(getValidatorSummaryIdentityHTML(this.summary));
             // para validator
             if (this.summary.isParaValidator) {
-                const parachain = network.parachainMap.get(
-                    this.summary.paraId ?? 0
-                );
+                const parachain = network.parachainMap.get(this.summary.paraId ?? 0);
                 if (parachain) {
                     components.push(`Validating for ${parachain.name}`);
                 } else {
@@ -101,11 +94,7 @@ class Validator {
             components.push(points + " era points");
             // return rate
             if (this.summary.returnRatePerBillion) {
-                const returnRate = formatNumber(
-                    BigInt(this.summary.returnRatePerBillion),
-                    7,
-                    2
-                );
+                const returnRate = formatNumber(BigInt(this.summary.returnRatePerBillion), 7, 2);
                 components.push(returnRate + "% return");
             }
             sections.push(components.join("<br>\n"));
@@ -169,46 +158,30 @@ class Validator {
                 components.push(`<img src="./img/status/status_icon_1kv.svg">`);
             }
             if (this.summary.heartbeatReceived ?? false) {
-                components.push(
-                    `<img src="./img/status/status_icon_heartbeat_received.svg">`
-                );
+                components.push(`<img src="./img/status/status_icon_heartbeat_received.svg">`);
             }
             if (this.summary.activeNextSession) {
-                components.push(
-                    `<img src="./img/status/status_icon_active_next_session.svg">`
-                );
+                components.push(`<img src="./img/status/status_icon_active_next_session.svg">`);
             }
             if (this.summary.slashCount > 0) {
-                components.push(
-                    `<img src="./img/status/status_icon_slashed.svg">`
-                );
+                components.push(`<img src="./img/status/status_icon_slashed.svg">`);
             }
             if (this.summary.preferences.blocksNominations) {
-                components.push(
-                    `<img src="./img/status/status_icon_blocks_nominations.svg">`
-                );
+                components.push(`<img src="./img/status/status_icon_blocks_nominations.svg">`);
             }
             if (this.summary.oversubscribed) {
-                components.push(
-                    `<img src="./img/status/status_icon_oversubscribed.svg">`
-                );
+                components.push(`<img src="./img/status/status_icon_oversubscribed.svg">`);
             }
             if (components.length > 0) {
                 sections.push(
-                    `<div class="status-icon-container">${components.join(
-                        "&nbsp;"
-                    )}</div>`
+                    `<div class="status-icon-container">${components.join("&nbsp;")}</div>`
                 );
             }
         }
         return sections.join("\n<hr>\n");
     }
 
-    beginAuthorship(
-        validatorMesh: THREE.InstancedMesh,
-        index: number,
-        onComplete: () => void
-    ) {
+    beginAuthorship(validatorMesh: THREE.InstancedMesh, index: number, onComplete: () => void) {
         this._isAuthoring = true;
         const scaleTween = createTween(
             this.object.scale,
@@ -272,11 +245,7 @@ class Validator {
         ).start();
     }
 
-    endAuthorship(
-        validatorMesh: THREE.InstancedMesh,
-        index: number,
-        onComplete: () => void
-    ) {
+    endAuthorship(validatorMesh: THREE.InstancedMesh, index: number, onComplete: () => void) {
         const color = new THREE.Color().setHex(0x00ff00);
         const colorTween = createTween(
             color,

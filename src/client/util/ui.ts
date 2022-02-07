@@ -10,9 +10,9 @@ function getValidatorIdentityIconHTML(summary: ValidatorSummary): string {
         }
     } else if (summary.parentDisplay) {
         if (summary.confirmed) {
-            return '<img src="/img/icon/parent_id_confirmed_icon.svg" class="id-confirmed-icon">';
+            return '<img src="/img/icon/parent_id_confirmed_icon.svg" class="id-confirmation-icon">';
         } else {
-            return '<img src="/img/icon/parent_id_unconfirmed_icon.svg" class="id-confirmed-icon">';
+            return '<img src="/img/icon/parent_id_unconfirmed_icon.svg" class="id-confirmation-icon">';
         }
     }
     return "";

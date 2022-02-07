@@ -1,9 +1,6 @@
 import * as THREE from "three";
 import * as TWEEN from "@tweenjs/tween.js";
-import {
-    Block as SubstrateBlock,
-    SignedBlock,
-} from "@polkadot/types/interfaces";
+import { Block as SubstrateBlock, SignedBlock } from "@polkadot/types/interfaces";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
 import { Font, FontLoader } from "three/examples/jsm/loaders/FontLoader";
 import Stats from "three/examples/jsm/libs/stats.module";
@@ -11,13 +8,12 @@ import { Block } from "../model/app/block";
 import { ValidatorSummary } from "../model/subvt/validator_summary";
 import AsyncLock = require("async-lock");
 import { Constants } from "../util/constants";
-import {
-    NetworkStatus,
-    NetworkStatusDiff,
-} from "../model/subvt/network_status";
+import { NetworkStatus, NetworkStatusDiff } from "../model/subvt/network_status";
 import { NetworkStatusBoard } from "../ui/network_status_board";
 import { ValidatorMesh } from "../ui/validator_mesh";
 import { ValidatorList, ValidatorListDelegate } from "../ui/validator_list";
+import { ValidatorSummaryBoard } from "../ui/validator_summary_board";
+import { Validator } from "../model/app/validator";
 
 class ChainVizScene {
     private readonly scene: THREE.Scene;
@@ -37,27 +33,21 @@ class ChainVizScene {
     private validatorMesh!: ValidatorMesh;
     private validatorsInited = false;
     private validatorList: ValidatorList;
+    private readonly validatorSummaryBoard: ValidatorSummaryBoard;
+
+    private networkStatusBoard!: NetworkStatusBoard;
 
     private readonly lock = new AsyncLock();
     private readonly blockPushLockKey = "block_push";
 
-    private readonly hoverInfoBoard = <HTMLElement>(
-        document.getElementById("hover-info-board")
-    );
-    private readonly leftPanel = <HTMLElement>(
-        document.getElementById("left-panel")
-    );
+    private readonly leftPanel = <HTMLElement>document.getElementById("left-panel");
     private mouseIsInLeftPanel = false;
-    private networkStatusBoard!: NetworkStatusBoard;
 
     constructor() {
         // init font loader
-        this.fontLoader.load(
-            "./font/fira_mono_regular.typeface.json",
-            (font) => {
-                this.blockNumberFont = font;
-            }
-        );
+        this.fontLoader.load("./font/fira_mono_regular.typeface.json", (font) => {
+            this.blockNumberFont = font;
+        });
         this.scene = new THREE.Scene();
         this.camera = new THREE.PerspectiveCamera(
             20,
@@ -97,12 +87,8 @@ class ChainVizScene {
         // stats
         this.stats = Stats();
         document.body.appendChild(this.stats.dom);
-        this.stats.domElement.style.cssText =
-            "position:absolute; bottom:0px; right:0px;";
-        this.controls = new OrbitControls(
-            this.camera,
-            this.renderer.domElement
-        );
+        this.stats.domElement.style.cssText = "position:absolute; bottom:0px; right:0px;";
+        this.controls = new OrbitControls(this.camera, this.renderer.domElement);
         this.limitOrbitControls();
         window.addEventListener(
             "resize",
@@ -114,12 +100,18 @@ class ChainVizScene {
         // validator list
         this.validatorList = new ValidatorList(<ValidatorListDelegate>{
             onMouseOver: (accountIdHex) => {
-                this.validatorMesh.hoverByAccountIdHex(accountIdHex);
+                const index = this.validatorMesh.getIndexOf(accountIdHex);
+                if (index) {
+                    const _validator = this.validatorMesh.hover(index);
+                }
             },
             onMouseLeave: (_accountIdHex) => {
                 this.validatorMesh.clearHover();
+                this.validatorSummaryBoard.hide();
             },
         });
+        // validator summary board
+        this.validatorSummaryBoard = new ValidatorSummaryBoard();
     }
 
     private addLights() {
@@ -156,16 +148,8 @@ class ChainVizScene {
         this.controls.minDistance = Constants.ORBIT_MIN_DISTANCE;
         this.controls.maxDistance = Constants.ORBIT_MAX_DISTANCE;
         this.controls.screenSpacePanning = true;
-        const minPan = new THREE.Vector3(
-            -Constants.ORBIT_MAX_PAN_X,
-            -Constants.ORBIT_MAX_PAN_Y,
-            0
-        );
-        const maxPan = new THREE.Vector3(
-            Constants.ORBIT_MAX_PAN_X,
-            Constants.ORBIT_MAX_PAN_Y,
-            0
-        );
+        const minPan = new THREE.Vector3(-Constants.ORBIT_MAX_PAN_X, -Constants.ORBIT_MAX_PAN_Y, 0);
+        const maxPan = new THREE.Vector3(Constants.ORBIT_MAX_PAN_X, Constants.ORBIT_MAX_PAN_Y, 0);
         const _v = new THREE.Vector3();
         this.controls.addEventListener("change", () => {
             _v.copy(this.controls.target);
@@ -184,10 +168,7 @@ class ChainVizScene {
             -(event.clientY / window.innerHeight) * 2 + 1
         );
         this.raycaster.setFromCamera(clickPoint, this.camera);
-        const intersects = this.raycaster.intersectObjects(
-            this.scene.children,
-            false
-        );
+        const intersects = this.raycaster.intersectObjects(this.scene.children, false);
         console.log("CLICK INT : " + intersects.length);
     }
 
@@ -226,35 +207,27 @@ class ChainVizScene {
             return;
         }
         this.raycaster.setFromCamera(this.hoverPoint, this.camera);
-        const intersects = this.raycaster.intersectObjects(
-            this.scene.children,
-            false
-        );
-        const index =
-            intersects.length > 0 ? intersects[0].instanceId : undefined;
-        const validator = index
-            ? this.validatorMesh.hoverByIndex(index)
-            : undefined;
+        const intersects = this.raycaster.intersectObjects(this.scene.children, false);
+        const index = intersects.length > 0 ? intersects[0].instanceId : undefined;
+        const validator = index ? this.validatorMesh.hover(index) : undefined;
         if (index && validator && !validator.isAuthoring()) {
             this.setPointerCursor();
-            const position = this.validatorMesh.getOnScreenPositionOfItem(
-                index,
-                this.renderer,
-                this.camera
-            );
-            this.hoverInfoBoard.style.display = "block";
-            this.hoverInfoBoard.classList.remove("block");
-            this.hoverInfoBoard.classList.add("validator-hover-info-board");
-            this.hoverInfoBoard.style.left =
-                position.x + Constants.HOVER_INFO_BOARD_X_OFFSET + "px";
-            this.hoverInfoBoard.style.top =
-                position.y + Constants.HOVER_INFO_BOARD_Y_OFFSET + "px";
-            this.hoverInfoBoard.innerHTML = validator.getHoverInfoHTML();
+            this.showValidatorSummaryBoard(index, validator);
         } else {
             this.validatorMesh.clearHover();
             this.setDefaultCursor();
-            this.hoverInfoBoard.style.display = "none";
+            this.validatorSummaryBoard.hide();
         }
+    }
+
+    private showValidatorSummaryBoard(index: number, validator: Validator) {
+        const position = this.validatorMesh.getOnScreenPositionOfItem(
+            index,
+            this.renderer,
+            this.camera
+        );
+        this.validatorSummaryBoard.show(validator.getSummary());
+        this.validatorSummaryBoard.setPosition(position.x, position.y);
     }
 
     private render() {
@@ -313,10 +286,7 @@ class ChainVizScene {
 
     async initBlocks(signedBlocks: Array<SignedBlock>) {
         for (let i = signedBlocks.length - 1; i >= 0; i--) {
-            const block = new Block(
-                signedBlocks[i].block,
-                this.blockNumberFont
-            );
+            const block = new Block(signedBlocks[i].block, this.blockNumberFont);
             this.blocks.unshift(block);
             block.addTo(this.scene);
             block.setIndex(i, true);
@@ -329,16 +299,12 @@ class ChainVizScene {
     private hasBlock(substrateBlock: SubstrateBlock): boolean {
         return (
             this.blocks.filter((block) => {
-                block.substrateBlock.header.hash.toHex() ==
-                    substrateBlock.header.hash.toHex();
+                block.substrateBlock.header.hash.toHex() == substrateBlock.header.hash.toHex();
             }).length > 0
         );
     }
 
-    async pushBlock(
-        substrateBlock: SubstrateBlock,
-        authorAccountIdHex?: string
-    ) {
+    async pushBlock(substrateBlock: SubstrateBlock, authorAccountIdHex?: string) {
         if (this.hasBlock(substrateBlock)) {
             // skip duplicate block
             return;
@@ -357,22 +323,13 @@ class ChainVizScene {
                         }
                         setTimeout(() => {
                             // shift blocks
-                            block.spawn(
-                                this.scene,
-                                validator.index,
-                                validator.ringSize,
-                                () => {
-                                    for (
-                                        let i = this.blocks.length;
-                                        i >= this.maxBlocks;
-                                        i--
-                                    ) {
-                                        const blockToRemove = this.blocks.pop();
-                                        blockToRemove?.removeAndDispose();
-                                    }
-                                    done();
+                            block.spawn(this.scene, validator.index, validator.ringSize, () => {
+                                for (let i = this.blocks.length; i >= this.maxBlocks; i--) {
+                                    const blockToRemove = this.blocks.pop();
+                                    blockToRemove?.removeAndDispose();
                                 }
-                            );
+                                done();
+                            });
                             setTimeout(() => {
                                 this.validatorMesh.endAuthorship();
                             }, Constants.VALIDATOR_AUTHORSHIP_END_DELAY);

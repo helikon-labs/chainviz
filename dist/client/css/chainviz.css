@@ -104,65 +104,6 @@ hr {
     width: 120px;
 }
 
-.hover-info-board {
-    position: absolute;
-    top: 0px;
-    left: 0px;
-    background-color: #000000bb;
-    color: #ffffffdd;
-    padding: 12px 8px 4px 8px;
-    display: none;
-    border-radius: 6px;
-    border-color: #ffffffcc;
-    border-width: 1px;
-    border-style: solid;
-    font-family: "IBM Plex Mono", Courier, monospace;
-    font-size: 14px;
-    line-height: 20px;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-}
-
-.validator-hover-info-board {
-    width: 260px;
-}
-
-.validator-hover-info-board .id-confirmation-icon {
-    width: 14px;
-    margin-right: 8px;
-}
-
-.hover-info-board .identicon {
-    margin-left: 115px;
-}
-
-.hover-info-board .active-title {
-    color: #00ff00;
-}
-
-.hover-info-board .inactive-title {
-    color: #ff0000;
-}
-
-.hover-info-board div.amount-title {
-    float: left;
-    width: 120px;
-}
-
-.hover-info-board div.amount {
-    width: 100%;
-    text-align: right;
-}
-
-.hover-info-board .status-icon-container {
-    text-align: center;
-}
-
-.hover-info-board .status-icon-container img {
-    width: 26px;
-}
-
 #left-panel {
     position: absolute;
     width: 240px;
@@ -350,4 +291,102 @@ hr {
 
 #left-panel #icon-container #github-icon {
     margin-left: 8px;
+}
+
+/* validator summary board */
+#validator-summary-board {
+    visibility: hidden;
+    position: absolute;
+    top: 0px;
+    left: 0px;
+    width: 250px;
+    display: flex;
+    flex-flow: column nowrap;
+    align-items: center;
+    background-color: #000000bb;
+    color: #ffffffdd;
+    padding: 8px 12px 4px 12px;
+    border-radius: 6px;
+    border-color: #ffffffcc;
+    border-width: 1px;
+    border-style: solid;
+    font-family: "IBM Plex Mono", Courier, monospace;
+    font-size: 14px;
+    line-height: 20px;
+}
+
+#validator-summary-board hr {
+    width: 100%;
+}
+
+#validator-summary-board div {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+#validator-summary-board div.top-margin {
+    margin-top: 4px;
+}
+
+#validator-summary-board div.left {
+    width: 100%;
+}
+
+#validator-summary-board span {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+#validator-summary-board .id-confirmation-icon {
+    width: 16px;
+    height: 16px;
+    margin-right: 8px;
+}
+
+#validator-summary-board #validator-summary-identity {
+    margin-top: 6px;
+    display: flex;
+    flex-flow: row nowrap;
+    justify-content: center;
+    align-items: center;
+    max-width: 100%;
+    min-width: 0%;
+}
+
+#validator-summary-board .active-title {
+    color: #00ff00;
+}
+
+#validator-summary-board .inactive-title {
+    color: #ff0000;
+}
+
+#validator-summary-board .amount-container {
+    display: flex;
+    flex-flow: row nowrap;
+    align-items: center;
+}
+
+#validator-summary-board .amount-title {
+    flex-grow: 1;
+}
+
+#validator-summary-board #status-icon-container {
+    display: flex;
+    flex-flow: row nowrap;
+    justify-content: center;
+    align-items: center;
+    gap: 8px;
+    margin-top: 8px;
+    width: 100%;
+    padding: 12px 0px;
+    border-style: solid;
+    border-width: 1px 0px 0px 0px;
+    border-color: #777;
+}
+
+#validator-summary-board #status-icon-container img {
+    width: 26px;
 }

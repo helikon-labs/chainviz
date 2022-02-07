@@ -25,11 +25,7 @@ class ValidatorMesh {
     private authorValidatorIndex = -1;
 
     constructor(validatorCount: number) {
-        this.mesh = new THREE.InstancedMesh(
-            this.geometry,
-            this.material,
-            validatorCount
-        );
+        this.mesh = new THREE.InstancedMesh(this.geometry, this.material, validatorCount);
         this.mesh.instanceMatrix.setUsage(THREE.DynamicDrawUsage);
     }
 
@@ -74,16 +70,16 @@ class ValidatorMesh {
         }
     }
 
-    hoverByAccountIdHex(accountIdHex: string): Validator | undefined {
+    getIndexOf(accountIdHex: string): number | undefined {
         for (let i = 0; i < this.validators.length; i++) {
             if (this.validators[i].getAccountIdHex() == accountIdHex) {
-                return this.hoverByIndex(i);
+                return i;
             }
         }
         return undefined;
     }
 
-    hoverByIndex(index: number): Validator {
+    hover(index: number): Validator {
         if (this.hoverValidatorIndex == index) {
             return this.validators[index];
         }
@@ -125,10 +121,7 @@ class ValidatorMesh {
         this.refreshMeshMatrix();
     }
 
-    beginAuthorship(
-        accountIdHex?: string,
-        onComplete?: (validator: Validator) => void
-    ): boolean {
+    beginAuthorship(accountIdHex?: string, onComplete?: (validator: Validator) => void): boolean {
         const index = this.validators.findIndex((validator) => {
             return validator.getAccountIdHex().toLowerCase() === accountIdHex;
         });

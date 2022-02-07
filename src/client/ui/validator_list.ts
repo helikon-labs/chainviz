@@ -19,24 +19,14 @@ class ValidatorList {
 
     constructor(delegate: ValidatorListDelegate) {
         this.delegate = delegate;
-        this.container = <HTMLElement>(
-            document.getElementById("validator-list-container")
-        );
+        this.container = <HTMLElement>document.getElementById("validator-list-container");
         this.titleContainer = <HTMLElement>(
             document.getElementById("validator-list-title-container")
         );
-        this.title = <HTMLElement>(
-            document.getElementById("validator-list-title")
-        );
-        this.toggle = <HTMLElement>(
-            document.getElementById("validator-list-toggle")
-        );
-        this.searchContainer = <HTMLElement>(
-            document.getElementById("validator-search-container")
-        );
-        this.searchInput = <HTMLInputElement>(
-            document.getElementById("validator-search-input")
-        );
+        this.title = <HTMLElement>document.getElementById("validator-list-title");
+        this.toggle = <HTMLElement>document.getElementById("validator-list-toggle");
+        this.searchContainer = <HTMLElement>document.getElementById("validator-search-container");
+        this.searchInput = <HTMLInputElement>document.getElementById("validator-search-input");
         this.list = <HTMLElement>document.getElementById("validator-list");
 
         this.titleContainer.addEventListener("click", (_event) => {
@@ -84,17 +74,13 @@ class ValidatorList {
     }
 
     private filter() {
-        const query = this.searchInput.value
-            .toLocaleLowerCase()
-            .replace(" ", "");
+        const query = this.searchInput.value.toLocaleLowerCase().replace(" ", "");
         let filteredItems;
         if (query.length == 0) {
             filteredItems = this.items;
         } else {
             filteredItems = this.items.filter((item) => {
-                const text = (
-                    getValidatorSummaryDisplay(item) + item.address
-                ).toLocaleLowerCase();
+                const text = (getValidatorSummaryDisplay(item) + item.address).toLocaleLowerCase();
                 return text.indexOf(query) >= 0;
             });
         }

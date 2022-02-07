@@ -36,12 +36,11 @@ export abstract class Constants {
     static readonly VALIDATOR_AUTHORSHIP_SCALE = 2.5;
     static readonly VALIDATOR_AUTHORSHIP_TRANSLATE_Z = 10;
     static readonly VALIDATOR_AUTHORSHIP_SCALE_CURVE = TWEEN.Easing.Linear.None;
-    static readonly VALIDATOR_AUTHORSHIP_TRANSLATE_CURVE =
-        TWEEN.Easing.Exponential.Out;
+    static readonly VALIDATOR_AUTHORSHIP_TRANSLATE_CURVE = TWEEN.Easing.Exponential.Out;
     static readonly VALIDATOR_AUTHORSHIP_MOVE_TIME_MS = 350;
     static readonly VALIDATOR_AUTHORSHIP_END_DELAY = 800;
     // hover info board
-    static readonly HOVER_INFO_BOARD_X_OFFSET = 16;
+    static readonly HOVER_INFO_BOARD_X_OFFSET = 30;
     static readonly HOVER_INFO_BOARD_Y_OFFSET = -30;
     // format
     static readonly BALANCE_FORMAT_DECIMALS = 4;
