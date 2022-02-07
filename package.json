@@ -15,10 +15,10 @@
     "author": "kukabi @ Helikon Labs",
     "license": "GPL 3",
     "devDependencies": {
-        "@polkadot/api": "^7.6.1",
-        "@polkadot/api-derive": "^7.6.1",
+        "@polkadot/api": "^7.7.1",
+        "@polkadot/api-derive": "^7.7.1",
         "@polkadot/keyring": "^8.3.3",
-        "@polkadot/types": "^7.6.1",
+        "@polkadot/types": "^7.7.1",
         "@polkadot/ui-shared": "^1.0.1",
         "@tweenjs/tween.js": "^18.6.4",
         "@types/async-lock": "^1.1.3",
