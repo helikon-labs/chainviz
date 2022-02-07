@@ -6,6 +6,7 @@ interface Network {
     tokenDecimals: number;
     tokenTicker: string;
     blockTimeMs: number;
+    accountURLPrefix: string;
     parachainMap: Map<number, Parachain>;
 }
 
@@ -15,6 +16,7 @@ const kusama: Network = {
     tokenDecimals: 12,
     tokenTicker: "KSM",
     blockTimeMs: 6 * 1000,
+    accountURLPrefix: "https://kusama.subscan.io/account/",
     parachainMap: new Map<number, Parachain>([
         [
             1000,
@@ -201,6 +203,7 @@ const polkadot: Network = {
     tokenDecimals: 10,
     tokenTicker: "DOT",
     blockTimeMs: 6 * 1000,
+    accountURLPrefix: "https://polkadot.subscan.io/account/",
     parachainMap: new Map<number, Parachain>(),
 };
 

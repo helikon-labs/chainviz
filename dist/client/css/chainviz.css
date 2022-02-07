@@ -2,13 +2,22 @@ body {
     overflow: hidden;
     margin: 0px;
     background-color: #000000;
+    color: #ffffffdd;
     font-family: "IBM Plex Mono", Courier, monospace;
     font-size: 14px;
 }
 
+a:link,
+a:visited,
+a:hover,
+a:active {
+    color: #ffffffdd;
+    cursor: pointer;
+}
+
 hr {
-    color: #777;
-    background-color: #777;
+    color: #666;
+    background-color: #666;
     height: 1px;
     border: none;
     max-width: 100%;
@@ -33,7 +42,7 @@ hr {
     transform: rotate(-180deg);
 }
 
-#spinner {
+#page-spinner {
     width: 60px;
     height: 60px;
 
@@ -43,8 +52,8 @@ hr {
     transform: translate(-50%, -50%);
 }
 
-#double-bounce1,
-#double-bounce2 {
+.double-bounce1,
+.double-bounce2 {
     width: 100%;
     height: 100%;
     border-radius: 50%;
@@ -58,7 +67,7 @@ hr {
     animation: sk-bounce 2s infinite ease-in-out;
 }
 
-#double-bounce2 {
+.double-bounce2 {
     -webkit-animation-delay: -1s;
     animation-delay: -1s;
 }
@@ -249,7 +258,7 @@ hr {
     display: flex;
     font-size: 13px;
     padding: 4px 8px;
-    background-color: #ffffff1d;
+    background-color: #ffffff10;
     margin-top: 3px;
     cursor: pointer;
     height: 30px;
@@ -301,8 +310,8 @@ hr {
     flex-flow: column nowrap;
     align-items: center;
     background-color: #000000bb;
-    color: #ffffffdd;
     padding: 8px 12px 4px 12px;
+    font-size: 13px;
     border-radius: 6px;
     border-color: #ffffffcc;
     border-width: 1px;
@@ -385,18 +394,121 @@ hr {
 /* validator details board */
 #validator-details-board {
     position: absolute;
-    top: 0px;
+    top: 46px;
     right: 0px;
     width: 280px;
     display: none;
     flex-flow: column nowrap;
     align-items: center;
-    background-color: #00000077;
-    padding: 10px 10px 0px 10px;
+    background-color: #ffffff11;
+    padding: 24px 16px 0px 16px;
     color: #ffffffdd;
+    border-radius: 16px 0 0 16px;
     /* border-radius: 6px;
     border-color: #ffffffcc;
     border-width: 1px;
     border-style: solid; */
     line-height: 20px;
+}
+
+#validator-details-spinner {
+    width: 12px;
+    height: 12px;
+    position: absolute;
+    top: 16px;
+    left: 16px;
+    opacity: 0.5;
+}
+
+#validator-details-spinner .double-bounce1,
+#validator-details-spinner .double-bounce2 {
+    background-color: #00ff00;
+}
+
+#validator-details-board div {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+#validator-details-board span {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+#validator-details-board #validator-details-close-button {
+    position: absolute;
+    top: 16px;
+    right: 16px;
+}
+
+#validator-details-board #validator-details-close-button i {
+    color: #ffffff66;
+    font-size: 22px;
+    cursor: pointer;
+}
+
+#validator-details-board #validator-details-close-button i:hover {
+    color: #ffffffcc;
+}
+
+#validator-details-board #validator-details-identity {
+    margin-top: 6px;
+    display: flex;
+    flex-flow: row nowrap;
+    justify-content: center;
+    align-items: center;
+    max-width: 100%;
+    min-width: 0%;
+}
+
+#validator-details-board .id-confirmation-icon {
+    width: 18px;
+    height: 18px;
+    margin-right: 8px;
+}
+
+#validator-details-board div.top-margin {
+    margin-top: 4px;
+}
+
+#validator-details-board div.left {
+    width: 100%;
+}
+
+#validator-details-board .amount-container {
+    display: flex;
+    flex-flow: row nowrap;
+    align-items: center;
+}
+
+#validator-details-board .amount-title {
+    flex-grow: 1;
+}
+
+#validator-details-board .active-title {
+    color: #00ff00;
+}
+
+#validator-details-board .inactive-title {
+    color: #ff0000;
+}
+
+#validator-details-board #status-icon-container {
+    display: flex;
+    flex-flow: row nowrap;
+    justify-content: center;
+    align-items: center;
+    gap: 8px;
+    margin-top: 8px;
+    width: 100%;
+    padding: 12px 0px;
+    border-style: solid;
+    border-width: 1px 0px 0px 0px;
+    border-color: #777;
+}
+
+#validator-details-board #status-icon-container img {
+    width: 32px;
 }

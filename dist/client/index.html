@@ -17,9 +17,9 @@
         <a href="https://kusama.network">
             <img src="./img/logo/kusama_logo.svg" alt="Kusama" id="kusama-logo" />
         </a>
-        <div id="spinner" id="spinner">
-            <div id="double-bounce1"></div>
-            <div id="double-bounce2"></div>
+        <div id="page-spinner">
+            <div class="double-bounce1"></div>
+            <div class="double-bounce2"></div>
         </div>
         <div id="loading-status"></div>
         <!-- left panel -->
@@ -118,7 +118,7 @@
             <hr />
             <div class="left active-title">ACTIVE</div>
             <div class="left top-margin amount-container">
-                <span id="validator-summary-self-stake-title" class="amount-title"></span>
+                <span id="validator-summary-self-stake-title" class="amount-title">Self</span>
                 <span id="validator-summary-self-stake-amount"></span>
             </div>
             <div class="left top-margin amount-container">
@@ -156,8 +156,96 @@
             </div>
         </div>
         <!-- validator details board -->
-        <div id="validator-details-board" class="no-select">
+        <div id="validator-details-board">
+            <div id="validator-details-spinner">
+                <div class="double-bounce1"></div>
+                <div class="double-bounce2"></div>
+            </div>
+            <div id="validator-details-close-button">
+                <i id="validator-list-toggle" class="fas fa-times"></i>
+            </div>
             <div id="validator-details-identicon-container"></div>
+            <div id="validator-details-identity"></div>
+            <div id="validator-details-para-info" class="top-margin"></div>
+            <hr />
+            <div class="left amount-container">
+                <span id="validator-details-stash-title" class="amount-title">Stash</span>
+                <span id="validator-details-stash"></span>
+            </div>
+            <div class="left amount-container">
+                <span id="validator-details-controller-title" class="amount-title">Controller</span>
+                <span id="validator-details-controller"></span>
+            </div>
+            <hr />
+            <div class="left amount-container">
+                <span class="amount-title">Commission</span>
+                <span id="validator-details-commission"></span>
+            </div>
+            <div class="left amount-container top-margin">
+                <span class="amount-title">Blocks in era</span>
+                <span id="validator-details-blocks"></span>
+            </div>
+            <div class="left amount-container top-margin">
+                <span class="amount-title">Era reward points</span>
+                <span id="validator-details-points"></span>
+            </div>
+            <div id="validator-details-return-container" class="left amount-container top-margin">
+                <span class="amount-title">Return rate</span>
+                <span id="validator-details-return"></span>
+            </div>
+            <hr />
+            <div class="left active-title">Active Stake</div>
+            <div class="left top-margin amount-container">
+                <span id="validator-details-self-stake-title" class="amount-title">Self</span>
+                <span id="validator-details-self-stake-amount"></span>
+            </div>
+            <div class="left top-margin amount-container">
+                <span id="validator-details-other-stake-title" class="amount-title"></span>
+                <span id="validator-details-other-stake-amount"></span>
+            </div>
+            <hr />
+            <div class="left inactive-title">Inactive Stake</div>
+            <div class="left top-margin amount-container">
+                <span id="validator-details-inactive-stake-title" class="amount-title"></span>
+                <span id="validator-details-inactive-stake-amount"></span>
+            </div>
+            <div id="status-icon-container">
+                <img
+                    id="validator-details-icon-1kv"
+                    src="./img/status/status_icon_1kv.svg"
+                    alt="Is enrolled in the Thousand Validators Programme"
+                />
+                <img
+                    id="validator-details-icon-heartbeat"
+                    src="./img/status/status_icon_heartbeat_received.svg"
+                    alt="Heartbeat received"
+                    title="Heartbeat received"
+                />
+                <img
+                    id="validator-details-icon-next-session"
+                    src="./img/status/status_icon_active_next_session.svg"
+                    alt="Is active next session"
+                    title="Is active next session"
+                />
+                <img
+                    id="validator-details-icon-slashed"
+                    src="./img/status/status_icon_slashed.svg"
+                    alt="Has been slashed before"
+                    title="Has been slashed before"
+                />
+                <img
+                    id="validator-details-icon-blocks-nominations"
+                    src="./img/status/status_icon_blocks_nominations.svg"
+                    alt="Blocks nominations"
+                    title="Blocks nominations"
+                />
+                <img
+                    id="validator-details-icon-oversubscribed"
+                    src="./img/status/status_icon_oversubscribed.svg"
+                    alt="Oversubscribed"
+                    title="Oversubscribed"
+                />
+            </div>
         </div>
     </body>
 </html>

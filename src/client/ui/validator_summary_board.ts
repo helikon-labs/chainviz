@@ -114,7 +114,6 @@ class ValidatorSummaryBoard {
         }
         // active stake
         {
-            this.ui.selfStakeTitle.innerHTML = "Self";
             this.ui.selfStakeAmount.innerHTML = formatNumber(
                 summary.selfStake.activeAmount,
                 network.tokenDecimals,

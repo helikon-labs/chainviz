@@ -128,7 +128,7 @@ class ChainViz {
     }
 
     private removeLoadingStatus() {
-        document.getElementById("spinner")?.remove();
+        document.getElementById("page-spinner")?.remove();
         document.getElementById("loading-status")?.remove();
     }
 

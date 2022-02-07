@@ -30,7 +30,7 @@ function formatNumber(
 }
 
 function getCondensedAddress(address: string) {
-    return `${address.slice(0, 5)}...${address.slice(-5)}`;
+    return `${address.slice(0, 6)}...${address.slice(-6)}`;
 }
 
 export { formatNumber, getCondensedAddress };
