@@ -2,7 +2,6 @@ import * as THREE from "three";
 import * as TWEEN from "@tweenjs/tween.js";
 import { Block as SubstrateBlock, SignedBlock } from "@polkadot/types/interfaces";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
-import { Font, FontLoader } from "three/examples/jsm/loaders/FontLoader";
 import Stats from "three/examples/jsm/libs/stats.module";
 import { Block } from "../model/app/block";
 import { ValidatorSummary } from "../model/subvt/validator_summary";
@@ -27,8 +26,6 @@ class ChainVizScene {
     private readonly raycaster: THREE.Raycaster;
     private readonly hoverPoint: THREE.Vector2 = new THREE.Vector2();
 
-    private readonly fontLoader = new FontLoader();
-    private blockNumberFont!: Font;
     private readonly blocks = new Array<Block>();
     private readonly maxBlocks = 13;
 
@@ -47,9 +44,7 @@ class ChainVizScene {
 
     constructor() {
         // init font loader
-        this.fontLoader.load("./font/fira_mono_regular.typeface.json", (font) => {
-            this.blockNumberFont = font;
-        });
+
         this.scene = new THREE.Scene();
         this.camera = new THREE.PerspectiveCamera(
             20,
@@ -262,7 +257,6 @@ class ChainVizScene {
 
     start() {
         this.addChainRing();
-        this.addChainLine();
         this.animate();
     }
 
@@ -280,15 +274,6 @@ class ChainVizScene {
             side: THREE.DoubleSide,
         });
         this.scene.add(new THREE.Mesh(geometry, material));
-    }
-
-    private addChainLine() {
-        const points = [];
-        points.push(new THREE.Vector3(0, 0, 0));
-        points.push(new THREE.Vector3(-(this.maxBlocks - 1) * 5, 0, 0));
-        const geometry = new THREE.BufferGeometry().setFromPoints(points);
-        const material = new THREE.LineBasicMaterial({ color: 0x005500 });
-        this.scene.add(new THREE.Line(geometry, material));
     }
 
     async initValidators(summaries: Array<ValidatorSummary>) {
@@ -309,7 +294,7 @@ class ChainVizScene {
 
     async initBlocks(signedBlocks: Array<SignedBlock>) {
         for (let i = signedBlocks.length - 1; i >= 0; i--) {
-            const block = new Block(signedBlocks[i].block, this.blockNumberFont);
+            const block = new Block(signedBlocks[i].block);
             this.blocks.unshift(block);
             block.addTo(this.scene);
             block.setIndex(i, true);
@@ -319,33 +304,46 @@ class ChainVizScene {
         }
     }
 
-    private hasBlock(substrateBlock: SubstrateBlock): boolean {
+    private getBlockWithNumber(number: number): Block | undefined {
+        return this.blocks.find((block) => {
+            return block.substrateBlock.header.number.toNumber() == number;
+        });
+    }
+
+    private hasBlockWithHash(hashHex: string): boolean {
         return (
             this.blocks.filter((block) => {
-                block.substrateBlock.header.hash.toHex() == substrateBlock.header.hash.toHex();
+                block.substrateBlock.header.hash.toHex() == hashHex;
             }).length > 0
         );
     }
 
     async pushBlock(substrateBlock: SubstrateBlock, authorAccountIdHex?: string) {
-        if (this.hasBlock(substrateBlock)) {
+        if (this.hasBlockWithHash(substrateBlock.header.hash.toHex())) {
             // skip duplicate block
             return;
         }
         this.lock.acquire(
             this.blockPushLockKey,
             (done) => {
-                const block = new Block(substrateBlock, this.blockNumberFont);
+                const block = new Block(substrateBlock);
+                const blockNumber = substrateBlock.header.number.toNumber();
+                const sibling = this.getBlockWithNumber(blockNumber);
                 this.blocks.unshift(block);
                 const authorshipBegan = this.validatorMesh.beginAuthorship(
                     authorAccountIdHex,
                     (validator) => {
-                        for (let i = 1; i < this.blocks.length; i++) {
-                            const block = this.blocks[i];
-                            block.setIndex(block.getIndex() + 1, true);
+                        if (sibling) {
+                            sibling.setSibling(block);
+                            block.setSibling(sibling);
+                            sibling.fork();
+                        } else {
+                            for (let i = 1; i < this.blocks.length; i++) {
+                                const block = this.blocks[i];
+                                block.setIndex(block.getIndex() + 1, true);
+                            }
                         }
                         setTimeout(() => {
-                            // shift blocks
                             block.spawn(this.scene, validator.index, validator.ringSize, () => {
                                 for (let i = this.blocks.length; i >= this.maxBlocks; i--) {
                                     const blockToRemove = this.blocks.pop();

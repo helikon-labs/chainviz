@@ -1,6 +1,6 @@
 import { Block as SubstrateBlock } from "@polkadot/types/interfaces";
 import * as THREE from "three";
-import { Font } from "three/examples/jsm/loaders/FontLoader";
+import { Font, FontLoader } from "three/examples/jsm/loaders/FontLoader";
 import { TextGeometry } from "three/examples/jsm/geometries/TextGeometry";
 import { Constants } from "../../util/constants";
 import { createTween } from "../../util/tween";
@@ -9,7 +9,16 @@ import { rotateAboutPoint } from "../../util/geometry";
 class Block {
     private readonly mesh: THREE.Group;
     readonly substrateBlock: SubstrateBlock;
+    private sibling?: Block = undefined;
     private index: number;
+
+    private static blockNumberFont: Font;
+
+    static {
+        new FontLoader().load("./font/fira_mono_regular.typeface.json", (font) => {
+            Block.blockNumberFont = font;
+        });
+    }
 
     private readonly indexXOffset = 5;
     private readonly sideLength = 2.5;
@@ -17,19 +26,25 @@ class Block {
         color: 0x00ff00,
         shininess: 8,
         specular: 0xffffff,
-        wireframe: true,
     });
-    private readonly textMaterial = new THREE.MeshBasicMaterial({
+    private readonly blockNumberTextMaterial = new THREE.MeshBasicMaterial({
         color: 0x00ff00,
     });
+    private readonly finalizedTextMaterial = new THREE.MeshBasicMaterial({
+        color: 0xffffff,
+    });
     private boxGeometry!: THREE.BoxGeometry;
-    private textGeometry!: TextGeometry;
+    private blockNumberTextGeometry!: TextGeometry;
+    private finalizedTextGeometry!: TextGeometry;
+    private finalizedTextMesh!: THREE.Mesh;
     private scene!: THREE.Scene;
+    private isFinalized: boolean;
 
-    constructor(block: SubstrateBlock, font: Font) {
+    constructor(block: SubstrateBlock, isFinalized = false) {
         this.substrateBlock = block;
         this.index = -1;
-        this.mesh = this.createMesh(font);
+        this.isFinalized = isFinalized;
+        this.mesh = this.createMesh(Block.blockNumberFont);
     }
 
     private createMesh(font: Font): THREE.Group {
@@ -44,9 +59,9 @@ class Block {
             );
             group.add(new THREE.Mesh(this.boxGeometry, this.boxMaterial));
         }
-        // text
+        // block number
         {
-            this.textGeometry = new TextGeometry(
+            this.blockNumberTextGeometry = new TextGeometry(
                 `${this.substrateBlock.header.number.toNumber()}`,
                 {
                     font: font,
@@ -55,10 +70,26 @@ class Block {
                     curveSegments: 6,
                 }
             );
-            const textMesh = new THREE.Mesh(this.textGeometry, this.textMaterial);
-            textMesh.position.x = -1.5;
-            textMesh.position.y = -2.2;
-            group.add(textMesh);
+            const mesh = new THREE.Mesh(this.blockNumberTextGeometry, this.blockNumberTextMaterial);
+            mesh.position.x = -1.5;
+            mesh.position.y = -2.2;
+            group.add(mesh);
+        }
+        // finalized
+        {
+            this.finalizedTextGeometry = new TextGeometry("+", {
+                font: font,
+                size: 2,
+                height: 0,
+                curveSegments: 6,
+            });
+            const mesh = new THREE.Mesh(this.finalizedTextGeometry, this.finalizedTextMaterial);
+            mesh.position.x = -0.8;
+            mesh.position.y = -0.85;
+            mesh.position.z = 1.3;
+            mesh.visible = this.isFinalized;
+            group.add(mesh);
+            this.finalizedTextMesh = mesh;
         }
         return group;
     }
@@ -68,6 +99,26 @@ class Block {
         this.index = 0;
         this.mesh.position.x = -this.index * 5;
         scene.add(this.mesh);
+    }
+
+    setSibling(sibling: Block) {
+        this.sibling = sibling;
+    }
+
+    async fork(onComplete?: () => void) {
+        createTween(
+            this.mesh.position,
+            { x: 0, y: -Constants.BLOCK_FORK_DELTA_Y, z: 0 },
+            Constants.BLOCK_SHIFT_CURVE,
+            Constants.BLOCK_SHIFT_TIME_MS,
+            undefined,
+            undefined,
+            () => {
+                if (onComplete) {
+                    onComplete();
+                }
+            }
+        ).start();
     }
 
     spawn(
@@ -117,7 +168,7 @@ class Block {
         );
         createTween(
             this.mesh.position,
-            { x: 0, y: 0, z: 0 },
+            { x: 0, y: this.sibling ? Constants.BLOCK_FORK_DELTA_Y : 0, z: 0 },
             Constants.BLOCK_TO_ORIGIN_CURVE,
             Constants.BLOCK_TO_ORIGIN_TIME_MS,
             () => {
@@ -149,15 +200,27 @@ class Block {
     }
 
     finalize() {
-        this.boxMaterial.wireframe = false;
+        if (this.sibling) {
+            this.sibling.removeAndDispose();
+            this.sibling = undefined;
+            createTween(
+                this.mesh.position,
+                { x: this.mesh.position.x, y: 0, z: 0 },
+                Constants.BLOCK_TO_ORIGIN_CURVE,
+                Constants.BLOCK_TO_ORIGIN_TIME_MS
+            ).start();
+        }
+        this.finalizedTextMesh.visible = true;
     }
 
     removeAndDispose() {
         this.scene.remove(this.mesh);
         this.boxGeometry.dispose();
-        this.textGeometry.dispose();
         this.boxMaterial.dispose();
-        this.textMaterial.dispose();
+        this.blockNumberTextGeometry.dispose();
+        this.blockNumberTextMaterial.dispose();
+        this.finalizedTextGeometry.dispose();
+        this.finalizedTextMaterial.dispose();
     }
 }
 

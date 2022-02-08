@@ -20,6 +20,7 @@ export abstract class Constants {
     static readonly BLOCK_SPAWN_SCALE_TIME_MS = 250;
     static readonly BLOCK_TO_ORIGIN_CURVE = TWEEN.Easing.Cubic.Out;
     static readonly BLOCK_TO_ORIGIN_TIME_MS = 750;
+    static readonly BLOCK_FORK_DELTA_Y = 2.25;
     // identicon
     static readonly SUMMARY_BOARD_IDENTICON_SIZE = 30;
     static readonly DETAILS_BOARD_IDENTICON_SIZE = 36;
