@@ -1,6 +1,6 @@
 import * as THREE from "three";
 import { Validator } from "../model/app/validator";
-import { ValidatorSummary } from "../model/subvt/validator_summary";
+import { ValidatorSummary, ValidatorSummaryDiff } from "../model/subvt/validator_summary";
 import { Constants } from "../util/constants";
 import { getOnScreenPosition } from "../util/geometry";
 
@@ -103,6 +103,7 @@ class ValidatorMesh {
         if (this.selectedValidatorIndex == index) {
             return undefined;
         }
+        this.clearSelection();
         const validator = this.validators[index];
         validator.select();
         this.setMatrixAt(index, validator.getMatrix());
@@ -113,7 +114,14 @@ class ValidatorMesh {
     }
 
     clearSelection() {
-        console.log("clear selection");
+        if (this.selectedValidatorIndex < 0) {
+            return;
+        }
+        const validator = this.validators[this.selectedValidatorIndex];
+        validator.unselect();
+        this.setMatrixAt(this.selectedValidatorIndex, validator.getMatrix());
+        this.setColorAt(this.selectedValidatorIndex, validator.getColor());
+        this.selectedValidatorIndex = -1;
     }
 
     getOnScreenPositionOfItem(
@@ -161,6 +169,16 @@ class ValidatorMesh {
         this.validators[index].endAuthorship(this.mesh, index, () => {
             if (onComplete) onComplete();
         });
+    }
+
+    update(diff: ValidatorSummaryDiff) {
+        const index = this.getIndexOf(diff.accountId);
+        if (index) {
+            this.validators[index].update(diff);
+            if (this.selectedValidatorIndex != index && this.hoverValidatorIndex != index) {
+                this.setColorAt(index, this.validators[index].getColor());
+            }
+        }
     }
 }
 

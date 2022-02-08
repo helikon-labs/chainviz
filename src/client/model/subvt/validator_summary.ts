@@ -21,9 +21,9 @@ interface ValidatorSummary {
     isEnrolledIn1kv: boolean;
     isParaValidator: boolean;
     paraId?: number;
-    returnRatePerBillion?: number;
-    blocksAuthored?: number;
-    rewardPoints?: number;
+    returnRatePerBillion: number;
+    blocksAuthored: number;
+    rewardPoints: number;
     heartbeatReceived?: boolean;
     validatorStake?: ValidatorStakeSummary;
 }
@@ -54,9 +54,9 @@ interface ValidatorSummaryDiff {
 
 interface ValidatorListUpdate {
     finalizedBlockNumber?: number;
-    insert: [ValidatorSummary];
-    update: [ValidatorSummaryDiff];
-    removeIds: [string];
+    insert: Array<ValidatorSummary>;
+    update: Array<ValidatorSummaryDiff>;
+    removeIds: Array<string>;
 }
 
 export { ValidatorSummary, ValidatorSummaryDiff, ValidatorListUpdate };

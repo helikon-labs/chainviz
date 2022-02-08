@@ -1,5 +1,5 @@
 import { network } from "../chainviz";
-import { ValidatorSummary } from "../model/subvt/validator_summary";
+import { ValidatorSummary, ValidatorSummaryDiff } from "../model/subvt/validator_summary";
 import { Constants } from "../util/constants";
 import { formatNumber } from "../util/format";
 import { generateIdenticonSVGHTML } from "../util/identicon";
@@ -29,7 +29,7 @@ interface UI {
 
 class ValidatorSummaryBoard {
     private readonly ui: UI;
-    private summary!: ValidatorSummary;
+    private summary?: ValidatorSummary = undefined;
 
     constructor() {
         this.ui = {
@@ -203,6 +203,14 @@ class ValidatorSummaryBoard {
 
     hide() {
         this.ui.root.style.visibility = "hidden";
+        this.summary = undefined;
+    }
+
+    update(diff: ValidatorSummaryDiff) {
+        if (this.summary && this.summary.accountId == diff.accountId) {
+            Object.assign(this.summary, diff);
+            this.show(this.summary);
+        }
     }
 }
 

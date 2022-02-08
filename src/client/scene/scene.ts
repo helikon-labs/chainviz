@@ -1,10 +1,10 @@
 import * as THREE from "three";
 import * as TWEEN from "@tweenjs/tween.js";
-import { Block as SubstrateBlock, SignedBlock } from "@polkadot/types/interfaces";
+import { Block as SubstrateBlock, Header, SignedBlock } from "@polkadot/types/interfaces";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
 import Stats from "three/examples/jsm/libs/stats.module";
 import { Block } from "../model/app/block";
-import { ValidatorSummary } from "../model/subvt/validator_summary";
+import { ValidatorSummary, ValidatorSummaryDiff } from "../model/subvt/validator_summary";
 import AsyncLock = require("async-lock");
 import { Constants } from "../util/constants";
 import { NetworkStatus, NetworkStatusDiff } from "../model/subvt/network_status";
@@ -14,7 +14,11 @@ import { ValidatorList, ValidatorListDelegate } from "../ui/validator_list";
 import { ValidatorSummaryBoard } from "../ui/validator_summary_board";
 import { Validator } from "../model/app/validator";
 import { cloneJSONSafeArray, cloneJSONSafeObject } from "../util/object";
-import { ValidatorDetailsBoard } from "../ui/validator_details_board";
+import {
+    ValidatorDetailsBoard,
+    ValidatorDetailsBoardDelegate,
+} from "../ui/validator_details_board";
+import { ApiPromise } from "@polkadot/api";
 
 class ChainVizScene {
     private readonly scene: THREE.Scene;
@@ -120,7 +124,11 @@ class ChainVizScene {
             },
         });
         this.validatorSummaryBoard = new ValidatorSummaryBoard();
-        this.validatorDetailsBoard = new ValidatorDetailsBoard();
+        this.validatorDetailsBoard = new ValidatorDetailsBoard(<ValidatorDetailsBoardDelegate>{
+            onClose: (_accountIdHex) => {
+                this.validatorMesh.clearSelection();
+            },
+        });
     }
 
     private addLights() {
@@ -306,16 +314,46 @@ class ChainVizScene {
 
     private getBlockWithNumber(number: number): Block | undefined {
         return this.blocks.find((block) => {
-            return block.substrateBlock.header.number.toNumber() == number;
+            return block.getNumber() == number;
         });
     }
 
     private hasBlockWithHash(hashHex: string): boolean {
         return (
             this.blocks.filter((block) => {
-                block.substrateBlock.header.hash.toHex() == hashHex;
+                block.getHashHex() == hashHex;
             }).length > 0
         );
+    }
+
+    getChainTipHex(): string {
+        return this.blocks[0].getHashHex();
+    }
+
+    private async fillMissingBlocks(header: Header, substrateClient: ApiPromise) {
+        let parentHash = header.parentHash;
+        const missingBlocks = new Array<SignedBlock>();
+        while (parentHash.toHex() != this.getChainTipHex()) {
+            const parent = await substrateClient.rpc.chain.getBlock(parentHash);
+            missingBlocks.push(parent);
+            parentHash = parent.block.header.parentHash;
+        }
+        for (const missingBlock of missingBlocks.reverse()) {
+            const extendedHeader = await substrateClient.derive.chain.getHeader(
+                missingBlock.block.header.toHex()
+            );
+            this.pushBlock(missingBlock.block, extendedHeader?.author?.toHex());
+        }
+    }
+
+    async onNewBlock(header: Header, substrateClient: ApiPromise) {
+        if (this.networkStatusBoard) {
+            this.networkStatusBoard.setBestBlockNumber(header.number.toNumber());
+        }
+        await this.fillMissingBlocks(header, substrateClient);
+        const extendedHeader = await substrateClient.derive.chain.getHeader(header.hash);
+        const block = await substrateClient.rpc.chain.getBlock(header.hash);
+        this.pushBlock(block.block, extendedHeader?.author?.toHex());
     }
 
     async pushBlock(substrateBlock: SubstrateBlock, authorAccountIdHex?: string) {
@@ -323,13 +361,13 @@ class ChainVizScene {
             // skip duplicate block
             return;
         }
+        const block = new Block(substrateBlock);
+        const blockNumber = substrateBlock.header.number.toNumber();
+        const sibling = this.getBlockWithNumber(blockNumber);
+        this.blocks.unshift(block);
         this.lock.acquire(
             this.blockPushLockKey,
             (done) => {
-                const block = new Block(substrateBlock);
-                const blockNumber = substrateBlock.header.number.toNumber();
-                const sibling = this.getBlockWithNumber(blockNumber);
-                this.blocks.unshift(block);
                 const authorshipBegan = this.validatorMesh.beginAuthorship(
                     authorAccountIdHex,
                     (validator) => {
@@ -375,12 +413,19 @@ class ChainVizScene {
         );
     }
 
-    onFinalizedBlock(hashHex: string) {
-        this.blocks
-            .find((block) => {
-                return hashHex == block.substrateBlock.hash.toHex();
-            })
-            ?.finalize();
+    onFinalizedBlock(hash: string, number?: number) {
+        if (number && this.networkStatusBoard) {
+            this.networkStatusBoard.setFinalizedBlockNumber(number);
+        }
+        const block = this.blocks.find((block) => {
+            return hash == block.getHashHex();
+        });
+        if (block) {
+            block.finalize();
+            this.onFinalizedBlock(block.getParentHashHex());
+        } else {
+            return;
+        }
     }
 
     initNetworkStatus(status: NetworkStatus) {
@@ -389,6 +434,29 @@ class ChainVizScene {
 
     updateNetworkStatus(diff: NetworkStatusDiff) {
         this.networkStatusBoard.update(diff);
+    }
+
+    updateValidators(diffs: Array<ValidatorSummaryDiff>) {
+        for (const diff of diffs) {
+            this.validatorDetailsBoard.update(diff);
+            this.validatorSummaryBoard.update(diff);
+            this.validatorMesh.update(diff);
+        }
+    }
+
+    removeValidators(accountsIds: Array<string>) {
+        for (const accountIdHex of accountsIds) {
+            this.validatorDetailsBoard.remove(accountIdHex);
+            // summary board
+            // mesh
+        }
+    }
+
+    insertValidators(summaries: Array<ValidatorSummary>) {
+        for (const summary of summaries) {
+            console.log("insert validator: " + summary.accountId);
+        }
+        // mesh
     }
 }
 

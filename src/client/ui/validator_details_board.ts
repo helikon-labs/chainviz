@@ -1,17 +1,18 @@
-//import { network } from "../chainviz";
 import { network } from "../chainviz";
-import { ValidatorSummary } from "../model/subvt/validator_summary";
+import { ValidatorSummary, ValidatorSummaryDiff } from "../model/subvt/validator_summary";
 import { Constants } from "../util/constants";
 import { formatNumber, getCondensedAddress } from "../util/format";
-//import { formatNumber } from "../util/format";
 import { generateIdenticonSVGHTML } from "../util/identicon";
 import { getSS58Address } from "../util/ss58";
 import { getValidatorIdentityIconHTML, getValidatorSummaryDisplay } from "../util/ui";
-//import { cloneJSONSafeObject } from "../util/object";
-//import { getValidatorIdentityIconHTML, getValidatorSummaryDisplay } from "../util/ui";
+
+interface ValidatorDetailsBoardDelegate {
+    onClose(accountIdHex: string): void;
+}
 
 interface UI {
     root: HTMLElement;
+    closeButton: HTMLElement;
     identiconContainer: HTMLElement;
     identity: HTMLElement;
     paraInfo: HTMLElement;
@@ -38,11 +39,14 @@ interface UI {
 
 class ValidatorDetailsBoard {
     private readonly ui: UI;
-    private summary!: ValidatorSummary;
+    private summary?: ValidatorSummary = undefined;
+    private readonly delegate: ValidatorDetailsBoardDelegate;
 
-    constructor() {
+    constructor(delegate: ValidatorDetailsBoardDelegate) {
+        this.delegate = delegate;
         this.ui = {
             root: <HTMLElement>document.getElementById("validator-details-board"),
+            closeButton: <HTMLElement>document.getElementById("validator-details-close-button"),
             identiconContainer: <HTMLElement>(
                 document.getElementById("validator-details-identicon-container")
             ),
@@ -88,6 +92,9 @@ class ValidatorDetailsBoard {
                 document.getElementById("validator-details-icon-oversubscribed")
             ),
         };
+        this.ui.closeButton.addEventListener("click", (_event) => {
+            this.close();
+        });
     }
 
     show(summary: ValidatorSummary) {
@@ -223,11 +230,26 @@ class ValidatorDetailsBoard {
         this.ui.root.style.display = "flex";
     }
 
-    /*
-    private hide() {
+    private close() {
+        if (this.summary) {
+            this.delegate.onClose(this.summary.accountId);
+        }
         this.ui.root.style.display = "none";
+        this.summary = undefined;
     }
-    */
+
+    update(diff: ValidatorSummaryDiff) {
+        if (this.summary && this.summary.accountId == diff.accountId) {
+            Object.assign(this.summary, diff);
+            this.show(this.summary);
+        }
+    }
+
+    remove(accountIdHex: string) {
+        if (this.summary && this.summary.accountId == accountIdHex) {
+            this.close();
+        }
+    }
 }
 
-export { ValidatorDetailsBoard };
+export { ValidatorDetailsBoard, ValidatorDetailsBoardDelegate };

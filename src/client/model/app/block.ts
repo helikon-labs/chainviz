@@ -8,7 +8,7 @@ import { rotateAboutPoint } from "../../util/geometry";
 
 class Block {
     private readonly mesh: THREE.Group;
-    readonly substrateBlock: SubstrateBlock;
+    private readonly substrateBlock: SubstrateBlock;
     private sibling?: Block = undefined;
     private index: number;
 
@@ -103,6 +103,18 @@ class Block {
 
     setSibling(sibling: Block) {
         this.sibling = sibling;
+    }
+
+    getNumber(): number {
+        return this.substrateBlock.header.number.toNumber();
+    }
+
+    getHashHex(): string {
+        return this.substrateBlock.header.hash.toHex();
+    }
+
+    getParentHashHex(): string {
+        return this.substrateBlock.header.parentHash.toHex();
     }
 
     async fork(onComplete?: () => void) {

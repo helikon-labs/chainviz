@@ -313,7 +313,7 @@ hr {
     padding: 8px 12px 4px 12px;
     font-size: 13px;
     border-radius: 6px;
-    border-color: #ffffffcc;
+    border-color: #ffffffaa;
     border-width: 1px;
     border-style: solid;
     line-height: 20px;
@@ -400,14 +400,13 @@ hr {
     display: none;
     flex-flow: column nowrap;
     align-items: center;
-    background-color: #ffffff11;
+    background-color: #000000bb;
     padding: 24px 16px 0px 16px;
     color: #ffffffdd;
     border-radius: 16px 0 0 16px;
-    /* border-radius: 6px;
-    border-color: #ffffffcc;
-    border-width: 1px;
-    border-style: solid; */
+    border-color: #ffffff77;
+    border-width: 1px 0 1px 1px;
+    border-style: solid;
     line-height: 20px;
 }
 

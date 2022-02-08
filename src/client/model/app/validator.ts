@@ -2,26 +2,30 @@ import * as THREE from "three";
 import { rotateAboutPoint } from "../../util/geometry";
 import { createTween } from "../../util/tween";
 import { Constants } from "../../util/constants";
-import { ValidatorSummary } from "../subvt/validator_summary";
+import { ValidatorSummary, ValidatorSummaryDiff } from "../subvt/validator_summary";
 
 class Validator {
     private readonly object = new THREE.Object3D();
     private readonly summary: ValidatorSummary;
     readonly index: [number, number];
     readonly ringSize: number;
-    private readonly color: THREE.Color;
+    private color!: THREE.Color;
 
     private _isAuthoring = false;
     private _isSelected = false;
 
     constructor(summary: ValidatorSummary, index: [number, number], ringSize: number) {
         this.summary = summary;
-        this.color = summary.isParaValidator
-            ? Constants.PARA_VALIDATOR_COLOR
-            : Constants.VALIDATOR_COLOR;
         this.index = index;
         this.ringSize = ringSize;
         this.updateMatrix();
+        this.updateColor();
+    }
+
+    private updateColor() {
+        this.color = this.summary.isParaValidator
+            ? Constants.PARA_VALIDATOR_COLOR
+            : Constants.VALIDATOR_COLOR;
     }
 
     private updateMatrix() {
@@ -56,6 +60,7 @@ class Validator {
 
     beginAuthorship(validatorMesh: THREE.InstancedMesh, index: number, onComplete: () => void) {
         this._isAuthoring = true;
+        if (this._isSelected) onComplete();
         const scaleTween = createTween(
             this.object.scale,
             {
@@ -115,6 +120,10 @@ class Validator {
     }
 
     endAuthorship(validatorMesh: THREE.InstancedMesh, index: number, onComplete: () => void) {
+        if (this._isSelected) {
+            this._isAuthoring = false;
+            onComplete();
+        }
         const color = new THREE.Color().setHex(Constants.VALIDATOR_AUTHOR_COLOR);
         const colorTween = createTween(
             color,
@@ -189,11 +198,17 @@ class Validator {
         this.object.scale.y = 1;
         this.object.scale.z = 1;
         this.object.position.z = 0;
+        this.object.updateMatrix();
         this._isSelected = false;
     }
 
     isSelected(): boolean {
         return this._isSelected;
+    }
+
+    update(diff: ValidatorSummaryDiff) {
+        Object.assign(this.summary, diff);
+        this.updateColor();
     }
 }
 

@@ -61,13 +61,13 @@ class ChainViz {
         },
     };
     private readonly networkStatusClient = new RPCSubscriptionService(
-        "ws://78.181.100.160:17888",
+        "ws://141.95.3.159:17888",
         "subscribe_networkStatus",
         "unsubscribe_networkStatus",
         this.networkStatusListener
     );
     private readonly validatorListClient = new RPCSubscriptionService(
-        "ws://78.181.100.160:17889",
+        "ws://141.95.3.159:17889",
         "subscribe_validatorList",
         "unsubscribe_validatorList",
         this.validatorListListener
@@ -96,7 +96,9 @@ class ChainViz {
                 this.startScene();
             }
         } else {
-            // TODO process update
+            this.scene.updateValidators(update.update);
+            this.scene.removeValidators(update.removeIds);
+            this.scene.insertValidators(update.insert);
         }
     }
 
@@ -150,10 +152,8 @@ class ChainViz {
         await this.scene.initBlocks(this.initialBlocks);
         this.initialBlocks = [];
         this.initialValidators = [];
-        // subscribe to finalized blocks
-        this.subscribeToFinalizedHeads();
-        // subscribe to new blocks
         this.subsribeToNewHeads();
+        this.subscribeToFinalizedHeads();
         this.networkStatusClient.connect();
     }
 
@@ -170,13 +170,11 @@ class ChainViz {
     }
 
     private async onNewBlock(header: Header) {
-        const extendedHeader = await this.substrateClient.derive.chain.getHeader(header.hash);
-        const block = await this.substrateClient.rpc.chain.getBlock(header.hash);
-        this.scene.pushBlock(block.block, extendedHeader?.author?.toHex());
+        this.scene.onNewBlock(header, this.substrateClient);
     }
 
     private async onFinalizedBlock(header: Header) {
-        this.scene.onFinalizedBlock(header.hash.toHex());
+        this.scene.onFinalizedBlock(header.hash.toHex(), header.number.toNumber());
     }
 
     private processNetworkStatusUpdate(update: NetworkStatusUpdate) {

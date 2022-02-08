@@ -55,10 +55,16 @@ class NetworkStatusBoard {
         this.updateUI();
     }
 
-    updateUI() {
+    setBestBlockNumber(number: number) {
+        this.ui.bestBlock.innerHTML = number.toString();
         this.lastBlockTime = Date.now();
-        this.ui.bestBlock.innerHTML = this.status.bestBlockNumber.toString();
-        this.ui.finalizedBlock.innerHTML = this.status.finalizedBlockNumber.toString();
+    }
+
+    setFinalizedBlockNumber(number: number) {
+        this.ui.finalizedBlock.innerHTML = number.toString();
+    }
+
+    updateUI() {
         this.ui.eraIndex.innerHTML = this.status.activeEra.index.toString();
         this.ui.eraRewardPoints.innerHTML = this.status.eraRewardPoints.toString();
         this.ui.return.innerHTML =
