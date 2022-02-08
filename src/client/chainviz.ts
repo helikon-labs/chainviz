@@ -63,13 +63,13 @@ class ChainViz {
         },
     };
     private readonly networkStatusClient = new RPCSubscriptionService(
-        "ws://141.95.3.159:17888",
+        "wss://subvt-rpc.helikon.io:17888/",
         "subscribe_networkStatus",
         "unsubscribe_networkStatus",
         this.networkStatusListener
     );
     private readonly validatorListClient = new RPCSubscriptionService(
-        "ws://141.95.3.159:17889",
+        "wss://subvt-rpc.helikon.io:17889/",
         "subscribe_validatorList",
         "unsubscribe_validatorList",
         this.validatorListListener
