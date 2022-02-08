@@ -201,7 +201,7 @@ class ValidatorSummaryBoard {
         this.ui.root.style.top = `${y + Constants.HOVER_INFO_BOARD_Y_OFFSET}px`;
     }
 
-    hide() {
+    close() {
         this.ui.root.style.visibility = "hidden";
         this.summary = undefined;
     }
@@ -210,6 +210,12 @@ class ValidatorSummaryBoard {
         if (this.summary && this.summary.accountId == diff.accountId) {
             Object.assign(this.summary, diff);
             this.show(this.summary);
+        }
+    }
+
+    remove(accountIdHex: string) {
+        if (this.summary && this.summary.accountId == accountIdHex) {
+            this.close();
         }
     }
 }

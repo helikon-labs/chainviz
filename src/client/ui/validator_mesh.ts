@@ -19,7 +19,7 @@ class ValidatorMesh {
     });
 
     private readonly ringSizes = [82, 102, 120, 140, 165, 190, 201, 240];
-    private readonly validators = new Array<Validator>();
+    private readonly validators = new Array<Validator | undefined>();
     private hoverValidatorIndex = -1;
     private authorValidatorIndex = -1;
     private selectedValidatorIndex = -1;
@@ -27,6 +27,17 @@ class ValidatorMesh {
     constructor(validatorCount: number) {
         this.mesh = new THREE.InstancedMesh(this.geometry, this.material, validatorCount);
         this.mesh.instanceMatrix.setUsage(THREE.DynamicDrawUsage);
+    }
+
+    private getRingIndexForIndex(index: number): [number, number] | undefined {
+        let runningTotal = 0;
+        for (let ringIndex = 0; ringIndex < this.ringSizes.length; ringIndex++) {
+            if (index >= runningTotal && index < runningTotal + this.ringSizes[ringIndex]) {
+                return [ringIndex, index - runningTotal];
+            }
+            runningTotal += this.ringSizes[ringIndex];
+        }
+        return undefined;
     }
 
     async addTo(scene: THREE.Scene, summaries: Array<ValidatorSummary>) {
@@ -68,7 +79,7 @@ class ValidatorMesh {
 
     getIndexOf(accountIdHex: string): number | undefined {
         for (let i = 0; i < this.validators.length; i++) {
-            if (this.validators[i].getAccountIdHex() == accountIdHex) {
+            if ((this.validators[i]?.getAccountIdHex() ?? "") == accountIdHex) {
                 return i;
             }
         }
@@ -79,7 +90,7 @@ class ValidatorMesh {
         return this.selectedValidatorIndex == index;
     }
 
-    hover(index: number): Validator {
+    hover(index: number): Validator | undefined {
         if (this.hoverValidatorIndex == index || this.selectedValidatorIndex == index) {
             return this.validators[index];
         }
@@ -91,10 +102,10 @@ class ValidatorMesh {
 
     clearHover() {
         if (this.hoverValidatorIndex >= 0) {
-            this.setColorAt(
-                this.hoverValidatorIndex,
-                this.validators[this.hoverValidatorIndex].getColor()
-            );
+            const validator = this.validators[this.hoverValidatorIndex];
+            if (validator) {
+                this.setColorAt(this.hoverValidatorIndex, validator.getColor());
+            }
             this.hoverValidatorIndex = -1;
         }
     }
@@ -103,14 +114,18 @@ class ValidatorMesh {
         if (this.selectedValidatorIndex == index) {
             return undefined;
         }
-        this.clearSelection();
         const validator = this.validators[index];
-        validator.select();
-        this.setMatrixAt(index, validator.getMatrix());
-        this.setColorAt(index, new THREE.Color().setHex(Constants.VALIDATOR_SELECT_COLOR));
-        this.selectedValidatorIndex = index;
-        this.hoverValidatorIndex = -1;
-        return validator;
+        if (validator) {
+            this.clearSelection();
+            validator.select();
+            this.setMatrixAt(index, validator.getMatrix());
+            this.setColorAt(index, new THREE.Color().setHex(Constants.VALIDATOR_SELECT_COLOR));
+            this.selectedValidatorIndex = index;
+            this.hoverValidatorIndex = -1;
+            return validator;
+        } else {
+            return undefined;
+        }
     }
 
     clearSelection() {
@@ -118,10 +133,12 @@ class ValidatorMesh {
             return;
         }
         const validator = this.validators[this.selectedValidatorIndex];
-        validator.unselect();
-        this.setMatrixAt(this.selectedValidatorIndex, validator.getMatrix());
-        this.setColorAt(this.selectedValidatorIndex, validator.getColor());
-        this.selectedValidatorIndex = -1;
+        if (validator) {
+            validator.unselect();
+            this.setMatrixAt(this.selectedValidatorIndex, validator.getMatrix());
+            this.setColorAt(this.selectedValidatorIndex, validator.getColor());
+            this.selectedValidatorIndex = -1;
+        }
     }
 
     getOnScreenPositionOfItem(
@@ -148,15 +165,19 @@ class ValidatorMesh {
 
     beginAuthorship(accountIdHex?: string, onComplete?: (validator: Validator) => void): boolean {
         const index = this.validators.findIndex((validator) => {
-            return validator.getAccountIdHex().toLowerCase() === accountIdHex;
+            return validator?.getAccountIdHex().toLowerCase() === accountIdHex;
         });
         if (index < 0) return false;
-        this.authorValidatorIndex = index;
         const validator = this.validators[index];
-        validator.beginAuthorship(this.mesh, index, () => {
-            if (onComplete) onComplete(this.validators[index]);
-        });
-        return true;
+        if (validator) {
+            this.authorValidatorIndex = index;
+            validator.beginAuthorship(this.mesh, index, () => {
+                if (onComplete) onComplete(validator);
+            });
+            return true;
+        } else {
+            return false;
+        }
     }
 
     endAuthorship(onComplete?: () => void) {
@@ -166,7 +187,7 @@ class ValidatorMesh {
         }
         const index = this.authorValidatorIndex;
         this.authorValidatorIndex = -1;
-        this.validators[index].endAuthorship(this.mesh, index, () => {
+        this.validators[index]?.endAuthorship(this.mesh, index, () => {
             if (onComplete) onComplete();
         });
     }
@@ -174,9 +195,43 @@ class ValidatorMesh {
     update(diff: ValidatorSummaryDiff) {
         const index = this.getIndexOf(diff.accountId);
         if (index) {
-            this.validators[index].update(diff);
-            if (this.selectedValidatorIndex != index && this.hoverValidatorIndex != index) {
-                this.setColorAt(index, this.validators[index].getColor());
+            const validator = this.validators[index];
+            if (validator) {
+                validator.update(diff);
+                if (this.selectedValidatorIndex != index && this.hoverValidatorIndex != index) {
+                    this.setColorAt(index, validator.getColor());
+                }
+            }
+        }
+    }
+
+    remove(accountIdHex: string) {
+        const index = this.getIndexOf(accountIdHex);
+        if (index) {
+            if (this.selectedValidatorIndex == index) {
+                this.selectedValidatorIndex = -1;
+            }
+            if (this.hoverValidatorIndex == index) {
+                this.hoverValidatorIndex = -1;
+            }
+            const validator = this.validators[index];
+            if (validator) {
+                validator.remove();
+                this.setMatrixAt(index, validator.getMatrix());
+            }
+            this.validators[index] = undefined;
+        }
+    }
+
+    insert(summary: ValidatorSummary) {
+        for (let i = 0; i < this.validators.length; i++) {
+            const ringIndex = this.getRingIndexForIndex(i);
+            if (this.validators[i] == undefined && ringIndex) {
+                const [ring, i] = ringIndex;
+                const validator = new Validator(summary, [ring, i], this.ringSizes[ring]);
+                this.validators[i] = validator;
+                this.setMatrixAt(i, validator.getMatrix());
+                this.setColorAt(i, validator.getColor());
             }
         }
     }

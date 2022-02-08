@@ -19,6 +19,7 @@ import {
     ValidatorDetailsBoardDelegate,
 } from "../ui/validator_details_board";
 import { ApiPromise } from "@polkadot/api";
+import { HeaderExtended } from "@polkadot/api-derive/types";
 
 class ChainVizScene {
     private readonly scene: THREE.Scene;
@@ -102,13 +103,14 @@ class ChainVizScene {
         this.validatorList = new ValidatorList(<ValidatorListDelegate>{
             onMouseOver: (accountIdHex) => {
                 const index = this.validatorMesh.getIndexOf(accountIdHex);
+                console.log('PVER ' + accountIdHex + ' ' + index);
                 if (index) {
                     const _validator = this.validatorMesh.hover(index);
                 }
             },
             onMouseLeave: (_accountIdHex) => {
                 this.validatorMesh.clearHover();
-                this.validatorSummaryBoard.hide();
+                this.validatorSummaryBoard.close();
             },
             onClick: (accountIdHex) => {
                 const index = this.validatorMesh.getIndexOf(accountIdHex);
@@ -118,7 +120,7 @@ class ChainVizScene {
                         this.validatorDetailsBoard.show(
                             cloneJSONSafeObject(validator.getSummary())
                         );
-                        this.validatorSummaryBoard.hide();
+                        this.validatorSummaryBoard.close();
                     }
                 }
             },
@@ -191,7 +193,7 @@ class ChainVizScene {
             const validator = this.validatorMesh.select(index);
             if (validator) {
                 this.validatorDetailsBoard.show(cloneJSONSafeObject(validator.getSummary()));
-                this.validatorSummaryBoard.hide();
+                this.validatorSummaryBoard.close();
             }
         }
     }
@@ -242,7 +244,7 @@ class ChainVizScene {
         } else {
             this.validatorMesh.clearHover();
             this.setDefaultCursor();
-            this.validatorSummaryBoard.hide();
+            this.validatorSummaryBoard.close();
         }
     }
 
@@ -321,7 +323,7 @@ class ChainVizScene {
     private hasBlockWithHash(hashHex: string): boolean {
         return (
             this.blocks.filter((block) => {
-                block.getHashHex() == hashHex;
+                return block.getHashHex() == hashHex;
             }).length > 0
         );
     }
@@ -346,14 +348,12 @@ class ChainVizScene {
         }
     }
 
-    async onNewBlock(header: Header, substrateClient: ApiPromise) {
+    async onNewBlock(block: SubstrateBlock, header: HeaderExtended) {
         if (this.networkStatusBoard) {
             this.networkStatusBoard.setBestBlockNumber(header.number.toNumber());
         }
-        await this.fillMissingBlocks(header, substrateClient);
-        const extendedHeader = await substrateClient.derive.chain.getHeader(header.hash);
-        const block = await substrateClient.rpc.chain.getBlock(header.hash);
-        this.pushBlock(block.block, extendedHeader?.author?.toHex());
+        console.log(`new block :: ${block.header.parentHash.toHex()} :: ${this.hasBlockWithHash(block.header.parentHash.toHex())} :: ${header.number.toNumber()} :: ${header.hash.toHex()}`);
+        this.pushBlock(block, header.author?.toHex());
     }
 
     async pushBlock(substrateBlock: SubstrateBlock, authorAccountIdHex?: string) {
@@ -361,13 +361,13 @@ class ChainVizScene {
             // skip duplicate block
             return;
         }
-        const block = new Block(substrateBlock);
-        const blockNumber = substrateBlock.header.number.toNumber();
-        const sibling = this.getBlockWithNumber(blockNumber);
-        this.blocks.unshift(block);
         this.lock.acquire(
             this.blockPushLockKey,
             (done) => {
+                const block = new Block(substrateBlock);
+                const blockNumber = substrateBlock.header.number.toNumber();
+                const sibling = this.getBlockWithNumber(blockNumber);
+                this.blocks.unshift(block);
                 const authorshipBegan = this.validatorMesh.beginAuthorship(
                     authorAccountIdHex,
                     (validator) => {
@@ -440,23 +440,22 @@ class ChainVizScene {
         for (const diff of diffs) {
             this.validatorDetailsBoard.update(diff);
             this.validatorSummaryBoard.update(diff);
-            this.validatorMesh.update(diff);
+            this.validatorMesh?.update(diff);
         }
     }
 
     removeValidators(accountsIds: Array<string>) {
         for (const accountIdHex of accountsIds) {
             this.validatorDetailsBoard.remove(accountIdHex);
-            // summary board
-            // mesh
+            this.validatorSummaryBoard.remove(accountIdHex);
+            this.validatorMesh.remove(accountIdHex);
         }
     }
 
     insertValidators(summaries: Array<ValidatorSummary>) {
         for (const summary of summaries) {
-            console.log("insert validator: " + summary.accountId);
+            this.validatorMesh.insert(summary);
         }
-        // mesh
     }
 }
 

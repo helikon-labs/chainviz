@@ -10,6 +10,8 @@ import { Header, SignedBlock } from "@polkadot/types/interfaces";
 import { kusama } from "./model/app/network";
 import { NetworkStatusUpdate } from "./model/subvt/network_status";
 import { getSS58Address } from "./util/ss58";
+import { Constants } from "./util/constants";
+import AsyncLock = require("async-lock");
 
 THREE.Cache.enabled = true;
 const network = kusama;
@@ -84,6 +86,9 @@ class ChainViz {
     private hasReceivedValidatorList = false;
     private initialValidators = new Array<ValidatorSummary>();
 
+    private readonly lock = new AsyncLock();
+    private readonly blockPushLockKey = "block_push";
+
     private processValidatorListUpdate(update: ValidatorListUpdate) {
         // calculate addresses
         for (const summary of update.insert) {
@@ -98,7 +103,9 @@ class ChainViz {
         } else {
             this.scene.updateValidators(update.update);
             this.scene.removeValidators(update.removeIds);
-            this.scene.insertValidators(update.insert);
+            setTimeout(() => {
+                this.scene.insertValidators(update.insert);
+            }, Constants.VALIDATOR_INSERT_DELAY_MS);
         }
     }
 
@@ -170,7 +177,17 @@ class ChainViz {
     }
 
     private async onNewBlock(header: Header) {
-        this.scene.onNewBlock(header, this.substrateClient);
+        this.lock.acquire(
+            this.blockPushLockKey,
+            async (done) => {
+                const extendedHeader = await this.substrateClient.derive.chain.getHeader(header.hash);
+                if (extendedHeader) {
+                    const block = await this.substrateClient.rpc.chain.getBlock(header.hash);
+                    this.scene.onNewBlock(block.block, extendedHeader);
+                }
+                done();
+            }
+        );
     }
 
     private async onFinalizedBlock(header: Header) {

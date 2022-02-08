@@ -210,6 +210,14 @@ class Validator {
         Object.assign(this.summary, diff);
         this.updateColor();
     }
+
+    remove() {
+        this.object.scale.x = 0;
+        this.object.scale.y = 0;
+        this.object.scale.z = 0;
+        this.object.position.z = 0;
+        this.object.updateMatrix();
+    }
 }
 
 export { Validator };

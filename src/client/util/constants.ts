@@ -2,6 +2,8 @@ import * as TWEEN from "@tweenjs/tween.js";
 import * as THREE from "three";
 
 export abstract class Constants {
+    // UI
+    static readonly VALIDATOR_INSERT_DELAY_MS = 1000;
     // orbit control
     static readonly ORBIT_MIN_POLAR_ANGLE = Math.PI / 12;
     static readonly ORBIT_MAX_POLAR_ANGLE = (Math.PI * 11) / 12;
