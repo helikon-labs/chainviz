@@ -102,11 +102,15 @@ class ValidatorList {
         for (const row of rows) {
             const rowElement = <HTMLElement>row;
             rowElement.addEventListener("mouseover", (event) => {
-                const accountIdHex = (<HTMLElement>event.target).id;
+                const accountIdHex = (<HTMLElement>event.target).id
+                    .replace("_div", "")
+                    .replace("_span", "");
                 this.delegate.onMouseOver(accountIdHex);
             });
             rowElement.addEventListener("mouseleave", (event) => {
-                const accountIdHex = (<HTMLElement>event.target).id;
+                const accountIdHex = (<HTMLElement>event.target).id
+                    .replace("_div", "")
+                    .replace("_span", "");
                 this.delegate.onMouseLeave(accountIdHex);
             });
             rowElement.addEventListener("click", (event) => {

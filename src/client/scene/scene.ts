@@ -110,7 +110,6 @@ class ChainVizScene {
         this.validatorList = new ValidatorList(<ValidatorListDelegate>{
             onMouseOver: (accountIdHex) => {
                 const index = this.validatorMesh.getIndexOf(accountIdHex);
-                console.log("PVER " + accountIdHex + " " + index);
                 if (index) {
                     const _validator = this.validatorMesh.hover(index);
                 }
