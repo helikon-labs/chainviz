@@ -36,7 +36,7 @@ export abstract class Constants {
     static readonly PARA_VALIDATOR_COLOR = new THREE.Color(0.556, 0.874, 1.0);
     static readonly AUTHOR_VALIDATOR_COLOR = 0xffff00;
     static readonly VALIDATOR_SPECULAR_COLOR = 0xffffff;
-    static readonly VALIDATOR_HOVER_COLOR = 0xffff00;
+    static readonly VALIDATOR_HOVER_COLOR = 0xeeee00;
     static readonly VALIDATOR_AUTHOR_COLOR = 0x00ff00;
     static readonly VALIDATOR_AUTHOR_COLOR_RGB = { r: 0.0, g: 1.0, b: 0.0 };
     static readonly VALIDATOR_SELECT_COLOR = 0xffff00;

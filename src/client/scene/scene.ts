@@ -19,6 +19,7 @@ import {
     ValidatorDetailsBoardDelegate,
 } from "../ui/validator_details_board";
 import { HeaderExtended } from "@polkadot/api-derive/types";
+import Visibility = require("visibilityjs");
 
 class ChainVizScene {
     private readonly scene: THREE.Scene;
@@ -47,8 +48,6 @@ class ChainVizScene {
     private mouseIsInLeftPanel = false;
 
     constructor() {
-        // init font loader
-
         this.scene = new THREE.Scene();
         this.camera = new THREE.PerspectiveCamera(
             20,
@@ -349,6 +348,25 @@ class ChainVizScene {
             // skip duplicate block
             return;
         }
+        if (Visibility.hidden()) {
+            const block = new Block(substrateBlock);
+            const blockNumber = substrateBlock.header.number.toNumber();
+            const sibling = this.getBlockWithNumber(blockNumber);
+            this.blocks.unshift(block);
+            if (sibling) {
+                sibling.setSibling(block);
+                block.setSibling(sibling);
+                sibling.fork(false);
+            } else {
+                for (let i = 1; i < this.blocks.length; i++) {
+                    const block = this.blocks[i];
+                    block.setIndex(block.getIndex() + 1, false);
+                }
+            }
+            block.addTo(this.scene);
+            this.removeOffScreenValidators();
+            return;
+        }
         this.lock.acquire(
             this.blockPushLockKey,
             (done) => {
@@ -362,7 +380,7 @@ class ChainVizScene {
                         if (sibling) {
                             sibling.setSibling(block);
                             block.setSibling(sibling);
-                            sibling.fork();
+                            sibling.fork(true);
                         } else {
                             for (let i = 1; i < this.blocks.length; i++) {
                                 const block = this.blocks[i];
@@ -371,14 +389,7 @@ class ChainVizScene {
                         }
                         setTimeout(() => {
                             block.spawn(this.scene, validator.index, validator.ringSize, () => {
-                                const max = this.blocks[0].getNumber();
-                                const min = this.blocks[this.blocks.length - 1].getNumber();
-                                for (let i = min; i <= max - this.maxLength; i++) {
-                                    while (this.blocks[this.blocks.length - 1].getNumber() == i) {
-                                        const blockToRemove = this.blocks.pop();
-                                        blockToRemove?.removeAndDispose();
-                                    }
-                                }
+                                this.removeOffScreenValidators();
                                 done();
                             });
                             setTimeout(() => {
@@ -405,6 +416,17 @@ class ChainVizScene {
         );
     }
 
+    private removeOffScreenValidators() {
+        const max = this.blocks[0].getNumber();
+        const min = this.blocks[this.blocks.length - 1].getNumber();
+        for (let i = min; i <= max - this.maxLength; i++) {
+            while (this.blocks[this.blocks.length - 1].getNumber() == i) {
+                const blockToRemove = this.blocks.pop();
+                blockToRemove?.removeAndDispose();
+            }
+        }
+    }
+
     onFinalizedBlock(hash: string, number?: number) {
         if (number && this.networkStatusBoard) {
             this.networkStatusBoard.setFinalizedBlockNumber(number);
@@ -413,7 +435,7 @@ class ChainVizScene {
             return hash == block.getHashHex();
         });
         if (block) {
-            block.finalize();
+            block.finalize(!Visibility.hidden());
             this.onFinalizedBlock(block.getParentHashHex());
         } else {
             return;

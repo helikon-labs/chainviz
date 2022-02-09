@@ -98,6 +98,9 @@ class Block {
         this.scene = scene;
         this.index = 0;
         this.mesh.position.x = -this.index * 5;
+        if (this.sibling) {
+            this.mesh.position.y = Constants.BLOCK_FORK_DELTA_Y;
+        }
         scene.add(this.mesh);
     }
 
@@ -117,7 +120,12 @@ class Block {
         return this.substrateBlock.header.parentHash.toHex();
     }
 
-    async fork(onComplete?: () => void) {
+    async fork(animated: boolean, onComplete?: () => void) {
+        if (!animated) {
+            this.mesh.position.y = -Constants.BLOCK_FORK_DELTA_Y;
+            this.mesh.updateMatrix();
+            return;
+        }
         createTween(
             this.mesh.position,
             { x: 0, y: -Constants.BLOCK_FORK_DELTA_Y, z: 0 },
@@ -201,6 +209,7 @@ class Block {
         this.index = newIndex;
         if (!animated) {
             this.mesh.position.x = -newIndex * 5;
+            this.mesh.updateMatrix();
             return;
         }
         createTween(
@@ -211,16 +220,21 @@ class Block {
         ).start();
     }
 
-    finalize() {
+    finalize(animated: boolean) {
         if (this.sibling) {
             this.sibling.removeAndDispose();
             this.sibling = undefined;
-            createTween(
-                this.mesh.position,
-                { x: this.mesh.position.x, y: 0, z: 0 },
-                Constants.BLOCK_TO_ORIGIN_CURVE,
-                Constants.BLOCK_TO_ORIGIN_TIME_MS
-            ).start();
+            if (animated) {
+                createTween(
+                    this.mesh.position,
+                    { x: this.mesh.position.x, y: 0, z: 0 },
+                    Constants.BLOCK_TO_ORIGIN_CURVE,
+                    Constants.BLOCK_TO_ORIGIN_TIME_MS
+                ).start();
+            } else {
+                this.mesh.position.y = 0;
+                this.mesh.updateMatrix();
+            }
         }
         this.finalizedTextMesh.visible = true;
     }
