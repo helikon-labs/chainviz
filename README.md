@@ -42,3 +42,7 @@ npm run dev
 Chainviz should be running at `localhost:8080`.
 
 Please report any issues to `kutsal [at] helikon.io`.
+
+### Known Issues
+
+`three.js` crashes some versions of (15.x) Safari desktop. It's a known issue and we'll be following the fix. Please see the discussion [here](https://github.com/mrdoob/three.js/issues/22582) for details.
