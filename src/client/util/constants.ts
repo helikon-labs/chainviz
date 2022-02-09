@@ -56,4 +56,11 @@ export abstract class Constants {
     static readonly BALANCE_FORMAT_DECIMALS = 4;
     static readonly DECIMAL_SEPARATOR = ".";
     static readonly THOUSANDS_SEPARATOR = ",";
+    // camera
+    static readonly CAMERA_START_POSITIONS = [
+        new THREE.Vector3(180, 180, Constants.ORBIT_DEFAULT_DISTANCE / 2),
+        new THREE.Vector3(-180, 180, Constants.ORBIT_DEFAULT_DISTANCE / 2),
+    ];
+    static readonly CAMERA_RESET_ANIM_LENGTH_MS = 1000;
+    static readonly CAMERA_RESET_ANIM_CURVE = TWEEN.Easing.Cubic.Out;
 }

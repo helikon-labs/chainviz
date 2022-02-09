@@ -20,6 +20,7 @@ import {
 } from "../ui/validator_details_board";
 import { HeaderExtended } from "@polkadot/api-derive/types";
 import Visibility = require("visibilityjs");
+import { createTween } from "../util/tween";
 
 class ChainVizScene {
     private readonly scene: THREE.Scene;
@@ -55,7 +56,17 @@ class ChainVizScene {
             0.1,
             1000
         );
-        this.camera.position.z = Constants.ORBIT_DEFAULT_DISTANCE;
+        const cameraStartPosition =
+            Constants.CAMERA_START_POSITIONS[
+                Math.floor(Math.random() * Constants.CAMERA_START_POSITIONS.length)
+            ];
+        this.camera.position.set(
+            cameraStartPosition.x,
+            cameraStartPosition.y,
+            cameraStartPosition.z
+        );
+        this.camera.lookAt(new THREE.Vector3());
+
         // axes helper :: x is red, y is green, z is blue
         const _axesHelper = new THREE.AxesHelper(5);
         // this.scene.add(axesHelper);
@@ -90,6 +101,7 @@ class ChainVizScene {
         //this.stats.domElement.style.cssText = "position:absolute; bottom:0px; right:0px;";
         // orbit controls
         this.controls = new OrbitControls(this.camera, this.renderer.domElement);
+        this.controls.enabled = false;
         this.limitOrbitControls();
         window.addEventListener(
             "resize",
@@ -130,6 +142,34 @@ class ChainVizScene {
                 this.validatorMesh.clearSelection();
             },
         });
+    }
+
+    private resetCamera() {
+        if (Visibility.hidden()) {
+            this.camera.position.x = 0;
+            this.camera.position.y = 0;
+            this.camera.position.z = Constants.ORBIT_DEFAULT_DISTANCE;
+            return;
+        }
+
+        createTween(
+            this.camera.position,
+            {
+                x: 0,
+                y: 0,
+                z: Constants.ORBIT_DEFAULT_DISTANCE,
+            },
+            Constants.CAMERA_RESET_ANIM_CURVE,
+            Constants.CAMERA_RESET_ANIM_LENGTH_MS,
+            undefined,
+            undefined,
+            () => {
+                this.camera.rotation.x = 0;
+                this.camera.rotation.y = 0;
+                this.camera.rotation.z = 0;
+                this.controls.enabled = true;
+            }
+        ).start();
     }
 
     private addLights() {
@@ -233,7 +273,7 @@ class ChainVizScene {
     }
 
     private checkHoverRaycast() {
-        if (this.mouseIsInLeftPanel) {
+        if (this.mouseIsInLeftPanel || !this.controls.enabled) {
             return;
         }
         this.raycaster.setFromCamera(this.hoverPoint, this.camera);
@@ -316,6 +356,7 @@ class ChainVizScene {
                 setTimeout(resolve, 50);
             });
         }
+        this.resetCamera();
     }
 
     private getBlockWithNumber(number: number): Block | undefined {
