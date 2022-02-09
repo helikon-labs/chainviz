@@ -209,6 +209,7 @@ hr {
 }
 
 #validator-search input {
+    font-family: "Roboto Mono", Courier, monospace;
     flex-grow: 1;
     margin-left: 6px;
     height: 26px;
@@ -352,6 +353,25 @@ hr {
     min-width: 0%;
 }
 
+#validator-summary-para-info {
+    width: 100%;
+    display: flex;
+    flex-flow: row nowrap;
+    justify-content: center;
+    align-items: center;
+}
+
+#validator-summary-para-info img.parachain-icon {
+    width: 14px;
+    height: 14px;
+    margin-right: 8px;
+    background-color: #fff;
+    border-radius: 12px;
+    border-style: solid;
+    border-width: 1px;
+    border-color: #ffffff22;
+}
+
 #validator-summary-board #validator-summary-era-data {
     display: flex;
     flex-flow: row nowrap;
@@ -461,6 +481,25 @@ hr {
     width: 18px;
     height: 18px;
     margin-right: 8px;
+}
+
+#validator-details-para-info {
+    width: 100%;
+    display: flex;
+    flex-flow: row nowrap;
+    justify-content: center;
+    align-items: center;
+}
+
+#validator-details-para-info img.parachain-icon {
+    width: 18px;
+    height: 18px;
+    margin-right: 8px;
+    background-color: #fff;
+    border-radius: 12px;
+    border-style: solid;
+    border-width: 1px;
+    border-color: #ffffff22;
 }
 
 #validator-details-board div.top-margin {

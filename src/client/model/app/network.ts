@@ -1,4 +1,4 @@
-import { Parachain } from "../../data/parachains";
+import { Parachain } from "./parachain";
 
 interface Network {
     name: string;

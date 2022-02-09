@@ -38,11 +38,14 @@ class ValidatorSummaryBoard {
             if (summary.isParaValidator) {
                 const parachain = CONFIG.network.parachainMap.get(summary.paraId ?? 0);
                 if (parachain) {
-                    this.ui.paraInfo.innerHTML = `${parachain.name}`;
+                    const imageHTML = `<img class="parachain-icon" src="${
+                        CONFIG.network.parachainMap.get(parachain.id)?.image
+                    }" alt="${parachain.name}" title="${parachain.name}" />`;
+                    this.ui.paraInfo.innerHTML = `${imageHTML}<span>${parachain.name}</span>`;
                 } else {
-                    this.ui.paraInfo.innerHTML = "Paravalidator";
+                    this.ui.paraInfo.innerHTML = "Idle Paravalidator";
                 }
-                this.ui.paraInfo.style.display = "block";
+                this.ui.paraInfo.style.display = "flex";
             } else {
                 this.ui.paraInfo.style.display = "none";
             }
