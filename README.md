@@ -10,6 +10,14 @@ ChainViz ([alpha.chainviz.app](https://alpha.chainviz.app)) is a real-time 3D ch
     <a href="https://alpha.chainviz.app" target="_blank"><img width="100%" src="https://raw.githubusercontent.com/helikon-labs/chainsynth/development/readme_files/screenshot_01.png"></a>
 </p>
 
+---
+
+🚧 This project is in heavy progress, and this repo is subject to frequent change.
+
+📱 Chainviz UI is **NOT** optimized / designed for mobile yet, expect a poor mobile experience.
+
+---
+
 Chainviz visualizes the following aspects of the Kusama relay chain and validators in real-time:
 
 -   Active Validators, and the block production and finalization process.
@@ -22,4 +30,15 @@ Chainviz visualizes the following aspects of the Kusama relay chain and validato
 
 Chainviz uses the services provided by the [SubVT backend](https://github.com/helikon-labs/subvt-backend), part of SubVT, a project supported by the Kusama Treasury.
 
-🚧 Chainviz is in heavy progress, and this repo is subject to frequent change.
+### Build & Run
+
+```
+git clone https://github.com/helikon-labs/chainviz.git
+cd chainviz
+npm ci
+npm run dev
+```
+
+Chainviz should be running at `localhost:8080`.
+
+Please report any issues to `kutsal [at] helikon.io`.
