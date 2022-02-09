@@ -59,7 +59,7 @@ class ChainVizScene {
         this.camera.position.set(
             Constants.CAMERA_START_POSITION.x,
             Constants.CAMERA_START_POSITION.y,
-            Constants.CAMERA_START_POSITION.z,
+            Constants.CAMERA_START_POSITION.z
         );
         this.camera.lookAt(new THREE.Vector3());
 
