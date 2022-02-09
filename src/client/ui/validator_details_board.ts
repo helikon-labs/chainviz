@@ -124,12 +124,14 @@ class ValidatorDetailsBoard {
         {
             this.ui.stash.innerHTML = `<a href="${CONFIG.network.accountURLPrefix}${
                 summary.address
-            }"${summary.address}">${getCondensedAddress(summary.address)}</a>`;
+            }"${summary.address}" target="_blank">${getCondensedAddress(summary.address)}</a>`;
             if (summary.controllerAccountId) {
                 const controller = getSS58Address(summary.controllerAccountId);
                 this.ui.controller.innerHTML = `<a href="${
                     CONFIG.network.accountURLPrefix
-                }${controller}"${controller}">${getCondensedAddress(controller)}</a>`;
+                }${controller}"${controller}" target="_blank">${getCondensedAddress(
+                    controller
+                )}</a>`;
             }
         }
         // performance

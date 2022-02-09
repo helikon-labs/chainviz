@@ -375,7 +375,7 @@ class ChainVizScene {
                             block.spawn(this.scene, validator.index, validator.ringSize, () => {
                                 const max = this.blocks[0].getNumber();
                                 const min = this.blocks[this.blocks.length - 1].getNumber();
-                                for (let i = min; i <= (max - this.maxLength); i++) {
+                                for (let i = min; i <= max - this.maxLength; i++) {
                                     while (this.blocks[this.blocks.length - 1].getNumber() == i) {
                                         const blockToRemove = this.blocks.pop();
                                         blockToRemove?.removeAndDispose();

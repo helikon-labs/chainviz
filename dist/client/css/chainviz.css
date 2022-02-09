@@ -2,8 +2,8 @@ body {
     overflow: hidden;
     margin: 0px;
     background-color: #000000;
-    color: #ffffffdd;
-    font-family: "IBM Plex Mono", Courier, monospace;
+    color: #ffffffe5;
+    font-family: "Roboto Mono", Courier, monospace;
     font-size: 14px;
 }
 
@@ -43,8 +43,8 @@ hr {
 }
 
 #page-spinner {
-    width: 60px;
-    height: 60px;
+    width: 40px;
+    height: 40px;
 
     position: absolute;
     top: 50%;
@@ -100,7 +100,6 @@ hr {
     line-height: 22px;
     top: 50%;
     left: 50%;
-    color: #dddddd;
     transform: translate(-50%, -50%);
     margin-top: 57px;
     text-align: center;
@@ -142,9 +141,8 @@ hr {
 #left-panel #network-status {
     opacity: 0;
     width: 100%;
-    color: #ffffffcc;
     z-index: 99999;
-    font-size: 12px;
+    font-size: 13px;
     line-height: 20px;
     margin-top: 4px;
 }
@@ -184,8 +182,7 @@ hr {
     display: flex;
     flex-flow: column;
     min-height: 0;
-    font-size: 12px;
-    color: #ffffffdd;
+    font-size: 13px;
 }
 
 #validator-list-container #validator-search-container {
@@ -207,7 +204,6 @@ hr {
 }
 
 #validator-search i {
-    color: #ffffffdd;
     font-size: 12px;
     margin-top: 2px;
 }
@@ -305,9 +301,10 @@ hr {
     position: absolute;
     top: 0px;
     left: 0px;
-    width: 250px;
+    width: 180px;
     display: flex;
     flex-flow: column nowrap;
+    justify-content: flex-start;
     align-items: center;
     background-color: #000000bb;
     padding: 8px 12px 4px 12px;
@@ -342,53 +339,52 @@ hr {
 #validator-summary-board .id-confirmation-icon {
     width: 16px;
     height: 16px;
-    margin-right: 8px;
+    margin-right: 6px;
 }
 
 #validator-summary-board #validator-summary-identity {
     margin-top: 6px;
     display: flex;
     flex-flow: row nowrap;
-    justify-content: center;
+    justify-content: flex-end;
     align-items: center;
     max-width: 100%;
     min-width: 0%;
 }
 
-#validator-summary-board .active-title {
+#validator-summary-board #validator-summary-era-data {
+    display: flex;
+    flex-flow: row nowrap;
+    gap: 14px;
+    align-items: center;
+    justify-content: flex-end;
+}
+
+#validator-summary-board #validator-summary-era-data i {
+    font-size: 90%;
+    margin-right: 6px;
+}
+
+#validator-summary-board .active {
     color: #00ff00;
 }
 
-#validator-summary-board .inactive-title {
-    color: #ff0000;
+#validator-summary-board .inactive {
+    color: #ff8888;
 }
 
-#validator-summary-board .amount-container {
+#validator-summary-board .stake-data-container {
     display: flex;
     flex-flow: row nowrap;
+    justify-content: flex-end;
     align-items: center;
 }
 
-#validator-summary-board .amount-title {
-    flex-grow: 1;
-}
-
-#validator-summary-board #status-icon-container {
-    display: flex;
-    flex-flow: row nowrap;
-    justify-content: center;
-    align-items: center;
-    gap: 8px;
-    margin-top: 8px;
-    width: 100%;
-    padding: 12px 0px;
-    border-style: solid;
-    border-width: 1px 0px 0px 0px;
-    border-color: #777;
-}
-
-#validator-summary-board #status-icon-container img {
-    width: 26px;
+#validator-summary-board .stake-data-container i {
+    font-size: 8px;
+    width: 10px;
+    margin-left: 8px;
+    opacity: 0.9;
 }
 
 /* validator details board */
@@ -402,7 +398,6 @@ hr {
     align-items: center;
     background-color: #000000bb;
     padding: 24px 16px 0px 16px;
-    color: #ffffffdd;
     border-radius: 16px 0 0 16px;
     border-color: #ffffff77;
     border-width: 1px 0 1px 1px;
@@ -416,12 +411,12 @@ hr {
     position: absolute;
     top: 16px;
     left: 16px;
-    opacity: 0.5;
+    opacity: 0.75;
 }
 
 #validator-details-spinner .double-bounce1,
 #validator-details-spinner .double-bounce2 {
-    background-color: #00ff00;
+    background-color: #77ff77;
 }
 
 #validator-details-board div {
@@ -443,7 +438,7 @@ hr {
 }
 
 #validator-details-board #validator-details-close-button i {
-    color: #ffffff66;
+    color: #ffffff88;
     font-size: 22px;
     cursor: pointer;
 }
@@ -491,7 +486,7 @@ hr {
 }
 
 #validator-details-board .inactive-title {
-    color: #ff0000;
+    color: #ff6666;
 }
 
 #validator-details-board #status-icon-container {

@@ -109,7 +109,6 @@ class ChainViz {
             this.scene.removeValidators(update.removeIds);
             setTimeout(() => {
                 this.scene.insertValidators(update.insert);
-                
             }, Constants.VALIDATOR_INSERT_DELAY_MS);
         }
     }

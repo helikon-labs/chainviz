@@ -24,7 +24,7 @@ export abstract class Constants {
     static readonly BLOCK_TO_ORIGIN_TIME_MS = 750;
     static readonly BLOCK_FORK_DELTA_Y = 2.25;
     // identicon
-    static readonly SUMMARY_BOARD_IDENTICON_SIZE = 30;
+    static readonly SUMMARY_BOARD_IDENTICON_SIZE = 20;
     static readonly DETAILS_BOARD_IDENTICON_SIZE = 36;
     // validator geometry
     static readonly VALIDATOR_GEOM_RADIUS = 0.6;
