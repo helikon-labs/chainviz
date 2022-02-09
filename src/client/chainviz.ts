@@ -7,14 +7,13 @@ import { ChainVizScene } from "./scene/scene";
 import { ValidatorListUpdate, ValidatorSummary } from "./model/subvt/validator_summary";
 import { ApiPromise, WsProvider } from "@polkadot/api";
 import { Header, SignedBlock } from "@polkadot/types/interfaces";
-import { kusama } from "./model/app/network";
 import { NetworkStatusUpdate } from "./model/subvt/network_status";
 import { getSS58Address } from "./util/ss58";
 import { Constants } from "./util/constants";
 import AsyncLock = require("async-lock");
+import { CONFIG } from "./util/config";
 
 THREE.Cache.enabled = true;
-const network = kusama;
 
 class ChainViz {
     private scene = new ChainVizScene();
@@ -62,18 +61,8 @@ class ChainViz {
             console.log(`Validator list service error (${code}: ${message}).`);
         },
     };
-    private readonly networkStatusClient = new RPCSubscriptionService(
-        "wss://subvt-rpc.helikon.io:17888/",
-        "subscribe_networkStatus",
-        "unsubscribe_networkStatus",
-        this.networkStatusListener
-    );
-    private readonly validatorListClient = new RPCSubscriptionService(
-        "wss://subvt-rpc.helikon.io:17889/",
-        "subscribe_validatorList",
-        "unsubscribe_validatorList",
-        this.validatorListListener
-    );
+    private readonly networkStatusClient: RPCSubscriptionService<NetworkStatusUpdate>;
+    private readonly validatorListClient: RPCSubscriptionService<ValidatorListUpdate>;
     private validatorListClientIsConnected = false;
     private substrateClient: ApiPromise = new ApiPromise({
         provider: new WsProvider("wss://kusama-rpc.polkadot.io"),
@@ -88,6 +77,21 @@ class ChainViz {
 
     private readonly lock = new AsyncLock();
     private readonly blockPushLockKey = "block_push";
+
+    constructor(networkStatusServerURL: string, activeValidatorListServerURL: string) {
+        this.networkStatusClient = new RPCSubscriptionService(
+            networkStatusServerURL,
+            "subscribe_networkStatus",
+            "unsubscribe_networkStatus",
+            this.networkStatusListener
+        );
+        this.validatorListClient = new RPCSubscriptionService(
+            activeValidatorListServerURL,
+            "subscribe_validatorList",
+            "unsubscribe_validatorList",
+            this.validatorListListener
+        );
+    }
 
     private processValidatorListUpdate(update: ValidatorListUpdate) {
         // calculate addresses
@@ -105,6 +109,7 @@ class ChainViz {
             this.scene.removeValidators(update.removeIds);
             setTimeout(() => {
                 this.scene.insertValidators(update.insert);
+                
             }, Constants.VALIDATOR_INSERT_DELAY_MS);
         }
     }
@@ -145,8 +150,14 @@ class ChainViz {
         this.validatorListClient.subscribe();
     }
 
+    private displayVersion() {
+        const element = <HTMLElement>document.getElementById("chainviz-version");
+        element.innerHTML = `v${CONFIG.version}`;
+    }
+
     async init() {
         this.setLoadingStatus(":: connecting to services ::");
+        this.displayVersion();
         this.getInitialBlocks();
         this.validatorListClient.connect();
     }
@@ -177,17 +188,14 @@ class ChainViz {
     }
 
     private async onNewBlock(header: Header) {
-        this.lock.acquire(
-            this.blockPushLockKey,
-            async (done) => {
-                const extendedHeader = await this.substrateClient.derive.chain.getHeader(header.hash);
-                if (extendedHeader) {
-                    const block = await this.substrateClient.rpc.chain.getBlock(header.hash);
-                    this.scene.onNewBlock(block.block, extendedHeader);
-                }
-                done();
+        this.lock.acquire(this.blockPushLockKey, async (done) => {
+            const extendedHeader = await this.substrateClient.derive.chain.getHeader(header.hash);
+            if (extendedHeader) {
+                const block = await this.substrateClient.rpc.chain.getBlock(header.hash);
+                this.scene.onNewBlock(block.block, extendedHeader);
             }
-        );
+            done();
+        });
     }
 
     private async onFinalizedBlock(header: Header) {
@@ -203,4 +211,4 @@ class ChainViz {
     }
 }
 
-export { ChainViz, network };
+export { ChainViz };

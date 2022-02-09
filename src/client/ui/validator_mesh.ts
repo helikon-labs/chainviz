@@ -110,6 +110,10 @@ class ValidatorMesh {
         }
     }
 
+    getSelectedValidatorIndex(): number {
+        return this.selectedValidatorIndex;
+    }
+
     select(index: number): Validator | undefined {
         if (this.selectedValidatorIndex == index) {
             return undefined;
@@ -234,6 +238,10 @@ class ValidatorMesh {
                 this.setColorAt(i, validator.getColor());
             }
         }
+    }
+
+    getValidatorCount(): number {
+        return this.validators.filter((item) => item != undefined).length;
     }
 }
 

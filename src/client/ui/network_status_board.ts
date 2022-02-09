@@ -1,5 +1,5 @@
-import { network } from "../chainviz";
 import { NetworkStatus, NetworkStatusDiff } from "../model/subvt/network_status";
+import { CONFIG } from "../util/config";
 import { formatNumber } from "../util/format";
 
 interface UI {
@@ -42,8 +42,8 @@ class NetworkStatusBoard {
     }
 
     updateProgressBar() {
-        const elapsed = Math.min(network.blockTimeMs, Date.now() - this.lastBlockTime);
-        const progressPercent = (elapsed * 100) / network.blockTimeMs;
+        const elapsed = Math.min(CONFIG.network.blockTimeMs, Date.now() - this.lastBlockTime);
+        const progressPercent = (elapsed * 100) / CONFIG.network.blockTimeMs;
         this.ui.progress.style.width = progressPercent + "%";
         setTimeout(() => {
             this.updateProgressBar();
@@ -71,27 +71,27 @@ class NetworkStatusBoard {
             formatNumber(BigInt(this.status.returnRatePerMillion), 4, 2) + "%";
         this.ui.totalStake.innerHTML = formatNumber(
             this.status.totalStake,
-            network.tokenDecimals + 6,
+            CONFIG.network.tokenDecimals + 6,
             4,
-            "M" + network.tokenTicker
+            "M" + CONFIG.network.tokenTicker
         );
         this.ui.minStake.innerHTML = formatNumber(
             this.status.minStake,
-            network.tokenDecimals,
+            CONFIG.network.tokenDecimals,
             4,
-            network.tokenTicker
+            CONFIG.network.tokenTicker
         );
         this.ui.maxStake.innerHTML = formatNumber(
             this.status.maxStake,
-            network.tokenDecimals,
+            CONFIG.network.tokenDecimals,
             4,
-            network.tokenTicker
+            CONFIG.network.tokenTicker
         );
         this.ui.averageStake.innerHTML = formatNumber(
             this.status.averageStake,
-            network.tokenDecimals,
+            CONFIG.network.tokenDecimals,
             4,
-            network.tokenTicker
+            CONFIG.network.tokenTicker
         );
     }
 }

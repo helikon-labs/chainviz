@@ -48,6 +48,15 @@ class ValidatorList {
 
     init(summaries: Array<ValidatorSummary>) {
         this.items.push(...summaries);
+        this.sort();
+        setTimeout(() => {
+            this.updateTitle();
+            this.filter();
+            this.container.style.visibility = "visible";
+        }, 1000);
+    }
+
+    private sort() {
         this.items.sort((a, b) => {
             if (a.display || a.parentDisplay) {
                 if (b.display || b.parentDisplay) {
@@ -67,11 +76,6 @@ class ValidatorList {
                 }
             }
         });
-        setTimeout(() => {
-            this.title.innerHTML = `ACTIVE VALIDATORS (${this.items.length})`;
-            this.filter();
-            this.container.style.visibility = "visible";
-        }, 1000);
     }
 
     private filter() {
@@ -89,9 +93,9 @@ class ValidatorList {
         for (const item of filteredItems) {
             html += `<div class="validator" id="${
                 item.accountId
-            }"><span class="validator-list-display">${getValidatorSummaryDisplay(
-                item
-            )}</span></div>`;
+            }_div"><span class="validator-list-display" id="${
+                item.accountId
+            }_span">${getValidatorSummaryDisplay(item)}</span></div>`;
         }
         this.list.innerHTML = html;
         const rows = Array.from(document.getElementsByClassName("validator"));
@@ -106,10 +110,30 @@ class ValidatorList {
                 this.delegate.onMouseLeave(accountIdHex);
             });
             rowElement.addEventListener("click", (event) => {
-                const accountIdHex = (<HTMLElement>event.target).id;
+                const accountIdHex = (<HTMLElement>event.target).id
+                    .replace("_div", "")
+                    .replace("_span", "");
                 this.delegate.onClick(accountIdHex);
             });
         }
+    }
+
+    private updateTitle() {
+        this.title.innerHTML = `ACTIVE VALIDATORS (${this.items.length})`;
+    }
+
+    remove(accountIdHex: string) {
+        this.items.splice(
+            this.items.findIndex((item) => item.accountId == accountIdHex),
+            1
+        );
+        document.getElementById(`${accountIdHex}_div`)?.remove();
+    }
+
+    insert(item: ValidatorSummary) {
+        this.items.push(item);
+        this.sort();
+        this.filter();
     }
 }
 

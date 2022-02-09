@@ -1,5 +1,5 @@
-import { network } from "../chainviz";
 import { ValidatorSummary, ValidatorSummaryDiff } from "../model/subvt/validator_summary";
+import { CONFIG } from "../util/config";
 import { Constants } from "../util/constants";
 import { formatNumber } from "../util/format";
 import { generateIdenticonSVGHTML } from "../util/identicon";
@@ -87,7 +87,7 @@ class ValidatorSummaryBoard {
                 getValidatorIdentityIconHTML(summary) +
                 `<span>${getValidatorSummaryDisplay(summary)}</span>`;
             if (summary.isParaValidator) {
-                const parachain = network.parachainMap.get(summary.paraId ?? 0);
+                const parachain = CONFIG.network.parachainMap.get(summary.paraId ?? 0);
                 if (parachain) {
                     this.ui.paraInfo.innerHTML = `Validating for ${parachain.name}`;
                 } else {
@@ -116,26 +116,26 @@ class ValidatorSummaryBoard {
         {
             this.ui.selfStakeAmount.innerHTML = formatNumber(
                 summary.selfStake.activeAmount,
-                network.tokenDecimals,
+                CONFIG.network.tokenDecimals,
                 Constants.BALANCE_FORMAT_DECIMALS,
-                network.tokenTicker
+                CONFIG.network.tokenTicker
             );
             if (summary.validatorStake) {
                 const stake = summary.validatorStake;
                 this.ui.otherStakeTitle.innerHTML = `${stake.nominatorCount} nom.s`;
                 this.ui.otherStakeAmount.innerHTML = formatNumber(
                     stake.totalStake - stake.selfStake,
-                    network.tokenDecimals,
+                    CONFIG.network.tokenDecimals,
                     Constants.BALANCE_FORMAT_DECIMALS,
-                    network.tokenTicker
+                    CONFIG.network.tokenTicker
                 );
             } else {
                 this.ui.otherStakeTitle.innerHTML = `0 nom.s`;
                 this.ui.otherStakeAmount.innerHTML = formatNumber(
                     BigInt(0),
-                    network.tokenDecimals,
+                    CONFIG.network.tokenDecimals,
                     Constants.BALANCE_FORMAT_DECIMALS,
-                    network.tokenTicker
+                    CONFIG.network.tokenTicker
                 );
             }
         }
@@ -146,17 +146,17 @@ class ValidatorSummaryBoard {
                 this.ui.inactiveStakeTitle.innerHTML = `${noms.nominationCount} nom.s`;
                 this.ui.inactiveStakeAmount.innerHTML = formatNumber(
                     noms.totalAmount,
-                    network.tokenDecimals,
+                    CONFIG.network.tokenDecimals,
                     Constants.BALANCE_FORMAT_DECIMALS,
-                    network.tokenTicker
+                    CONFIG.network.tokenTicker
                 );
             } else {
                 this.ui.inactiveStakeTitle.innerHTML = `0 nom.s`;
                 this.ui.inactiveStakeAmount.innerHTML = formatNumber(
                     BigInt(0),
-                    network.tokenDecimals,
+                    CONFIG.network.tokenDecimals,
                     Constants.BALANCE_FORMAT_DECIMALS,
-                    network.tokenTicker
+                    CONFIG.network.tokenTicker
                 );
             }
         }
