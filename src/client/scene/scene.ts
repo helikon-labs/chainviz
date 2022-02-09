@@ -56,14 +56,10 @@ class ChainVizScene {
             0.1,
             1000
         );
-        const cameraStartPosition =
-            Constants.CAMERA_START_POSITIONS[
-                Math.floor(Math.random() * Constants.CAMERA_START_POSITIONS.length)
-            ];
         this.camera.position.set(
-            cameraStartPosition.x,
-            cameraStartPosition.y,
-            cameraStartPosition.z
+            Constants.CAMERA_START_POSITION.x,
+            Constants.CAMERA_START_POSITION.y,
+            Constants.CAMERA_START_POSITION.z,
         );
         this.camera.lookAt(new THREE.Vector3());
 
@@ -97,8 +93,8 @@ class ChainVizScene {
         });
         // stats
         this.stats = Stats();
-        //document.body.appendChild(this.stats.dom);
-        //this.stats.domElement.style.cssText = "position:absolute; bottom:0px; right:0px;";
+        document.body.appendChild(this.stats.dom);
+        this.stats.domElement.style.cssText = "position:absolute; bottom:0px; right:0px;";
         // orbit controls
         this.controls = new OrbitControls(this.camera, this.renderer.domElement);
         this.controls.enabled = false;
@@ -356,7 +352,9 @@ class ChainVizScene {
                 setTimeout(resolve, 50);
             });
         }
-        this.resetCamera();
+        setTimeout(() => {
+            this.resetCamera();
+        }, 0);
     }
 
     private getBlockWithNumber(number: number): Block | undefined {

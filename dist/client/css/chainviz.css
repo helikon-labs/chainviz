@@ -127,11 +127,15 @@ hr {
 #left-panel #chainviz-logo {
     color: #ffffff;
     font-family: "Audiowide", sans-serif;
+    display: flex;
+    flex-flow: row nowrap;
+    align-items: baseline;
 }
 
 #left-panel #chainviz-logo .chainviz-logo {
     font-size: 20px;
     font-weight: 800;
+    flex-grow: 1;
 }
 
 #left-panel #chainviz-logo .chainviz-version {
