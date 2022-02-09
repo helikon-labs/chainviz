@@ -200,9 +200,6 @@ class ChainVizScene {
                     this.validatorSummaryBoard.close();
                 }
             }
-        } else {
-            this.validatorDetailsBoard.close();
-            this.validatorMesh.clearSelection();
         }
     }
 
