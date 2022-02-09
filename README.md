@@ -30,24 +30,38 @@ Chainviz visualizes the following aspects of the Kusama relay chain and validato
 
 Chainviz uses the services provided by the [SubVT backend](https://github.com/helikon-labs/subvt-backend), part of SubVT, a project supported by the Kusama Treasury.
 
-### Build & Run
+## Build & Run
 
 ```
 git clone https://github.com/helikon-labs/chainviz.git
 cd chainviz
+```
+
+Edit `src/client/util/config.ts` and enable development mode:
+
+```typescript
+export const CONFIG = {
+    development: true,
+    // ...
+};
+```
+
+Then:
+
+```
 npm ci
 npm run dev
 ```
 
-Chainviz should be running at `localhost:8080`.
+ChainViz should be running at `localhost:8080`.
 
 Please report any issues to `kutsal [at] helikon.io`.
 
-### Known Issues
+## Known Issues
 
 `three.js` crashes some versions of (15.x) Safari desktop. It's a known issue and we'll be following the fix. Please see the discussion [here](https://github.com/mrdoob/three.js/issues/22582) for details.
 
-### Tips and Nominations
+## Tips and Nominations
 
 Tips and nominations are always much welcome!
 

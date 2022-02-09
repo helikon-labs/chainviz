@@ -1,7 +1,7 @@
 import { ChainViz } from "./chainviz";
 import { CONFIG } from "./util/config";
 
-if (window.location.host != CONFIG.host) {
+if (!CONFIG.development && window.location.host != CONFIG.host) {
     window.location.replace("https://" + CONFIG.host);
 } else {
     document.addEventListener("DOMContentLoaded", function (_) {
