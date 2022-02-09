@@ -116,7 +116,7 @@ class ValidatorDetailsBoard {
                     }" alt="${parachain.name}" title="${parachain.name}" />`;
                     this.ui.paraInfo.innerHTML = `${imageHTML}<span>${parachain.name} Paravalidator</span>`;
                 } else {
-                    this.ui.paraInfo.innerHTML = "Idle Paravalidator";
+                    this.ui.paraInfo.innerHTML = "Paravalidator";
                 }
                 this.ui.paraInfo.style.display = "flex";
             } else {
