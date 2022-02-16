@@ -1,7 +1,7 @@
 import { kusama } from "../model/app/network";
 
 export const CONFIG = {
-    development: false,
+    development: true,
     version: "0.1.0-ALPHA",
     host: "alpha.chainviz.app",
     networkStatusServiceURL: "wss://subvt-rpc.helikon.io:17888",

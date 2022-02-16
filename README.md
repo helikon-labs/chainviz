@@ -3,6 +3,7 @@
 </p>
 
 ![](https://github.com/helikon-labs/chainsynth/actions/workflows/prettier_eslint.yml/badge.svg)
+[![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=helikon-labs_chainviz&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=helikon-labs_chainviz)
 
 ChainViz ([alpha.chainviz.app](https://alpha.chainviz.app)) is a real-time 3D chain visualization web application for Kusama.
 

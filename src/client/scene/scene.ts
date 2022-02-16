@@ -386,13 +386,13 @@ class ChainVizScene {
             return;
         }
         if (Visibility.hidden()) {
-            const block = new Block(substrateBlock);
+            const newBlock = new Block(substrateBlock);
             const blockNumber = substrateBlock.header.number.toNumber();
             const sibling = this.getBlockWithNumber(blockNumber);
-            this.blocks.unshift(block);
+            this.blocks.unshift(newBlock);
             if (sibling) {
-                sibling.setSibling(block);
-                block.setSibling(sibling);
+                sibling.setSibling(newBlock);
+                newBlock.setSibling(sibling);
                 sibling.fork(false);
             } else {
                 for (let i = 1; i < this.blocks.length; i++) {
@@ -400,23 +400,23 @@ class ChainVizScene {
                     block.setIndex(block.getIndex() + 1, false);
                 }
             }
-            block.addTo(this.scene);
+            newBlock.addTo(this.scene);
             this.removeOffScreenValidators();
             return;
         }
         this.lock.acquire(
             this.blockPushLockKey,
             (done) => {
-                const block = new Block(substrateBlock);
+                const newBlock = new Block(substrateBlock);
                 const blockNumber = substrateBlock.header.number.toNumber();
                 const sibling = this.getBlockWithNumber(blockNumber);
-                this.blocks.unshift(block);
+                this.blocks.unshift(newBlock);
                 const authorshipBegan = this.validatorMesh.beginAuthorship(
                     authorAccountIdHex,
                     (validator) => {
                         if (sibling) {
-                            sibling.setSibling(block);
-                            block.setSibling(sibling);
+                            sibling.setSibling(newBlock);
+                            newBlock.setSibling(sibling);
                             sibling.fork(true);
                         } else {
                             for (let i = 1; i < this.blocks.length; i++) {
@@ -425,7 +425,7 @@ class ChainVizScene {
                             }
                         }
                         setTimeout(() => {
-                            block.spawn(this.scene, validator.index, validator.ringSize, () => {
+                            newBlock.spawn(this.scene, validator.index, validator.ringSize, () => {
                                 this.removeOffScreenValidators();
                                 done();
                             });
@@ -442,7 +442,7 @@ class ChainVizScene {
                     }
                     // insert block
                     setTimeout(() => {
-                        block.addTo(this.scene);
+                        newBlock.addTo(this.scene);
                         done();
                     }, Constants.BLOCK_SHIFT_TIME_MS);
                 }
@@ -468,12 +468,12 @@ class ChainVizScene {
         if (number && this.networkStatusBoard) {
             this.networkStatusBoard.setFinalizedBlockNumber(number);
         }
-        const block = this.blocks.find((block) => {
+        const finalizedBlock = this.blocks.find((block) => {
             return hash == block.getHashHex();
         });
-        if (block) {
-            block.finalize(!Visibility.hidden());
-            this.onFinalizedBlock(block.getParentHashHex());
+        if (finalizedBlock) {
+            finalizedBlock.finalize(!Visibility.hidden());
+            this.onFinalizedBlock(finalizedBlock.getParentHashHex());
         } else {
             return;
         }

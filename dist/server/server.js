@@ -10,8 +10,8 @@ const path_1 = __importDefault(require("path"));
 const http_1 = __importDefault(require("http"));
 const port = 3000;
 class App {
-    constructor(port) {
-        this.port = port;
+    constructor(tcpPort) {
+        this.port = tcpPort;
         const app = express_1.default();
         app.use(express_1.default.static(path_1.default.join(__dirname, "../client")));
         // In the webpack version of the boilerplate, it is not necessary
