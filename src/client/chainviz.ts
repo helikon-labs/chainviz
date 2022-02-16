@@ -135,8 +135,7 @@ class ChainViz {
     private setLoadingStatus(status: string) {
         const element = document.getElementById("loading-status");
         if (element != undefined) {
-            const htmlElement = element as HTMLElement;
-            htmlElement.innerHTML = status;
+            element.innerHTML = status;
         }
     }
 

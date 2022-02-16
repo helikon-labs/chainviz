@@ -183,7 +183,6 @@ hr {
     visibility: hidden;
     display: flex;
     flex-grow: 1;
-    display: flex;
     flex-flow: column;
     min-height: 0;
     font-size: 13px;
@@ -207,7 +206,7 @@ hr {
     align-items: center;
 }
 
-#validator-search i {
+#validator-search em {
     font-size: 12px;
     margin-top: 2px;
 }
@@ -384,7 +383,7 @@ hr {
     justify-content: flex-end;
 }
 
-#validator-summary-board #validator-summary-era-data i {
+#validator-summary-board #validator-summary-era-data em {
     font-size: 90%;
     margin-right: 6px;
 }
@@ -404,7 +403,7 @@ hr {
     align-items: center;
 }
 
-#validator-summary-board .stake-data-container i {
+#validator-summary-board .stake-data-container em {
     font-size: 8px;
     width: 10px;
     margin-left: 8px;
@@ -461,13 +460,13 @@ hr {
     right: 16px;
 }
 
-#validator-details-board #validator-details-close-button i {
+#validator-details-board #validator-details-close-button em {
     color: #ffffff88;
     font-size: 22px;
     cursor: pointer;
 }
 
-#validator-details-board #validator-details-close-button i:hover {
+#validator-details-board #validator-details-close-button em:hover {
     color: #ffffffcc;
 }
 

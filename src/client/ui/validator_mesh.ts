@@ -168,8 +168,8 @@ class ValidatorMesh {
     }
 
     beginAuthorship(accountIdHex?: string, onComplete?: (validator: Validator) => void): boolean {
-        const index = this.validators.findIndex((validator) => {
-            return validator?.getAccountIdHex().toLowerCase() === accountIdHex;
+        const index = this.validators.findIndex((candidateValidator) => {
+            return candidateValidator?.getAccountIdHex().toLowerCase() === accountIdHex;
         });
         if (index < 0) return false;
         const validator = this.validators[index];
@@ -231,8 +231,8 @@ class ValidatorMesh {
         for (let i = 0; i < this.validators.length; i++) {
             const ringIndex = this.getRingIndexForIndex(i);
             if (this.validators[i] == undefined && ringIndex) {
-                const [ring, i] = ringIndex;
-                const validator = new Validator(summary, [ring, i], this.ringSizes[ring]);
+                const [ring, index] = ringIndex;
+                const validator = new Validator(summary, [ring, index], this.ringSizes[ring]);
                 this.validators[i] = validator;
                 this.setMatrixAt(i, validator.getMatrix());
                 this.setColorAt(i, validator.getColor());

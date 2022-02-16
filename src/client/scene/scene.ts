@@ -74,7 +74,6 @@ class ChainVizScene {
         this.renderer.setSize(window.innerWidth, window.innerHeight);
         this.renderer.shadowMap.enabled = true;
         this.renderer.shadowMap.type = THREE.PCFSoftShadowMap;
-        this.renderer.domElement.addEventListener;
         document.body.appendChild(this.renderer.domElement);
         document.addEventListener("click", (event) => {
             this.onClick(event);
