@@ -11,6 +11,7 @@ class App {
     constructor(port: number) {
         this.port = port;
         const app = express();
+        app.disable("x-powered-by");
         app.use(express.static(path.join(__dirname, "../client")));
         // In the webpack version of the boilerplate, it is not necessary
         // to add static references to the libs in node_modules if
