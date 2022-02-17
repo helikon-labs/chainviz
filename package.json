@@ -52,6 +52,6 @@
         "ws": "^8.5.0"
     },
     "dependencies": {
-        "express": "^4.17.2"
+        "express": "^4.17.3"
     }
 }
