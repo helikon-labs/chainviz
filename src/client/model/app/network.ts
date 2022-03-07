@@ -67,11 +67,27 @@ const kusama: Network = {
             },
         ],
         [
+            2011,
+            {
+                id: 2011,
+                name: "SORA",
+                image: "./img/parachain/kusama/2011_sora.svg",
+            },
+        ],
+        [
             2012,
             {
                 id: 2012,
                 name: "Crust Shadow",
                 image: "./img/parachain/kusama/2012_crust_shadow.svg",
+            },
+        ],
+        [
+            2015,
+            {
+                id: 2015,
+                name: "Integritee",
+                image: "./img/parachain/kusama/2015_integritee.svg",
             },
         ],
         [
@@ -192,6 +208,22 @@ const kusama: Network = {
                 id: 2101,
                 name: "Zeitgeist",
                 image: "./img/parachain/kusama/2101_zeitgeist.png",
+            },
+        ],
+        [
+            2106,
+            {
+                id: 2106,
+                name: "Litmus",
+                image: "./img/parachain/kusama/2106_litmus.png",
+            },
+        ],
+        [
+            2107,
+            {
+                id: 2107,
+                name: "KICO",
+                image: "./img/parachain/kusama/2107_kico.png",
             },
         ],
     ]),
