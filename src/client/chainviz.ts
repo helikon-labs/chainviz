@@ -154,12 +154,10 @@ class ChainViz {
     }
 
     async init() {
-        this.setLoadingStatus(
-            "::&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;UNDER MAINTENANCE&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;::"
-        );
+        this.setLoadingStatus(":: connecting to services ::");
         this.displayVersion();
-        //this.getInitialBlocks();
-        //this.validatorListClient.connect();
+        this.getInitialBlocks();
+        this.validatorListClient.connect();
     }
 
     private async startScene() {
