@@ -548,3 +548,27 @@ hr {
 #validator-details-board #status-icon-container img {
     width: 32px;
 }
+
+#subvt-update-notice {
+    position: fixed;
+    top: 0px;
+    left: 50%;
+    width: 360px;
+    padding: 12px 12px;
+    margin-top: 16px;
+    font-size: 12px;
+    text-align: center;
+    transform: translate(-50%, 0);
+    z-index: 999999;
+    background-color: #000000cc;
+    border-radius: 16px;
+    border-width: 1px;
+    border-color: #333;
+    border-style: solid;
+    line-height: 18px;
+}
+
+#subvt-update-notice #subvt-update-notice-ok-button {
+    text-decoration: underline;
+    cursor: pointer;
+}
