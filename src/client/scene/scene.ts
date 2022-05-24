@@ -47,11 +47,6 @@ class ChainVizScene {
 
     private readonly leftPanel = <HTMLElement>document.getElementById("left-panel");
     private mouseIsInLeftPanel = false;
-    private readonly warningLabel = <HTMLElement>document.getElementById("subvt-update-notice");
-    private mouseIsInWarningLabel = false;
-    private readonly warningLabelOKButton = <HTMLElement>(
-        document.getElementById("subvt-update-notice-ok-button")
-    );
 
     constructor() {
         this.scene = new THREE.Scene();
@@ -96,20 +91,6 @@ class ChainVizScene {
             this.mouseIsInLeftPanel = false;
         });
 
-        this.warningLabel.addEventListener("mouseenter", (_event) => {
-            if (this.validatorMesh) {
-                this.validatorMesh.clearHover();
-            }
-            this.mouseIsInWarningLabel = true;
-        });
-        this.warningLabel.addEventListener("mouseleave", (_event) => {
-            this.mouseIsInWarningLabel = false;
-        });
-        this.warningLabelOKButton.addEventListener("click", (event) => {
-            event.stopPropagation();
-            this.warningLabel.remove();
-            this.mouseIsInWarningLabel = false;
-        });
         // stats
         this.stats = Stats();
         //document.body.appendChild(this.stats.dom);
@@ -232,7 +213,7 @@ class ChainVizScene {
     }
 
     private onClick(event: MouseEvent) {
-        if (this.mouseIsInLeftPanel || this.mouseIsInWarningLabel) {
+        if (this.mouseIsInLeftPanel) {
             return;
         }
         const clickPoint = new THREE.Vector2(
@@ -287,7 +268,7 @@ class ChainVizScene {
     }
 
     private checkHoverRaycast() {
-        if (this.mouseIsInLeftPanel || this.mouseIsInWarningLabel || !this.controls.enabled) {
+        if (this.mouseIsInLeftPanel || !this.controls.enabled) {
             return;
         }
         this.raycaster.setFromCamera(this.hoverPoint, this.camera);
