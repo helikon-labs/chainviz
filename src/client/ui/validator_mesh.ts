@@ -6,10 +6,18 @@ import { getOnScreenPosition } from "../util/geometry";
 
 class ValidatorMesh {
     private mesh: THREE.InstancedMesh;
+    /*
     private readonly geometry = new THREE.CylinderGeometry(
         Constants.VALIDATOR_GEOM_RADIUS,
         Constants.VALIDATOR_GEOM_RADIUS,
         Constants.VALIDATOR_GEOM_HEIGHT,
+        Constants.VALIDATOR_GEOM_SEGMENTS
+    );
+    */
+    private readonly geometry = new THREE.CapsuleGeometry(
+        Constants.VALIDATOR_GEOM_RADIUS,
+        Constants.VALIDATOR_GEOM_HEIGHT,
+        Constants.VALIDATOR_GEOM_SEGMENTS / 2,
         Constants.VALIDATOR_GEOM_SEGMENTS
     );
     private readonly material = new THREE.MeshPhongMaterial({
