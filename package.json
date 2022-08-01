@@ -16,7 +16,7 @@
     "license": "GPL 3",
     "devDependencies": {
         "@polkadot/api": "^8.14.1",
-        "@polkadot/api-derive": "^8.14.1",
+        "@polkadot/api-derive": "^9.0.1",
         "@polkadot/types": "^8.14.1",
         "@polkadot/keyring": "^10.1.2",
         "@polkadot/ui-shared": "^2.9.2",
