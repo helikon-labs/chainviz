@@ -211,7 +211,7 @@ class ValidatorDetailsBoard {
             } else {
                 this.ui.heartbeatIcon.style.display = "none";
             }
-            if (summary.activeNextSession) {
+            if (summary.isActiveNextSession) {
                 this.ui.nextSessionIcon.style.display = "block";
             } else {
                 this.ui.nextSessionIcon.style.display = "none";

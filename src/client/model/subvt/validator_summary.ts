@@ -14,7 +14,7 @@ interface ValidatorSummary {
     preferences: ValidatorPreferences;
     selfStake: StakeSummary;
     isActive: boolean;
-    activeNextSession: boolean;
+    isActiveNextSession: boolean;
     inactiveNominations: InactiveNominationsSummary;
     oversubscribed: boolean;
     slashCount: number;
@@ -38,7 +38,7 @@ interface ValidatorSummaryDiff {
     preferences?: ValidatorPreferences;
     selfStake?: StakeSummary;
     isActive?: boolean;
-    activeNextSession?: boolean;
+    isActiveNextSession?: boolean;
     inactiveNominations?: InactiveNominationsSummary;
     oversubscribed?: boolean;
     slashCount?: number;
