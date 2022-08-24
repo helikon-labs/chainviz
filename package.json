@@ -18,7 +18,7 @@
         "@polkadot/api": "^9.2.2",
         "@polkadot/api-derive": "^9.2.2",
         "@polkadot/types": "^9.2.2",
-        "@polkadot/keyring": "^10.1.4",
+        "@polkadot/keyring": "^10.1.6",
         "@polkadot/ui-shared": "^2.9.5",
         "@tweenjs/tween.js": "^18.6.4",
         "@types/async-lock": "^1.1.5",
