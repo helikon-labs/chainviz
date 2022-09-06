@@ -11,8 +11,8 @@ export function createTween<T, U>(
     onUpdate?: () => void,
     onComplete?: () => void
 ) {
-    return new TWEEN.Tween(property)
-        .to(targetProperties, durationMs)
+    return new TWEEN.Tween(property as any)
+        .to(targetProperties as any, durationMs)
         .easing(curve)
         .onStart(() => {
             if (onStart) {
