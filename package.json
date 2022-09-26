@@ -19,7 +19,7 @@
         "@polkadot/api-derive": "^9.3.3",
         "@polkadot/types": "^9.3.3",
         "@polkadot/keyring": "^10.1.7",
-        "@polkadot/ui-shared": "^2.9.8",
+        "@polkadot/ui-shared": "^2.9.10",
         "@tweenjs/tween.js": "^18.6.4",
         "@types/async-lock": "^1.1.5",
         "@types/camelcase-keys-deep": "^0.1.0",
