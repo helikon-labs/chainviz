@@ -291,8 +291,11 @@ hr {
 }
 
 #left-panel #icon-container #subvt-icon {
-    filter: invert(1);
+    box-sizing: border-box;
+    border-radius: 4px;
+    padding: 2px;
     margin-left: 8px;
+    background-color: #fff;
 }
 
 #left-panel #icon-container #github-icon {
