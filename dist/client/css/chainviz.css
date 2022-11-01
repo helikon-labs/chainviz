@@ -551,3 +551,8 @@ hr {
 #validator-details-board #status-icon-container img {
     width: 32px;
 }
+
+#validator-details-identicon-container {
+    width: 36px;
+    height: 36px;
+}
