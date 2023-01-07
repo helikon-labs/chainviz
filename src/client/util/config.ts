@@ -6,7 +6,7 @@ export const CONFIG = {
     host: "alpha.chainviz.app",
     //networkStatusServiceURL: "ws://localhost:7888",
     //activeValidatorListServiceURL: "ws://localhost:7889",
-    networkStatusServiceURL: "wss://rpc-test.subvt.io:17888",
-    activeValidatorListServiceURL: "wss://rpc-test.subvt.io:17889",
+    networkStatusServiceURL: "wss://rpc.kusama.subvt.io:17888",
+    activeValidatorListServiceURL: "wss://rpc.kusama.subvt.io:17889",
     network: kusama,
 };
