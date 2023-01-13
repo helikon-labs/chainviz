@@ -15,7 +15,7 @@
     "author": "kukabi @ Helikon Labs",
     "license": "GPL 3",
     "devDependencies": {
-        "@polkadot/api": "^9.10.5",
+        "@polkadot/api": "^9.11.2",
         "@polkadot/api-derive": "^9.10.5",
         "@polkadot/types": "^9.10.5",
         "@polkadot/keyring": "^10.2.2",
