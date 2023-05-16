@@ -94,7 +94,7 @@ class ChainVizScene {
         });
 
         // stats
-        this.stats = new Stats();
+        this.stats = Stats();
         //document.body.appendChild(this.stats.dom);
         //this.stats.domElement.style.cssText = "position:absolute; bottom:0px; right:0px;";
         // orbit controls
