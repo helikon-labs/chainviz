@@ -1,5 +1,5 @@
-import ReconnectingWebSocket from "reconnecting-websocket";
-import camelcaseKeysDeep = require("camelcase-keys-deep");
+import ReconnectingWebSocket from 'reconnecting-websocket';
+import camelcaseKeysDeep = require('camelcase-keys-deep');
 
 class RPCRequest {
     id: number;
@@ -9,7 +9,7 @@ class RPCRequest {
 
     constructor(id: number, method: string, params: unknown[]) {
         this.id = id;
-        this.jsonrpc = "2.0";
+        this.jsonrpc = '2.0';
         this.method = method;
         this.params = params;
     }
@@ -66,21 +66,21 @@ class RPCSubscriptionService<T> {
 
     private onMessage(event: MessageEvent) {
         const json = JSON.parse(event.data);
-        if (Object.prototype.hasOwnProperty.call(json, "result")) {
-            if (isNaN(json["result"])) {
+        if (Object.prototype.hasOwnProperty.call(json, 'result')) {
+            if (isNaN(json['result'])) {
                 this.state = RPCSubscriptionServiceState.Connected;
                 this.listener.onUnsubscribed(this.subscriptionId);
                 this.subscriptionId = 0;
             } else {
                 this.state = RPCSubscriptionServiceState.Subscribed;
-                this.subscriptionId = json["result"];
+                this.subscriptionId = json['result'];
                 this.listener.onSubscribed(this.subscriptionId);
             }
-        } else if (Object.prototype.hasOwnProperty.call(json, "params")) {
-            const update: T = camelcaseKeysDeep(json["params"]["result"]) as T;
+        } else if (Object.prototype.hasOwnProperty.call(json, 'params')) {
+            const update: T = camelcaseKeysDeep(json['params']['result']) as T;
             this.listener.onUpdate(update);
-        } else if (Object.prototype.hasOwnProperty.call(json, "error")) {
-            this.listener.onError(json["error"]["code"], json["error"]["message"]);
+        } else if (Object.prototype.hasOwnProperty.call(json, 'error')) {
+            this.listener.onError(json['error']['code'], json['error']['message']);
         }
     }
 

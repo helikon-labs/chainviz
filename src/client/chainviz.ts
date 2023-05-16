@@ -1,17 +1,17 @@
-import * as THREE from "three";
+import * as THREE from 'three';
 import {
     RPCSubscriptionService,
     RPCSubscriptionServiceListener,
-} from "./service/rpc/RPCSubscriptionService";
-import { ChainVizScene } from "./scene/scene";
-import { ValidatorListUpdate, ValidatorSummary } from "./model/subvt/validator_summary";
-import { ApiPromise, WsProvider } from "@polkadot/api";
-import { Header, SignedBlock } from "@polkadot/types/interfaces";
-import { NetworkStatusUpdate } from "./model/subvt/network_status";
-import { getSS58Address } from "./util/ss58";
-import { Constants } from "./util/constants";
-import AsyncLock = require("async-lock");
-import { CONFIG } from "./util/config";
+} from './service/rpc/RPCSubscriptionService';
+import { ChainVizScene } from './scene/scene';
+import { ValidatorListUpdate, ValidatorSummary } from './model/subvt/validator_summary';
+import { ApiPromise, WsProvider } from '@polkadot/api';
+import { Header, SignedBlock } from '@polkadot/types/interfaces';
+import { NetworkStatusUpdate } from './model/subvt/network_status';
+import { getSS58Address } from './util/ss58';
+import { Constants } from './util/constants';
+import AsyncLock from 'async-lock';
+import { CONFIG } from './util/config';
 
 THREE.Cache.enabled = true;
 
@@ -41,7 +41,7 @@ class ChainViz {
         onConnected: () => {
             this.validatorListClientIsConnected = true;
             if (this.substrateClientIsConnected) {
-                this.setLoadingStatus(":: connected ::<br>:: waiting for data ::");
+                this.setLoadingStatus(':: connected ::<br>:: waiting for data ::');
             }
             this.subscribeToValidatorList();
         },
@@ -65,7 +65,7 @@ class ChainViz {
     private readonly validatorListClient: RPCSubscriptionService<ValidatorListUpdate>;
     private validatorListClientIsConnected = false;
     private substrateClient: ApiPromise = new ApiPromise({
-        provider: new WsProvider("wss://rpc.dotters.network/kusama"),
+        provider: new WsProvider('wss://rpc.dotters.network/kusama'),
     });
     private substrateClientIsConnected = false;
 
@@ -76,19 +76,19 @@ class ChainViz {
     private initialValidators = new Array<ValidatorSummary>();
 
     private readonly lock = new AsyncLock();
-    private readonly blockPushLockKey = "block_push";
+    private readonly blockPushLockKey = 'block_push';
 
     constructor(networkStatusServerURL: string, activeValidatorListServerURL: string) {
         this.networkStatusClient = new RPCSubscriptionService(
             networkStatusServerURL,
-            "subscribe_networkStatus",
-            "unsubscribe_networkStatus",
+            'subscribe_networkStatus',
+            'unsubscribe_networkStatus',
             this.networkStatusListener
         );
         this.validatorListClient = new RPCSubscriptionService(
             activeValidatorListServerURL,
-            "subscribe_validatorList",
-            "unsubscribe_validatorList",
+            'subscribe_validatorList',
+            'unsubscribe_validatorList',
             this.validatorListListener
         );
     }
@@ -117,7 +117,7 @@ class ChainViz {
         await this.substrateClient.isReady;
         this.substrateClientIsConnected = true;
         if (this.validatorListClientIsConnected) {
-            this.setLoadingStatus(":: connected ::<br>:: waiting for data ::");
+            this.setLoadingStatus(':: connected ::<br>:: waiting for data ::');
         }
         const lastHeader = await this.substrateClient.rpc.chain.getHeader();
         let block = await this.substrateClient.rpc.chain.getBlock(lastHeader.hash);
@@ -133,15 +133,15 @@ class ChainViz {
     }
 
     private setLoadingStatus(status: string) {
-        const element = document.getElementById("loading-status");
+        const element = document.getElementById('loading-status');
         if (element != undefined) {
             element.innerHTML = status;
         }
     }
 
     private removeLoadingStatus() {
-        document.getElementById("page-spinner")?.remove();
-        document.getElementById("loading-status")?.remove();
+        document.getElementById('page-spinner')?.remove();
+        document.getElementById('loading-status')?.remove();
     }
 
     private subscribeToValidatorList() {
@@ -149,12 +149,12 @@ class ChainViz {
     }
 
     private displayVersion() {
-        const element = <HTMLElement>document.getElementById("chainviz-version");
+        const element = <HTMLElement>document.getElementById('chainviz-version');
         element.innerHTML = `v${CONFIG.version}`;
     }
 
     async init() {
-        this.setLoadingStatus(":: connecting to services ::");
+        this.setLoadingStatus(':: connecting to services ::');
         this.displayVersion();
         this.getInitialBlocks();
         this.validatorListClient.connect();

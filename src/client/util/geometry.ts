@@ -1,4 +1,4 @@
-import * as THREE from "three";
+import * as THREE from 'three';
 
 function rotateAboutPoint(
     obj: THREE.Object3D,

@@ -1,10 +1,10 @@
-import { Block as SubstrateBlock } from "@polkadot/types/interfaces";
-import * as THREE from "three";
-import { Font, FontLoader } from "three/examples/jsm/loaders/FontLoader";
-import { TextGeometry } from "three/examples/jsm/geometries/TextGeometry";
-import { Constants } from "../../util/constants";
-import { createTween } from "../../util/tween";
-import { rotateAboutPoint } from "../../util/geometry";
+import { Block as SubstrateBlock } from '@polkadot/types/interfaces';
+import * as THREE from 'three';
+import { Font, FontLoader } from 'three/examples/jsm/loaders/FontLoader';
+import { TextGeometry } from 'three/examples/jsm/geometries/TextGeometry';
+import { Constants } from '../../util/constants';
+import { createTween } from '../../util/tween';
+import { rotateAboutPoint } from '../../util/geometry';
 
 class Block {
     private readonly mesh: THREE.Group;
@@ -15,7 +15,7 @@ class Block {
     private static blockNumberFont: Font;
 
     static {
-        new FontLoader().load("./font/fira_mono_regular.typeface.json", (font) => {
+        new FontLoader().load('./font/fira_mono_regular.typeface.json', (font) => {
             Block.blockNumberFont = font;
         });
     }
@@ -77,7 +77,7 @@ class Block {
         }
         // finalized
         {
-            this.finalizedTextGeometry = new TextGeometry("+", {
+            this.finalizedTextGeometry = new TextGeometry('+', {
                 font: font,
                 size: 2,
                 height: 0,

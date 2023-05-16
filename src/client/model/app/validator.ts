@@ -1,8 +1,8 @@
-import * as THREE from "three";
-import { rotateAboutPoint } from "../../util/geometry";
-import { createTween } from "../../util/tween";
-import { Constants } from "../../util/constants";
-import { ValidatorSummary, ValidatorSummaryDiff } from "../subvt/validator_summary";
+import * as THREE from 'three';
+import { rotateAboutPoint } from '../../util/geometry';
+import { createTween } from '../../util/tween';
+import { Constants } from '../../util/constants';
+import { ValidatorSummary, ValidatorSummaryDiff } from '../subvt/validator_summary';
 
 class Validator {
     private readonly object = new THREE.Object3D();

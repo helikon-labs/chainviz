@@ -1,8 +1,8 @@
-import * as THREE from "three";
-import { Validator } from "../model/app/validator";
-import { ValidatorSummary, ValidatorSummaryDiff } from "../model/subvt/validator_summary";
-import { Constants } from "../util/constants";
-import { getOnScreenPosition } from "../util/geometry";
+import * as THREE from 'three';
+import { Validator } from '../model/app/validator';
+import { ValidatorSummary, ValidatorSummaryDiff } from '../model/subvt/validator_summary';
+import { Constants } from '../util/constants';
+import { getOnScreenPosition } from '../util/geometry';
 
 class ValidatorMesh {
     private mesh: THREE.InstancedMesh;
@@ -79,7 +79,7 @@ class ValidatorMesh {
 
     getIndexOf(accountIdHex: string): number | undefined {
         for (let i = 0; i < this.validators.length; i++) {
-            if ((this.validators[i]?.getAccountIdHex() ?? "") == accountIdHex) {
+            if ((this.validators[i]?.getAccountIdHex() ?? '') == accountIdHex) {
                 return i;
             }
         }

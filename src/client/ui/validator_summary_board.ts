@@ -1,8 +1,8 @@
-import { ValidatorSummary, ValidatorSummaryDiff } from "../model/subvt/validator_summary";
-import { CONFIG } from "../util/config";
-import { Constants } from "../util/constants";
-import { formatNumber } from "../util/format";
-import { getValidatorIdentityIconHTML, getValidatorSummaryDisplay } from "../util/ui";
+import { ValidatorSummary, ValidatorSummaryDiff } from '../model/subvt/validator_summary';
+import { CONFIG } from '../util/config';
+import { Constants } from '../util/constants';
+import { formatNumber } from '../util/format';
+import { getValidatorIdentityIconHTML, getValidatorSummaryDisplay } from '../util/ui';
 
 interface UI {
     root: HTMLElement;
@@ -19,12 +19,12 @@ class ValidatorSummaryBoard {
 
     constructor() {
         this.ui = {
-            root: <HTMLElement>document.getElementById("validator-summary-board"),
-            identity: <HTMLElement>document.getElementById("validator-summary-identity"),
-            paraInfo: <HTMLElement>document.getElementById("validator-summary-para-info"),
-            eraData: <HTMLElement>document.getElementById("validator-summary-era-data"),
-            activeStake: <HTMLElement>document.getElementById("validator-summary-active-stake"),
-            inactiveStake: <HTMLElement>document.getElementById("validator-summary-inactive-stake"),
+            root: <HTMLElement>document.getElementById('validator-summary-board'),
+            identity: <HTMLElement>document.getElementById('validator-summary-identity'),
+            paraInfo: <HTMLElement>document.getElementById('validator-summary-para-info'),
+            eraData: <HTMLElement>document.getElementById('validator-summary-era-data'),
+            activeStake: <HTMLElement>document.getElementById('validator-summary-active-stake'),
+            inactiveStake: <HTMLElement>document.getElementById('validator-summary-inactive-stake'),
         };
     }
 
@@ -43,11 +43,11 @@ class ValidatorSummaryBoard {
                     }" alt="${parachain.name}" title="${parachain.name}" />`;
                     this.ui.paraInfo.innerHTML = `${imageHTML}<span>${parachain.name}</span>`;
                 } else {
-                    this.ui.paraInfo.innerHTML = "Paravalidator";
+                    this.ui.paraInfo.innerHTML = 'Paravalidator';
                 }
-                this.ui.paraInfo.style.display = "flex";
+                this.ui.paraInfo.style.display = 'flex';
             } else {
-                this.ui.paraInfo.style.display = "none";
+                this.ui.paraInfo.style.display = 'none';
             }
         }
         // era data
@@ -82,7 +82,7 @@ class ValidatorSummaryBoard {
                 CONFIG.network.tokenTicker
             );
         }
-        this.ui.root.style.visibility = "visible";
+        this.ui.root.style.visibility = 'visible';
     }
 
     setPosition(x: number, y: number) {
@@ -91,7 +91,7 @@ class ValidatorSummaryBoard {
     }
 
     close() {
-        this.ui.root.style.visibility = "hidden";
+        this.ui.root.style.visibility = 'hidden';
         this.summary = undefined;
     }
 

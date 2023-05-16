@@ -13,14 +13,12 @@ See the Apache Version 2.0 License for specific language governing permissions
 and limitations under the License.
 ***************************************************************************** */
 
-/*! noble-hashes - MIT License (c) 2022 Paul Miller (paulmillr.com) */
-
-/*! noble-secp256k1 - MIT License (c) 2019 Paul Miller (paulmillr.com) */
+/*! noble-curves - MIT License (c) 2022 Paul Miller (paulmillr.com) */
 
 /*! scure-base - MIT License (c) 2022 Paul Miller (paulmillr.com) */
 
 /**
  * @license
- * Copyright 2010-2022 Three.js Authors
+ * Copyright 2010-2023 Three.js Authors
  * SPDX-License-Identifier: MIT
  */

@@ -1,10 +1,10 @@
-import { ValidatorSummary, ValidatorSummaryDiff } from "../model/subvt/validator_summary";
-import { CONFIG } from "../util/config";
-import { Constants } from "../util/constants";
-import { formatNumber, getCondensedAddress } from "../util/format";
-import { generateIdenticonSVGHTML } from "../util/identicon";
-import { getSS58Address } from "../util/ss58";
-import { getValidatorIdentityIconHTML, getValidatorSummaryDisplay } from "../util/ui";
+import { ValidatorSummary, ValidatorSummaryDiff } from '../model/subvt/validator_summary';
+import { CONFIG } from '../util/config';
+import { Constants } from '../util/constants';
+import { formatNumber, getCondensedAddress } from '../util/format';
+import { generateIdenticonSVGHTML } from '../util/identicon';
+import { getSS58Address } from '../util/ss58';
+import { getValidatorIdentityIconHTML, getValidatorSummaryDisplay } from '../util/ui';
 
 interface ValidatorDetailsBoardDelegate {
     onClose(accountIdHex: string): void;
@@ -45,54 +45,54 @@ class ValidatorDetailsBoard {
     constructor(delegate: ValidatorDetailsBoardDelegate) {
         this.delegate = delegate;
         this.ui = {
-            root: <HTMLElement>document.getElementById("validator-details-board"),
-            closeButton: <HTMLElement>document.getElementById("validator-details-close-button"),
+            root: <HTMLElement>document.getElementById('validator-details-board'),
+            closeButton: <HTMLElement>document.getElementById('validator-details-close-button'),
             identiconContainer: <HTMLElement>(
-                document.getElementById("validator-details-identicon-container")
+                document.getElementById('validator-details-identicon-container')
             ),
-            identity: <HTMLElement>document.getElementById("validator-details-identity"),
-            paraInfo: <HTMLElement>document.getElementById("validator-details-para-info"),
-            stash: <HTMLElement>document.getElementById("validator-details-stash"),
-            controller: <HTMLElement>document.getElementById("validator-details-controller"),
-            commission: <HTMLElement>document.getElementById("validator-details-commission"),
-            blocks: <HTMLElement>document.getElementById("validator-details-blocks"),
-            points: <HTMLElement>document.getElementById("validator-details-points"),
+            identity: <HTMLElement>document.getElementById('validator-details-identity'),
+            paraInfo: <HTMLElement>document.getElementById('validator-details-para-info'),
+            stash: <HTMLElement>document.getElementById('validator-details-stash'),
+            controller: <HTMLElement>document.getElementById('validator-details-controller'),
+            commission: <HTMLElement>document.getElementById('validator-details-commission'),
+            blocks: <HTMLElement>document.getElementById('validator-details-blocks'),
+            points: <HTMLElement>document.getElementById('validator-details-points'),
             returnContainer: <HTMLElement>(
-                document.getElementById("validator-details-return-container")
+                document.getElementById('validator-details-return-container')
             ),
-            return: <HTMLElement>document.getElementById("validator-details-return"),
+            return: <HTMLElement>document.getElementById('validator-details-return'),
             selfStakeTitle: <HTMLElement>(
-                document.getElementById("validator-details-self-stake-title")
+                document.getElementById('validator-details-self-stake-title')
             ),
             selfStakeAmount: <HTMLElement>(
-                document.getElementById("validator-details-self-stake-amount")
+                document.getElementById('validator-details-self-stake-amount')
             ),
             otherStakeTitle: <HTMLElement>(
-                document.getElementById("validator-details-other-stake-title")
+                document.getElementById('validator-details-other-stake-title')
             ),
             otherStakeAmount: <HTMLElement>(
-                document.getElementById("validator-details-other-stake-amount")
+                document.getElementById('validator-details-other-stake-amount')
             ),
             inactiveStakeTitle: <HTMLElement>(
-                document.getElementById("validator-details-inactive-stake-title")
+                document.getElementById('validator-details-inactive-stake-title')
             ),
             inactiveStakeAmount: <HTMLElement>(
-                document.getElementById("validator-details-inactive-stake-amount")
+                document.getElementById('validator-details-inactive-stake-amount')
             ),
-            oneKVIcon: <HTMLElement>document.getElementById("validator-details-icon-1kv"),
-            heartbeatIcon: <HTMLElement>document.getElementById("validator-details-icon-heartbeat"),
+            oneKVIcon: <HTMLElement>document.getElementById('validator-details-icon-1kv'),
+            heartbeatIcon: <HTMLElement>document.getElementById('validator-details-icon-heartbeat'),
             nextSessionIcon: <HTMLElement>(
-                document.getElementById("validator-details-icon-next-session")
+                document.getElementById('validator-details-icon-next-session')
             ),
-            slashedIcon: <HTMLElement>document.getElementById("validator-details-icon-slashed"),
+            slashedIcon: <HTMLElement>document.getElementById('validator-details-icon-slashed'),
             blocksNominationsIcon: <HTMLElement>(
-                document.getElementById("validator-details-icon-blocks-nominations")
+                document.getElementById('validator-details-icon-blocks-nominations')
             ),
             oversubscribedIcon: <HTMLElement>(
-                document.getElementById("validator-details-icon-oversubscribed")
+                document.getElementById('validator-details-icon-oversubscribed')
             ),
         };
-        this.ui.closeButton.addEventListener("click", (_event) => {
+        this.ui.closeButton.addEventListener('click', (_event) => {
             this.close();
         });
     }
@@ -116,11 +116,11 @@ class ValidatorDetailsBoard {
                     }" alt="${parachain.name}" title="${parachain.name}" />`;
                     this.ui.paraInfo.innerHTML = `${imageHTML}<span>${parachain.name} Paravalidator</span>`;
                 } else {
-                    this.ui.paraInfo.innerHTML = "Paravalidator";
+                    this.ui.paraInfo.innerHTML = 'Paravalidator';
                 }
-                this.ui.paraInfo.style.display = "flex";
+                this.ui.paraInfo.style.display = 'flex';
             } else {
-                this.ui.paraInfo.style.display = "none";
+                this.ui.paraInfo.style.display = 'none';
             }
         }
         // addresses
@@ -146,9 +146,9 @@ class ValidatorDetailsBoard {
             if (summary.returnRatePerBillion) {
                 const returnRate = formatNumber(BigInt(summary.returnRatePerBillion), 7, 2);
                 this.ui.return.innerHTML = `${returnRate}%`;
-                this.ui.returnContainer.style.display = "flex";
+                this.ui.returnContainer.style.display = 'flex';
             } else {
-                this.ui.returnContainer.style.display = "none";
+                this.ui.returnContainer.style.display = 'none';
             }
         }
         // active stake
@@ -202,44 +202,44 @@ class ValidatorDetailsBoard {
         // icons
         {
             if (summary.isEnrolledIn1kv) {
-                this.ui.oneKVIcon.style.display = "block";
+                this.ui.oneKVIcon.style.display = 'block';
             } else {
-                this.ui.oneKVIcon.style.display = "none";
+                this.ui.oneKVIcon.style.display = 'none';
             }
             if (summary.heartbeatReceived ?? false) {
-                this.ui.heartbeatIcon.style.display = "block";
+                this.ui.heartbeatIcon.style.display = 'block';
             } else {
-                this.ui.heartbeatIcon.style.display = "none";
+                this.ui.heartbeatIcon.style.display = 'none';
             }
             if (summary.isActiveNextSession) {
-                this.ui.nextSessionIcon.style.display = "block";
+                this.ui.nextSessionIcon.style.display = 'block';
             } else {
-                this.ui.nextSessionIcon.style.display = "none";
+                this.ui.nextSessionIcon.style.display = 'none';
             }
             if (summary.slashCount > 0) {
-                this.ui.slashedIcon.style.display = "block";
+                this.ui.slashedIcon.style.display = 'block';
             } else {
-                this.ui.slashedIcon.style.display = "none";
+                this.ui.slashedIcon.style.display = 'none';
             }
             if (summary.preferences.blocksNominations) {
-                this.ui.blocksNominationsIcon.style.display = "block";
+                this.ui.blocksNominationsIcon.style.display = 'block';
             } else {
-                this.ui.blocksNominationsIcon.style.display = "none";
+                this.ui.blocksNominationsIcon.style.display = 'none';
             }
             if (summary.oversubscribed) {
-                this.ui.oversubscribedIcon.style.display = "block";
+                this.ui.oversubscribedIcon.style.display = 'block';
             } else {
-                this.ui.oversubscribedIcon.style.display = "none";
+                this.ui.oversubscribedIcon.style.display = 'none';
             }
         }
-        this.ui.root.style.display = "flex";
+        this.ui.root.style.display = 'flex';
     }
 
     close() {
         if (this.summary) {
             this.delegate.onClose(this.summary.accountId);
         }
-        this.ui.root.style.display = "none";
+        this.ui.root.style.display = 'none';
         this.summary = undefined;
     }
 

@@ -1,6 +1,6 @@
-import express from "express";
-import path from "path";
-import http from "http";
+import express from 'express';
+import path from 'path';
+import http from 'http';
 
 const port = 3000;
 
@@ -11,8 +11,8 @@ class App {
     constructor(port: number) {
         this.port = port;
         const app = express();
-        app.disable("x-powered-by");
-        app.use(express.static(path.join(__dirname, "../client")));
+        app.disable('x-powered-by');
+        app.use(express.static(path.join(__dirname, '../client')));
         // In the webpack version of the boilerplate, it is not necessary
         // to add static references to the libs in node_modules if
         // you are using module specifiers in your client.ts imports.

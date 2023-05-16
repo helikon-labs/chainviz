@@ -1,5 +1,5 @@
-import * as TWEEN from "@tweenjs/tween.js";
-import * as THREE from "three";
+import * as TWEEN from '@tweenjs/tween.js';
+import * as THREE from 'three';
 
 export abstract class Constants {
     // UI
@@ -54,8 +54,8 @@ export abstract class Constants {
     static readonly HOVER_INFO_BOARD_Y_OFFSET = -30;
     // format
     static readonly BALANCE_FORMAT_DECIMALS = 4;
-    static readonly DECIMAL_SEPARATOR = ".";
-    static readonly THOUSANDS_SEPARATOR = ",";
+    static readonly DECIMAL_SEPARATOR = '.';
+    static readonly THOUSANDS_SEPARATOR = ',';
     // camera
     static readonly CAMERA_START_POSITION = new THREE.Vector3(
         180,

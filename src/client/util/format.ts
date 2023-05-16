@@ -1,4 +1,4 @@
-import { Constants } from "./constants";
+import { Constants } from './constants';
 
 function insertAtIndex(actual: string, index: number, insert: string): string {
     return actual.substring(0, index) + insert + actual.substring(index);
@@ -12,7 +12,7 @@ function formatNumber(
 ): string {
     let formatted = value.toString();
     while (formatted.length < decimals + 1) {
-        formatted = "0" + formatted;
+        formatted = '0' + formatted;
     }
     formatted = formatted.substring(0, formatted.length - decimals + formatDecimals);
     let integerPart = formatted.substring(0, formatted.length - formatDecimals);

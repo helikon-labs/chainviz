@@ -1,5 +1,5 @@
-import { ValidatorSummary } from "../model/subvt/validator_summary";
-import { getCondensedAddress } from "./format";
+import { ValidatorSummary } from '../model/subvt/validator_summary';
+import { getCondensedAddress } from './format';
 
 function getValidatorIdentityIconHTML(summary: ValidatorSummary): string {
     if (summary.display) {
@@ -15,11 +15,11 @@ function getValidatorIdentityIconHTML(summary: ValidatorSummary): string {
             return '<img src="/img/icon/parent_id_unconfirmed_icon.svg" class="id-confirmation-icon">';
         }
     }
-    return "";
+    return '';
 }
 
 function getValidatorSummaryDisplay(summary: ValidatorSummary): string {
-    let display = "";
+    let display = '';
     if (summary.display) {
         return summary.display;
     } else if (summary.parentDisplay) {

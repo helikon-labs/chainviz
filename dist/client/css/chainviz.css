@@ -3,7 +3,7 @@ body {
     margin: 0px;
     background-color: #000000;
     color: #ffffffe5;
-    font-family: "Roboto Mono", Courier, monospace;
+    font-family: 'Roboto Mono', Courier, monospace;
     font-size: 14px;
 }
 
@@ -126,7 +126,7 @@ hr {
 
 #left-panel #chainviz-logo {
     color: #ffffff;
-    font-family: "Audiowide", sans-serif;
+    font-family: 'Audiowide', sans-serif;
     display: flex;
     flex-flow: row nowrap;
     align-items: baseline;
@@ -212,7 +212,7 @@ hr {
 }
 
 #validator-search input {
-    font-family: "Roboto Mono", Courier, monospace;
+    font-family: 'Roboto Mono', Courier, monospace;
     flex-grow: 1;
     margin-left: 6px;
     height: 26px;

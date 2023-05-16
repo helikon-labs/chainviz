@@ -1,5 +1,5 @@
-import { Epoch } from "../substrate/epoch";
-import { Era } from "../substrate/era";
+import { Epoch } from '../substrate/epoch';
+import { Era } from '../substrate/era';
 
 type NetworkStatusKeys = keyof NetworkStatus;
 

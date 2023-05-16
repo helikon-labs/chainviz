@@ -1023,6 +1023,6 @@ declare module CANNON {
     }
 }
 
-declare module "cannon" {
+declare module 'cannon' {
     export = CANNON;
 }

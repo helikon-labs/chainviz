@@ -1,5 +1,5 @@
-import { Keyring } from "@polkadot/keyring";
-import { CONFIG } from "./config";
+import { Keyring } from '@polkadot/keyring';
+import { CONFIG } from './config';
 
 const keyring = new Keyring();
 

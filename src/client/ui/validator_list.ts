@@ -1,5 +1,5 @@
-import { ValidatorSummary } from "../model/subvt/validator_summary";
-import { getValidatorSummaryDisplay } from "../util/ui";
+import { ValidatorSummary } from '../model/subvt/validator_summary';
+import { getValidatorSummaryDisplay } from '../util/ui';
 
 interface ValidatorListDelegate {
     onMouseOver(accountIdHex: string): void;
@@ -20,25 +20,25 @@ class ValidatorList {
 
     constructor(delegate: ValidatorListDelegate) {
         this.delegate = delegate;
-        this.container = <HTMLElement>document.getElementById("validator-list-container");
+        this.container = <HTMLElement>document.getElementById('validator-list-container');
         this.titleContainer = <HTMLElement>(
-            document.getElementById("validator-list-title-container")
+            document.getElementById('validator-list-title-container')
         );
-        this.title = <HTMLElement>document.getElementById("validator-list-title");
-        this.toggle = <HTMLElement>document.getElementById("validator-list-toggle");
-        this.searchContainer = <HTMLElement>document.getElementById("validator-search-container");
-        this.searchInput = <HTMLInputElement>document.getElementById("validator-search-input");
-        this.list = <HTMLElement>document.getElementById("validator-list");
+        this.title = <HTMLElement>document.getElementById('validator-list-title');
+        this.toggle = <HTMLElement>document.getElementById('validator-list-toggle');
+        this.searchContainer = <HTMLElement>document.getElementById('validator-search-container');
+        this.searchInput = <HTMLInputElement>document.getElementById('validator-search-input');
+        this.list = <HTMLElement>document.getElementById('validator-list');
 
-        this.titleContainer.addEventListener("click", (_event) => {
-            if (this.toggle.classList.contains("up")) {
-                this.toggle.classList.remove("up");
-                this.list.style.visibility = "hidden";
-                this.searchContainer.style.visibility = "hidden";
+        this.titleContainer.addEventListener('click', (_event) => {
+            if (this.toggle.classList.contains('up')) {
+                this.toggle.classList.remove('up');
+                this.list.style.visibility = 'hidden';
+                this.searchContainer.style.visibility = 'hidden';
             } else {
-                this.toggle.classList.add("up");
-                this.list.style.visibility = "visible";
-                this.searchContainer.style.visibility = "visible";
+                this.toggle.classList.add('up');
+                this.list.style.visibility = 'visible';
+                this.searchContainer.style.visibility = 'visible';
             }
         });
         this.searchInput.oninput = (_event) => {
@@ -52,7 +52,7 @@ class ValidatorList {
         setTimeout(() => {
             this.updateTitle();
             this.filter();
-            this.container.style.visibility = "visible";
+            this.container.style.visibility = 'visible';
         }, 1000);
     }
 
@@ -79,7 +79,7 @@ class ValidatorList {
     }
 
     private filter() {
-        const query = this.searchInput.value.toLocaleLowerCase().replace(" ", "");
+        const query = this.searchInput.value.toLocaleLowerCase().replace(' ', '');
         let filteredItems;
         if (query.length == 0) {
             filteredItems = this.items;
@@ -89,7 +89,7 @@ class ValidatorList {
                 return text.indexOf(query) >= 0;
             });
         }
-        let html = "";
+        let html = '';
         for (const item of filteredItems) {
             html += `<div class="validator" id="${
                 item.accountId
@@ -98,25 +98,25 @@ class ValidatorList {
             }_span">${getValidatorSummaryDisplay(item)}</span></div>`;
         }
         this.list.innerHTML = html;
-        const rows = Array.from(document.getElementsByClassName("validator"));
+        const rows = Array.from(document.getElementsByClassName('validator'));
         for (const row of rows) {
             const rowElement = <HTMLElement>row;
-            rowElement.addEventListener("mouseover", (event) => {
+            rowElement.addEventListener('mouseover', (event) => {
                 const accountIdHex = (<HTMLElement>event.target).id
-                    .replace("_div", "")
-                    .replace("_span", "");
+                    .replace('_div', '')
+                    .replace('_span', '');
                 this.delegate.onMouseOver(accountIdHex);
             });
-            rowElement.addEventListener("mouseleave", (event) => {
+            rowElement.addEventListener('mouseleave', (event) => {
                 const accountIdHex = (<HTMLElement>event.target).id
-                    .replace("_div", "")
-                    .replace("_span", "");
+                    .replace('_div', '')
+                    .replace('_span', '');
                 this.delegate.onMouseLeave(accountIdHex);
             });
-            rowElement.addEventListener("click", (event) => {
+            rowElement.addEventListener('click', (event) => {
                 const accountIdHex = (<HTMLElement>event.target).id
-                    .replace("_div", "")
-                    .replace("_span", "");
+                    .replace('_div', '')
+                    .replace('_span', '');
                 this.delegate.onClick(accountIdHex);
             });
         }

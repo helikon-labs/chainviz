@@ -1,26 +1,26 @@
-import * as THREE from "three";
-import * as TWEEN from "@tweenjs/tween.js";
-import { Block as SubstrateBlock, SignedBlock } from "@polkadot/types/interfaces";
-import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
-import Stats from "three/examples/jsm/libs/stats.module";
-import { Block } from "../model/app/block";
-import { ValidatorSummary, ValidatorSummaryDiff } from "../model/subvt/validator_summary";
-import AsyncLock = require("async-lock");
-import { Constants } from "../util/constants";
-import { NetworkStatus, NetworkStatusDiff } from "../model/subvt/network_status";
-import { NetworkStatusBoard } from "../ui/network_status_board";
-import { ValidatorMesh } from "../ui/validator_mesh";
-import { ValidatorList, ValidatorListDelegate } from "../ui/validator_list";
-import { ValidatorSummaryBoard } from "../ui/validator_summary_board";
-import { Validator } from "../model/app/validator";
-import { cloneJSONSafeArray, cloneJSONSafeObject } from "../util/object";
+import * as THREE from 'three';
+import * as TWEEN from '@tweenjs/tween.js';
+import { Block as SubstrateBlock, SignedBlock } from '@polkadot/types/interfaces';
+import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
+import Stats from 'three/examples/jsm/libs/stats.module';
+import { Block } from '../model/app/block';
+import { ValidatorSummary, ValidatorSummaryDiff } from '../model/subvt/validator_summary';
+import AsyncLock from 'async-lock';
+import { Constants } from '../util/constants';
+import { NetworkStatus, NetworkStatusDiff } from '../model/subvt/network_status';
+import { NetworkStatusBoard } from '../ui/network_status_board';
+import { ValidatorMesh } from '../ui/validator_mesh';
+import { ValidatorList, ValidatorListDelegate } from '../ui/validator_list';
+import { ValidatorSummaryBoard } from '../ui/validator_summary_board';
+import { Validator } from '../model/app/validator';
+import { cloneJSONSafeArray, cloneJSONSafeObject } from '../util/object';
 import {
     ValidatorDetailsBoard,
     ValidatorDetailsBoardDelegate,
-} from "../ui/validator_details_board";
-import { HeaderExtended } from "@polkadot/api-derive/types";
-import Visibility = require("visibilityjs");
-import { createTween } from "../util/tween";
+} from '../ui/validator_details_board';
+import { HeaderExtended } from '@polkadot/api-derive/types';
+import Visibility = require('visibilityjs');
+import { createTween } from '../util/tween';
 
 class ChainVizScene {
     private readonly scene: THREE.Scene;
@@ -43,9 +43,9 @@ class ChainVizScene {
     private networkStatusBoard!: NetworkStatusBoard;
 
     private readonly lock = new AsyncLock();
-    private readonly blockPushLockKey = "block_push";
+    private readonly blockPushLockKey = 'block_push';
 
-    private readonly leftPanel = <HTMLElement>document.getElementById("left-panel");
+    private readonly leftPanel = <HTMLElement>document.getElementById('left-panel');
     private mouseIsInLeftPanel = false;
 
     constructor() {
@@ -75,25 +75,26 @@ class ChainVizScene {
         this.renderer.setPixelRatio(window.devicePixelRatio);
         this.renderer.shadowMap.enabled = true;
         this.renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+        // this.renderer.outputColorSpace  = THREE.LinearSRGBColorSpace;
         document.body.appendChild(this.renderer.domElement);
-        document.addEventListener("click", (event) => {
+        document.addEventListener('click', (event) => {
             this.onClick(event);
         });
-        document.addEventListener("mousemove", (event) => {
+        document.addEventListener('mousemove', (event) => {
             this.onMouseMove(event);
         });
-        this.leftPanel.addEventListener("mouseenter", (_event) => {
+        this.leftPanel.addEventListener('mouseenter', (_event) => {
             if (this.validatorMesh) {
                 this.validatorMesh.clearHover();
             }
             this.mouseIsInLeftPanel = true;
         });
-        this.leftPanel.addEventListener("mouseleave", (_event) => {
+        this.leftPanel.addEventListener('mouseleave', (_event) => {
             this.mouseIsInLeftPanel = false;
         });
 
         // stats
-        this.stats = Stats();
+        this.stats = new Stats();
         //document.body.appendChild(this.stats.dom);
         //this.stats.domElement.style.cssText = "position:absolute; bottom:0px; right:0px;";
         // orbit controls
@@ -101,7 +102,7 @@ class ChainVizScene {
         this.controls.enabled = false;
         this.limitOrbitControls();
         window.addEventListener(
-            "resize",
+            'resize',
             () => {
                 this.onWindowResize();
             },
@@ -205,7 +206,7 @@ class ChainVizScene {
         const minPan = new THREE.Vector3(-Constants.ORBIT_MAX_PAN_X, -Constants.ORBIT_MAX_PAN_Y, 0);
         const maxPan = new THREE.Vector3(Constants.ORBIT_MAX_PAN_X, Constants.ORBIT_MAX_PAN_Y, 0);
         const _v = new THREE.Vector3();
-        this.controls.addEventListener("change", () => {
+        this.controls.addEventListener('change', () => {
             _v.copy(this.controls.target);
             this.controls.target.clamp(minPan, maxPan);
             _v.sub(this.controls.target);
@@ -261,11 +262,11 @@ class ChainVizScene {
     }
 
     private setPointerCursor() {
-        document.getElementsByTagName("html")[0].style.cursor = "pointer";
+        document.getElementsByTagName('html')[0].style.cursor = 'pointer';
     }
 
     private setDefaultCursor() {
-        document.getElementsByTagName("html")[0].style.cursor = "default";
+        document.getElementsByTagName('html')[0].style.cursor = 'default';
     }
 
     private checkHoverRaycast() {
