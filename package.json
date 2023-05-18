@@ -24,7 +24,7 @@
         "@types/async-lock": "^1.4.0",
         "@types/camelcase-keys-deep": "^0.1.0",
         "@types/express": "^4.17.17",
-        "@types/node": "^20.1.5",
+        "@types/node": "^20.2.0",
         "@types/three": "^0.149.0",
         "@typescript-eslint/eslint-plugin": "^5.59.6",
         "@typescript-eslint/parser": "^5.59.6",
