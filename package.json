@@ -43,7 +43,7 @@
         "prettier": "^2.8.8",
         "reconnecting-websocket": "^4.4.0",
         "terser": "^5.17.4",
-        "three": "^0.150.1",
+        "three": "^0.153.0",
         "tone": "^14.7.77",
         "ts-loader": "^9.4.2",
         "typescript": "^5.0.4",
