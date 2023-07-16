@@ -1,4 +1,4 @@
-import { Logo } from './logo';
+import { Logo, getRandomCharacterType, getRandomShapeType } from './logo';
 
 class UI {
     private readonly root: HTMLElement;
@@ -6,7 +6,7 @@ class UI {
 
     constructor() {
         this.root = <HTMLElement>document.getElementById('network-status');
-        this.logo = new Logo();
+        this.logo = new Logo(getRandomShapeType(), getRandomCharacterType());
     }
 
     drawLogo() {

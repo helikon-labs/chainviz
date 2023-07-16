@@ -1,6 +1,6 @@
 @font-face {
     font-family: Mont;
-    src: url('../font/mont/Mont-Trial-Regular.otf') format('opentype');
+    src: url('../font/mont/Mont-Regular.woff') format('woff');
 }
 
 body {
