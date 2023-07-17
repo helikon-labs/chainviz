@@ -68,8 +68,6 @@ function getRandomCharacterType(): CharacterType {
 class Logo {
     private readonly shapeType: ShapeType;
     private characterType: CharacterType;
-    private readonly logoAnimCanvas: HTMLCanvasElement;
-    private readonly logoAnimContext: CanvasRenderingContext2D;
 
     constructor(shapeType: ShapeType, characterType: CharacterType) {
         this.shapeType = shapeType;
@@ -79,10 +77,6 @@ class Logo {
                 this.shapeType = getRandomShapeType();
             }
         }
-        this.logoAnimCanvas = <HTMLCanvasElement>document.getElementById('logo-anim');
-        this.logoAnimContext = (<HTMLCanvasElement>document.getElementById('logo-anim')).getContext(
-            '2d'
-        )!;
     }
 
     private getCharacter(index: number): string {
@@ -116,8 +110,7 @@ class Logo {
         }
     }
 
-    async draw() {
-        const scale = 1;
+    async draw(canvas: HTMLCanvasElement, scale: number) {
         const width = 120 * scale;
         const height = 120 * scale;
         const letterBoxWidth = 28 * scale;
@@ -126,19 +119,19 @@ class Logo {
         const lineWidth = 1.65 * scale;
 
         const dpi = window.devicePixelRatio;
-        this.logoAnimCanvas.width = width * dpi;
-        this.logoAnimCanvas.height = height * dpi;
-        this.logoAnimCanvas.style.width = width + 'px';
-        this.logoAnimCanvas.style.height = height + 'px';
+        canvas.width = width * dpi;
+        canvas.height = height * dpi;
+        canvas.style.width = width + 'px';
+        canvas.style.height = height + 'px';
 
-        const ctx = this.logoAnimContext;
+        const ctx = canvas.getContext('2d')!;
         ctx.scale(dpi, dpi);
         ctx.fillStyle = 'white';
         ctx.strokeStyle = 'white';
         ctx.textAlign = 'left';
         ctx.textBaseline = 'top';
         ctx.lineWidth = lineWidth;
-        ctx.clearRect(0, 0, this.logoAnimCanvas.width, this.logoAnimCanvas.height);
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
 
         const font = new FontFace('Mont', 'url(./font/mont/Mont-Regular.woff)');
         await font.load();

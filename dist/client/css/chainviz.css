@@ -29,12 +29,14 @@ a:active {
 
 .background {
     position: absolute;
-    width: 100%;
+    top: 0;
+    left: -28%;
+    width: 140%;
     height: 100%;
     display: flex;
     flex-direction: row;
     gap: 0px 0px;
-    opacity: 50%;
+    opacity: 36%;
     margin-top: 10%;
 }
 
@@ -74,33 +76,10 @@ a:active {
     align-items: center;
 }
 
-.logo-anim {
-    width: 80px;
-    height: 80px;
-}
-
-.logo {
+.main-logo {
     position: absolute;
-    top: 30px;
+    top: 26px;
     left: 30px;
-    display: flex;
-    flex-direction: row;
-    justify-content: center;
-    align-items: center;
-    align-content: center;
-    gap: 4px;
-    padding: 0px;
-}
-
-.logo div {
-    padding: 0px;
-}
-
-.logo .horizontal-connector {
-    width: 18px;
-    height: 1.5px;
-    background-color: #ebe3d8;
-    margin-bottom: 2px;
 }
 
 .icon-container {
