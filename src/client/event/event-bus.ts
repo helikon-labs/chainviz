@@ -3,7 +3,7 @@ export interface Registry {
 }
 
 export interface Callable {
-    [key: string]: Function;
+    [key: string]: Function; // eslint-disable-line @typescript-eslint/ban-types
 }
 
 export interface Subscriber {
@@ -12,7 +12,7 @@ export interface Subscriber {
 
 export interface IEventBus {
     dispatch<T>(event: string, arg?: T): void;
-    register(event: string, callback: Function): Registry;
+    register(event: string, callback: Function): Registry; // eslint-disable-line @typescript-eslint/ban-types
 }
 
 export class EventBus implements IEventBus {
@@ -43,6 +43,7 @@ export class EventBus implements IEventBus {
     }
 
     public register(event: string, callback: Function): Registry {
+        // eslint-disable-line @typescript-eslint/ban-types
         const id = this.getNextId();
         if (!this.subscribers[event]) this.subscribers[event] = {};
 
