@@ -2,6 +2,11 @@ import * as TWEEN from '@tweenjs/tween.js';
 import * as THREE from 'three';
 
 export abstract class Constants {
+    // connection
+    static readonly CONNECTION_TIMEOUT_MS = 7500;
+    static readonly CONNECTION_RETRY_MS = 5000;
+    static readonly UI_STATE_CHANGE_DELAY_MS = 750;
+
     // UI
     static readonly VALIDATOR_INSERT_DELAY_MS = 1000;
     // orbit control

@@ -1,7 +1,7 @@
 import { InactiveNominationsSummary } from '../substrate/nomination';
 import { StakeSummary } from '../substrate/stake';
-import { ValidatorPreferences } from '../substrate/validator_preferences';
-import { ValidatorStakeSummary } from '../substrate/validator_stake';
+import { ValidatorPreferences } from '../substrate/validator-preferences';
+import { ValidatorStakeSummary } from '../substrate/validator-stake';
 
 interface ValidatorSummary {
     accountId: string;

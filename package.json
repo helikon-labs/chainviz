@@ -17,8 +17,8 @@
     "devDependencies": {
         "@polkadot/api": "^10.9.1",
         "@polkadot/api-derive": "^10.9.1",
-        "@polkadot/types": "^10.9.1",
         "@polkadot/keyring": "^12.3.2",
+        "@polkadot/types": "^10.9.1",
         "@polkadot/ui-shared": "^3.5.1",
         "@tweenjs/tween.js": "^21.0.0",
         "@types/async-lock": "^1.4.0",
@@ -53,6 +53,5 @@
         "webpack-dev-server": "^4.15.1",
         "webpack-merge": "^5.9.0",
         "ws": "^8.13.0"
-    },
-    "dependencies": {}
+    }
 }

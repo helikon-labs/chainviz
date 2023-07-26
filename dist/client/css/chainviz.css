@@ -8,9 +8,14 @@ body {
     margin: 0px;
     background-color: #000000dd;
     color: #ffffffe9;
-    font-family: 'Mont', Courier, monospace;
+    font-family: 'Mont';
+    font-variant-numeric: tabular-nums;
     font-size: 14px;
     padding: 30px;
+}
+
+.mono {
+    font-family: 'Fira Mono';
 }
 
 a:link,
@@ -36,7 +41,7 @@ a:active {
     display: flex;
     flex-direction: row;
     gap: 0px 0px;
-    opacity: 36%;
+    opacity: 30%;
     margin-top: 10%;
 }
 
@@ -67,13 +72,23 @@ a:active {
     background-color: #c1f288;
 }
 
-.logo-anim-container {
+.loading-container {
     position: absolute;
     width: 100%;
     height: 100%;
     display: flex;
+    flex-direction: column;
     justify-content: center;
     align-items: center;
+}
+
+.loading-info {
+    margin-top: 12px;
+    font-size: 12px;
+    height: 36px;
+    opacity: 60%;
+    text-align: center;
+    line-height: 18px;
 }
 
 .main-logo {
@@ -210,19 +225,6 @@ img {
     padding-bottom: 10px;
 }
 
-.content .right-panel-content .block-list .multi-block {
-    border: 1px solid #ffffff55;
-    border-radius: 12px;
-    display: flex;
-    flex-direction: column;
-    padding: 8px 10px;
-    cursor: pointer;
-    font-size: 12px;
-    flex-shrink: 0;
-    justify-content: space-between;
-    gap: 6px;
-}
-
 .content .right-panel-content .block-list .block {
     border: 1px solid #ffffff55;
     border-radius: 12px;
@@ -234,13 +236,25 @@ img {
 }
 
 .content .right-panel-content .block-list .multi-block {
+    border: 1px solid #ffffff55;
+    border-radius: 12px;
+    padding: 10px 10px 8px 10px;
+    display: flex;
     flex-direction: column;
-    gap: 6px;
+    gap: 8px;
+}
+
+.content .right-panel-content .block-list .multi-block .block {
+    border: none !important;
+    padding: 0px;
 }
 
 .content .right-panel-content .block-list .block .hash {
+    font-family: 'Fira Mono';
     opacity: 0.8;
-    text-overflow: ellipsis;
-    font-size: 10.3px;
-    font-family: 'Courier New', Courier, monospace;
+    font-size: 10.2px;
+}
+
+.hidden {
+    display: none !important;
 }

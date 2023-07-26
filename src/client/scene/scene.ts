@@ -3,12 +3,10 @@ import * as TWEEN from '@tweenjs/tween.js';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
 import Stats from 'three/examples/jsm/libs/stats.module';
 import * as Visibility from 'visibilityjs';
-import { Constants } from './util/constants';
-import { createTween } from './util/tween';
-import { UI } from './ui/ui';
+import { Constants } from '../util/constants';
+import { createTween } from '../util/tween';
 
-class ChainvizScene {
-    private readonly ui: UI;
+class Chainviz3DScene {
     private readonly scene: THREE.Scene;
     private readonly camera: THREE.PerspectiveCamera;
     private readonly controls: OrbitControls;
@@ -16,7 +14,6 @@ class ChainvizScene {
     private readonly stats: Stats;
 
     constructor() {
-        this.ui = new UI();
         this.scene = new THREE.Scene();
         this.camera = new THREE.PerspectiveCamera(
             20,
@@ -61,8 +58,6 @@ class ChainvizScene {
             },
             false
         );
-
-        this.ui.drawLogo();
     }
 
     private resetCamera() {
@@ -161,4 +156,4 @@ class ChainvizScene {
     }
 }
 
-export { ChainvizScene };
+export { Chainviz3DScene };

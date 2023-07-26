@@ -4,8 +4,7 @@
         <title>ChainViz by Helikon</title>
         <meta charset="utf-8" />
         <link rel="icon" type="image/x-icon" href="./img/icon/favicon.ico" />
-        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Audiowide" />
-        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto%20Mono" />
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Fira%20Mono" />
         <link
             rel="stylesheet"
             href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css"
@@ -13,7 +12,7 @@
         <link rel="stylesheet" href="./css/chainviz.css" />
         <script src="https://kit.fontawesome.com/ebf2cd1147.js" crossorigin="anonymous"></script>
     </head>
-    <body>
+    <body id="root">
         <script src="bundle.js"></script>
         <div class="background">
             <div><div class="blue"></div></div>
@@ -21,7 +20,8 @@
             <div><div class="green"></div></div>
         </div>
         <div class="content">
-            <div class="left-panel">
+            <div id="left-panel" class="left-panel">
+                <canvas class="main-logo" id="main-logo"></canvas>
                 <div class="network-selector">
                     <div class="network active">
                         <img src="./img/icon/kusama-icon.svg" />
@@ -33,42 +33,64 @@
                     </div>
                 </div>
                 <div class="left-panel-spacer"></div>
+                <div class="icon-container">
+                    <a href="https://helikon.io" target="_blank">
+                        <img src="/img/icon/helikon-icon.svg" alt="Developed by Helikon Labs" />
+                    </a>
+                    <a href="https://subvt.io" target="_blank">
+                        <img
+                            id="subvt-icon"
+                            src="/img/icon/subvt-icon.svg"
+                            alt="Powered by SubVT"
+                        />
+                    </a>
+                    <a href="https://github.com/helikon-labs/chainviz" target="_blank">
+                        <img
+                            id="github-icon"
+                            src="/img/icon/github-icon.svg"
+                            alt="Source code repository"
+                        />
+                    </a>
+                    <a href="https://klad.design" target="_blank">
+                        <img id="klad-icon" src="/img/icon/klad-icon.svg" alt="Designed by Klad" />
+                    </a>
+                </div>
             </div>
-            <div class="right-panel">
+            <div class="right-panel" id="right-panel">
                 <div class="right-panel-content">
-                    <div class="network-status">
+                    <div class="network-status" id="network-status">
                         <div>CHAINVIZ v1.0.0</div>
                         <div class="network-status-row">
                             <span>Best Block</span>
-                            <span>18675432</span>
+                            <span id="network-best-block">-</span>
                         </div>
                         <div class="network-status-row">
                             <span>Finalized Block</span>
-                            <span>18675429</span>
+                            <span id="network-finalized-block">-</span>
                         </div>
                         <div class="network-status-row">
                             <span>Era</span>
-                            <span>3334</span>
+                            <span id="network-era-index">-</span>
                         </div>
                         <div class="network-status-row">
                             <span>Era Reward Points</span>
-                            <span>12342</span>
+                            <span id="network-era-reward-points">-</span>
                         </div>
                         <div class="network-status-row">
                             <span>Total Stake (MKSM)</span>
-                            <span>14.34</span>
+                            <span id="network-total-stake">-</span>
                         </div>
                         <div class="network-status-row">
                             <span>Min Stake (KSM)</span>
-                            <span>6,396.02</span>
+                            <span id="network-min-stake">-</span>
                         </div>
                         <div class="network-status-row">
                             <span>Avg Stake (KSM)</span>
-                            <span>7,340.34</span>
+                            <span id="network-average-stake">-</span>
                         </div>
                         <div class="network-status-row">
                             <span>Max Stake (KSM)</span>
-                            <span>60,651.34</span>
+                            <span id="network-max-stake">-</span>
                         </div>
                     </div>
                     <div class="block-list">
@@ -97,13 +119,13 @@
                             <span>I</span>
                             <span class="hash">0xd0f1b410ef4...8d67a5a2361</span>
                         </div>
-                        <div class="block multi-block">
-                            <div>
+                        <div class="multi-block">
+                            <div class="block">
                                 <span>18675427</span>
                                 <span>I</span>
                                 <span class="hash">0x7e959a0e945...458d139bf37</span>
                             </div>
-                            <div>
+                            <div class="block">
                                 <span>18675427</span>
                                 <span>I</span>
                                 <span class="hash">0x06970e7db74...95e917d0672</span>
@@ -122,7 +144,7 @@
                         <div class="block">
                             <span>18675424</span>
                             <span>I</span>
-                            <span class="hash">0x25c46cd6283...2af370ac5ae4</span>
+                            <span class="hash">0x25c46cd6283...af370ac5ae4</span>
                         </div>
                         <div class="block">
                             <span>18675423</span>
@@ -137,7 +159,7 @@
                         <div class="block">
                             <span>18675421</span>
                             <span>I</span>
-                            <span class="hash">0xf542fd5ebec...2af370ac5ae4</span>
+                            <span class="hash">0xf542fd5ebec...af370ac5ae4</span>
                         </div>
                         <div class="block">
                             <span>18675420</span>
@@ -163,27 +185,9 @@
                 </div>
             </div>
         </div>
-        <canvas class="main-logo" id="main-logo"></canvas>
-        <div class="icon-container">
-            <a href="https://helikon.io" target="_blank">
-                <img src="/img/icon/helikon-icon.svg" alt="Developed by Helikon Labs" />
-            </a>
-            <a href="https://subvt.io" target="_blank">
-                <img id="subvt-icon" src="/img/icon/subvt-icon.svg" alt="Powered by SubVT" />
-            </a>
-            <a href="https://github.com/helikon-labs/chainviz" target="_blank">
-                <img
-                    id="github-icon"
-                    src="/img/icon/github-icon.svg"
-                    alt="Source code repository"
-                />
-            </a>
-            <a href="https://klad.design" target="_blank">
-                <img id="klad-icon" src="/img/icon/klad-icon.svg" alt="Designed by Klad" />
-            </a>
-        </div>
-        <div class="logo-anim-container">
-            <canvas class="logo-anim" id="logo-anim"></canvas>
+        <div class="loading-container" id="loading-container">
+            <canvas class="loading-logo" id="loading-logo"></canvas>
+            <div class="loading-info" id="loading-info">:: connecting to services ::</div>
         </div>
     </body>
 </html>

@@ -89,11 +89,10 @@ class RPCSubscriptionService<T> {
     }
 
     connect() {
-        this.connection = new ReconnectingWebSocket(
-            this.url,
-            []
-            /*{ WebSocket: WebSocket }*/
-        );
+        this.connection = new ReconnectingWebSocket(this.url, [], {
+            // WebSocket: WebSocket,
+            connectionTimeout: 5000,
+        });
         this.connection.onopen = () => {
             this.onOpen();
         };
