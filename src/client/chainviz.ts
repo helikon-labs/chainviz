@@ -9,7 +9,7 @@ import { Constants } from './util/constants';
 import { NetworkStatus, NetworkStatusUpdate } from './model/subvt/network-status';
 import { ValidatorListUpdate, ValidatorSummary } from './model/subvt/validator-summary';
 import { Block } from '@polkadot/types/interfaces';
-import { Slot } from './model/slot';
+import { Slot } from './model/chainviz/slot';
 
 THREE.Cache.enabled = true;
 
@@ -240,9 +240,10 @@ class Chainviz {
     }
 
     private onNewBlock(block: Block) {
-        for (const slot of this.slots) {
-            if (slot.number == block.header.number.toNumber()) {
-                slot.insertBlock(block);
+        for (let i = 0; i < this.slots.length; i++) {
+            if (this.slots[i].number == block.header.number.toNumber()) {
+                this.slots[i].insertBlock(block);
+                this.ui.updateSlot(this.slots[i]);
                 return;
             }
         }
@@ -251,7 +252,7 @@ class Chainviz {
         if (this.slots.length > Constants.MAX_SLOT_COUNT) {
             this.slots = this.slots.slice(0, Constants.MAX_SLOT_COUNT);
         }
-        this.ui.displaySlots(this.slots);
+        this.ui.insertSlot(slot);
     }
 
     private async onNewFinalizedBlock(block: Block) {
@@ -259,18 +260,19 @@ class Chainviz {
         for (let i = 0; i < this.slots.length; i++) {
             if (this.slots[i].number == block.header.number.toNumber()) {
                 this.slots[i].finalize(block);
-                this.ui.displaySlots(this.slots);
+                this.ui.updateSlot(this.slots[i]);
                 finalizedNumber = block.header.number.toNumber();
             } else if (this.slots[i].number < finalizedNumber && !this.slots[i].getIsFinalized()) {
                 const block = await this.dataStore.getBlockByNumber(this.slots[i].number);
                 this.slots[i].finalize(block);
+                this.ui.updateSlot(this.slots[i]);
             }
         }
     }
 
     start() {
         this.started = true;
-        this.ui.displaySlots(this.slots);
+        this.ui.initializeSlots(this.slots);
         this.ui.start();
         this.dataStore.subsribeToNewBlocks();
         this.dataStore.subsribeToFinalizedBlocks();

@@ -12,7 +12,7 @@ import { Constants } from '../util/constants';
 import { ChainvizEvent } from '../event/event';
 import { Block } from '@polkadot/types/interfaces';
 import { UnsubscribePromise } from '@polkadot/api/types';
-import { Slot } from '../model/slot';
+import { Slot } from '../model/chainviz/slot';
 
 class DataStore {
     private network!: Network;
@@ -198,7 +198,6 @@ class DataStore {
         }
         this.finalizedHeaderSubscription = this.substrateClient.rpc.chain.subscribeFinalizedHeads(
             async (header) => {
-                console.log('fin', header.number.toNumber());
                 const block = (await this.substrateClient.rpc.chain.getBlock(header.hash)).block;
                 this.eventBus.dispatch<Block>(ChainvizEvent.NEW_FINALIZED_BLOCK, block);
             }

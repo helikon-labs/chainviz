@@ -234,16 +234,12 @@ img {
 }
 
 .content .right-panel-content .slot-list .non-finalized {
-    border-radius: 12px; /*1*/
-    border: 1px solid transparent; /*2*/
-    background: linear-gradient(45deg, red, blue) border-box; /*3*/
-    /*
-    -webkit-mask:
-        linear-gradient(#fff 0 0) padding-box, 
-        linear-gradient(#fff 0 0);
-    -webkit-mask-composite: xor;
-    mask-composite: exclude;
-    */
+    border: 1px solid #ffffff55;
+    animation: non-finalized-border 1s infinite;
+}
+
+@keyframes non-finalized-border {
+    50% { border-color: #ffffff22; }
 }
 
 .content .right-panel-content .slot-list .finalized {

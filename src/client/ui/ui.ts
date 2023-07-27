@@ -1,4 +1,4 @@
-import { Slot } from '../model/slot';
+import { Slot } from '../model/chainviz/slot';
 import { Network } from '../model/substrate/network';
 import { NetworkStatus } from '../model/subvt/network-status';
 import { hide, show } from '../util/ui-util';
@@ -55,8 +55,16 @@ class UI {
         this.networkStatusBoard.display(network, status);
     }
 
-    displaySlots(slots: Slot[]) {
-        this.slotList.display(slots);
+    initializeSlots(slots: Slot[]) {
+        this.slotList.initialize(slots);
+    }
+
+    insertSlot(slot: Slot) {
+        this.slotList.insertSlot(slot);
+    }
+
+    updateSlot(slot: Slot) {
+        this.slotList.updateSlot(slot);
     }
 }
 
