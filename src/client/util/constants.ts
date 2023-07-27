@@ -6,7 +6,8 @@ export abstract class Constants {
     static readonly CONNECTION_TIMEOUT_MS = 7500;
     static readonly CONNECTION_RETRY_MS = 5000;
     static readonly UI_STATE_CHANGE_DELAY_MS = 750;
-
+    static readonly INITIAL_SLOT_COUNT = 30;
+    static readonly MAX_SLOT_COUNT = 50;
     // UI
     static readonly VALIDATOR_INSERT_DELAY_MS = 1000;
     // orbit control

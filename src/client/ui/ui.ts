@@ -1,8 +1,10 @@
+import { Slot } from '../model/slot';
 import { Network } from '../model/substrate/network';
 import { NetworkStatus } from '../model/subvt/network-status';
 import { hide, show } from '../util/ui-util';
 import { Logo, getRandomCharacterType, getRandomShapeType } from './logo';
 import { NetworkStatusBoard } from './network-status-board';
+import { SlotList } from './slot-list';
 
 class UI {
     private readonly root: HTMLElement;
@@ -14,6 +16,7 @@ class UI {
     private readonly loadingInfo: HTMLDivElement;
     private readonly logo: Logo;
     private readonly networkStatusBoard: NetworkStatusBoard;
+    private readonly slotList: SlotList;
 
     constructor() {
         this.root = <HTMLElement>document.getElementById('root');
@@ -25,6 +28,7 @@ class UI {
         this.loadingInfo = <HTMLDivElement>document.getElementById('loading-info');
         this.logo = new Logo(getRandomShapeType(), getRandomCharacterType());
         this.networkStatusBoard = new NetworkStatusBoard();
+        this.slotList = new SlotList();
     }
 
     init() {
@@ -49,6 +53,10 @@ class UI {
 
     displayNetworkStatus(network: Network, status: NetworkStatus) {
         this.networkStatusBoard.display(network, status);
+    }
+
+    displaySlots(slots: Slot[]) {
+        this.slotList.display(slots);
     }
 }
 
