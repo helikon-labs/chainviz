@@ -239,7 +239,9 @@ img {
 }
 
 @keyframes non-finalized-border {
-    50% { border-color: #ffffff22; }
+    50% {
+        border-color: #ffffff22;
+    }
 }
 
 .content .right-panel-content .slot-list .finalized {

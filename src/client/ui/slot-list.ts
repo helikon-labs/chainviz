@@ -44,7 +44,7 @@ class SlotList {
     }
 
     insertSlot(slot: Slot) {
-        let slotDiv = document.createElement('div');
+        const slotDiv = document.createElement('div');
         slotDiv.classList.add('slot');
         if (slot.getIsFinalized()) {
             slotDiv.classList.add('finalized');
@@ -61,8 +61,10 @@ class SlotList {
     }
 
     updateSlot(slot: Slot) {
-        let slotDiv = <HTMLDivElement>document.getElementById(`slot-${slot.number}`);
-        if (!slotDiv) { return; }
+        const slotDiv = <HTMLDivElement>document.getElementById(`slot-${slot.number}`);
+        if (!slotDiv) {
+            return;
+        }
         slotDiv.classList.remove('non-finalized');
         slotDiv.classList.remove('finalized');
         if (slot.getIsFinalized()) {

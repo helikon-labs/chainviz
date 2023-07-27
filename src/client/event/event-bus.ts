@@ -34,11 +34,9 @@ export class EventBus implements IEventBus {
 
     public dispatch<T>(event: string, arg?: T): void {
         const subscriber = this.subscribers[event];
-
         if (subscriber === undefined) {
             return;
         }
-
         Object.keys(subscriber).forEach((key) => subscriber[key](arg));
     }
 

@@ -146,8 +146,9 @@ class DataStore {
         const finalizedSlots: Slot[] = [];
         // get finalized blocks
         const finalizedBlockHash = await this.substrateClient.rpc.chain.getFinalizedHead();
-        const lastFinalizedBlock = (await this.substrateClient.rpc.chain.getBlock(finalizedBlockHash))
-            .block;
+        const lastFinalizedBlock = (
+            await this.substrateClient.rpc.chain.getBlock(finalizedBlockHash)
+        ).block;
         finalizedSlots.push(
             new Slot(lastFinalizedBlock.header.number.toNumber(), true, [lastFinalizedBlock])
         );
