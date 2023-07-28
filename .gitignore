@@ -1,4 +1,5 @@
 node_modules
 .vscode
-/dist/client/bundle.js
+bundle.js
+bundle.js.LICENSE.txt
 .DS_Store
