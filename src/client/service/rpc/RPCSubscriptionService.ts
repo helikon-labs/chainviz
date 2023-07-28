@@ -45,7 +45,7 @@ class RPCSubscriptionService<T> {
         url: string,
         subscribeMethod: string,
         unsubscribeMethod: string,
-        listener: RPCSubscriptionServiceListener<T>
+        listener: RPCSubscriptionServiceListener<T>,
     ) {
         this.url = url;
         this.subscribeMethod = subscribeMethod;

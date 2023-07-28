@@ -14,6 +14,12 @@ body {
     padding: 30px;
 }
 
+.scene-container {
+    position: absolute;
+    left: 0px;
+    top: 0px;
+}
+
 .mono {
     font-family: 'Fira Mono';
 }
@@ -86,7 +92,7 @@ a:active {
     margin-top: 12px;
     font-size: 12px;
     height: 36px;
-    opacity: 60%;
+    opacity: 70%;
     text-align: center;
     line-height: 18px;
 }
@@ -251,11 +257,35 @@ img {
 .content .right-panel-content .slot-list .slot .block {
     cursor: pointer;
     display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.block .block-content-separator {
+    border-top: 1px dotted #ffffff;
+    height: 1px;
+    width: 100%;
+    opacity: 30%;
+}
+
+.block-header {
+    display: flex;
     flex-direction: row;
-    cursor: pointer;
     font-size: 12px;
     justify-content: space-between;
 }
+
+.block-content-row {
+    display: flex;
+    flex-direction: row;
+    font-size: 12px;
+    justify-content: space-between;
+}
+
+.block-content-row .header {
+    font-size: 14px;
+}
+
 .content .right-panel-content .slot-list .slot .block .hash {
     font-family: 'Fira Mono';
     opacity: 0.8;

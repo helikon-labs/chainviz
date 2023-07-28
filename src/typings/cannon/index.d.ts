@@ -26,7 +26,7 @@ declare module CANNON {
             points: Vec3[],
             position?: Vec3,
             quaternion?: Quaternion,
-            skinSize?: number
+            skinSize?: number,
         ): AABB;
         toLocalFrame(frame: Transform, target: AABB): AABB;
         toWorldFrame(frame: Transform, target: AABB): AABB;
@@ -108,7 +108,7 @@ declare module CANNON {
             hitPointWorld: Vec3,
             shape: Shape,
             body: Body,
-            distance: number
+            distance: number,
         ): void;
     }
 
@@ -358,13 +358,13 @@ declare module CANNON {
             position: Vec3,
             quaternion: Quaternion,
             worldPoint: Vec3,
-            result?: Vec3
+            result?: Vec3,
         ): Vec3;
         static pointToWorldFrame(
             position: Vec3,
             quaternion: Quaternion,
             localPoint: Vec3,
-            result?: Vec3
+            result?: Vec3,
         ): Vec3;
 
         position: Vec3;
@@ -375,7 +375,7 @@ declare module CANNON {
             position: Vec3,
             quaternion: Quaternion,
             worldVector: Vec3,
-            result?: Vec3
+            result?: Vec3,
         ): Vec3;
     }
 
@@ -714,7 +714,7 @@ declare module CANNON {
             axis: Vec3,
             pos: Vec3,
             quat: Quaternion,
-            result: number[]
+            result: number[],
         ): void;
 
         vertices: Vec3[];
@@ -737,7 +737,7 @@ declare module CANNON {
             separatingNormal: Vec3,
             minDist: number,
             maxDist: number,
-            result: any[]
+            result: any[],
         ): void;
         findSaparatingAxis(
             hullB: ConvexPolyhedron,
@@ -747,7 +747,7 @@ declare module CANNON {
             quatB: Quaternion,
             target: Vec3,
             faceListA: any[],
-            faceListB: any[]
+            faceListB: any[],
         ): boolean;
         testSepAxis(
             axis: Vec3,
@@ -755,7 +755,7 @@ declare module CANNON {
             posA: Vec3,
             quatA: Quaternion,
             posB: Vec3,
-            quatB: Quaternion
+            quatB: Quaternion,
         ): number;
         getPlaneConstantOfFace(face_i: number): number;
         clipFaceAgainstHull(
@@ -765,13 +765,13 @@ declare module CANNON {
             worldVertsB1: Vec3[],
             minDist: number,
             maxDist: number,
-            result: any[]
+            result: any[],
         ): void;
         clipFaceAgainstPlane(
             inVertices: Vec3[],
             outVertices: Vec3[],
             planeNormal: Vec3,
-            planeConstant: number
+            planeConstant: number,
         ): Vec3;
         computeWorldVertices(position: Vec3, quat: Quaternion): void;
         computeLocalAABB(aabbmin: Vec3, aabbmax: Vec3): void;
@@ -813,7 +813,7 @@ declare module CANNON {
             iMinY: number,
             iMaxX: number,
             iMaxY: number,
-            result: any[]
+            result: any[],
         ): void;
         getIndexOfPosition(x: number, y: number, result: any[], clamp: boolean): boolean;
         getConvexTrianglePillar(xi: number, yi: number, getUpperTriangle: boolean): void;
@@ -860,7 +860,7 @@ declare module CANNON {
             tube: number,
             radialSegments: number,
             tubularSegments: number,
-            arc: number
+            arc: number,
         ): Trimesh;
     }
 

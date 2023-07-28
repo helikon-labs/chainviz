@@ -40,7 +40,8 @@ export class EventBus implements IEventBus {
         Object.keys(subscriber).forEach((key) => subscriber[key](arg));
     }
 
-    public register(event: string, callback: Function): Registry { // eslint-disable-line @typescript-eslint/ban-types
+    public register(event: string, callback: Function): Registry {
+        // eslint-disable-line @typescript-eslint/ban-types
         const id = this.getNextId();
         if (!this.subscribers[event]) this.subscribers[event] = {};
 

@@ -183,7 +183,7 @@ class Logo {
                     element.cp2.x,
                     element.cp2.y,
                     element.p2.x,
-                    element.p2.y
+                    element.p2.y,
                 );
             } else {
                 ctx.lineTo(element.x, element.y);
@@ -211,7 +211,7 @@ class Logo {
         width: number,
         height: number,
         letterBoxWidth: number,
-        bezierOffset: number
+        bezierOffset: number,
     ) {
         this.drawText(
             ctx,
@@ -222,7 +222,7 @@ class Logo {
                     y: letterBoxWidth / 2,
                 },
             },
-            letterBoxWidth
+            letterBoxWidth,
         );
         let path: Path = [
             { x: letterBoxWidth, y: letterBoxWidth / 2 },
@@ -244,7 +244,7 @@ class Logo {
                     y: height / 2,
                 },
             },
-            letterBoxWidth
+            letterBoxWidth,
         );
         path = [
             { x: width / 2, y: height / 2 + letterBoxWidth / 2 },
@@ -266,7 +266,7 @@ class Logo {
                     y: height - letterBoxWidth / 2,
                 },
             },
-            letterBoxWidth
+            letterBoxWidth,
         );
     }
 
@@ -275,7 +275,7 @@ class Logo {
         width: number,
         height: number,
         letterBoxWidth: number,
-        bezierOffset: number
+        bezierOffset: number,
     ) {
         this.drawText(
             ctx,
@@ -286,7 +286,7 @@ class Logo {
                     y: letterBoxWidth / 2,
                 },
             },
-            letterBoxWidth
+            letterBoxWidth,
         );
         let path: Path = [
             { x: letterBoxWidth / 2, y: letterBoxWidth },
@@ -314,7 +314,7 @@ class Logo {
                     y: height / 2,
                 },
             },
-            letterBoxWidth
+            letterBoxWidth,
         );
         path = [
             { x: width / 2, y: height / 2 - letterBoxWidth / 2 },
@@ -342,7 +342,7 @@ class Logo {
                     y: height - letterBoxWidth / 2,
                 },
             },
-            letterBoxWidth
+            letterBoxWidth,
         );
     }
 
@@ -351,7 +351,7 @@ class Logo {
         width: number,
         height: number,
         letterBoxWidth: number,
-        bezierOffset: number
+        bezierOffset: number,
     ) {
         this.drawText(
             ctx,
@@ -362,7 +362,7 @@ class Logo {
                     y: letterBoxWidth / 2,
                 },
             },
-            letterBoxWidth
+            letterBoxWidth,
         );
         let path: Path = [
             { x: letterBoxWidth / 2, y: letterBoxWidth },
@@ -384,7 +384,7 @@ class Logo {
                     y: height - letterBoxWidth / 2,
                 },
             },
-            letterBoxWidth
+            letterBoxWidth,
         );
         path = [
             { x: width / 2 + letterBoxWidth / 2, y: height - letterBoxWidth / 2 },
@@ -415,7 +415,7 @@ class Logo {
                     y: height / 2,
                 },
             },
-            letterBoxWidth
+            letterBoxWidth,
         );
     }
 
@@ -424,7 +424,7 @@ class Logo {
         width: number,
         height: number,
         letterBoxWidth: number,
-        bezierOffset: number
+        bezierOffset: number,
     ) {
         const mBezierOffset = bezierOffset * 0.75;
         this.drawText(
@@ -436,7 +436,7 @@ class Logo {
                     y: height / 2,
                 },
             },
-            letterBoxWidth
+            letterBoxWidth,
         );
         let path: Path = [
             { x: letterBoxWidth, y: height / 2 },
@@ -498,7 +498,7 @@ class Logo {
                     y: height - letterBoxWidth / 2,
                 },
             },
-            letterBoxWidth
+            letterBoxWidth,
         );
         path = [
             { x: width - letterBoxWidth / 2 - mBezierOffset, y: height - letterBoxWidth / 2 },
@@ -533,7 +533,7 @@ class Logo {
                     y: letterBoxWidth / 2,
                 },
             },
-            letterBoxWidth
+            letterBoxWidth,
         );
     }
 
@@ -542,7 +542,7 @@ class Logo {
         width: number,
         height: number,
         letterBoxWidth: number,
-        bezierOffset: number
+        bezierOffset: number,
     ) {
         this.drawText(
             ctx,
@@ -553,7 +553,7 @@ class Logo {
                     y: letterBoxWidth / 2,
                 },
             },
-            letterBoxWidth
+            letterBoxWidth,
         );
         const mBezierOffset = bezierOffset * 0.8;
         let path: Path = [
@@ -586,7 +586,7 @@ class Logo {
                     y: height - letterBoxWidth / 2 - bezierOffset - letterBoxWidth / 2,
                 },
             },
-            letterBoxWidth
+            letterBoxWidth,
         );
         path = [
             { x: letterBoxWidth / 2, y: height - letterBoxWidth / 2 - bezierOffset },
@@ -624,7 +624,7 @@ class Logo {
                     y: height - letterBoxWidth / 2 - bezierOffset - letterBoxWidth / 2,
                 },
             },
-            letterBoxWidth
+            letterBoxWidth,
         );
     }
 
@@ -633,7 +633,7 @@ class Logo {
         width: number,
         height: number,
         letterBoxWidth: number,
-        bezierOffset: number
+        bezierOffset: number,
     ) {
         this.drawText(
             ctx,
@@ -644,7 +644,7 @@ class Logo {
                     y: letterBoxWidth / 2,
                 },
             },
-            letterBoxWidth
+            letterBoxWidth,
         );
         let path: Path = [
             { x: width / 2 - letterBoxWidth / 2, y: letterBoxWidth / 2 },
@@ -672,7 +672,7 @@ class Logo {
                     y: height / 2,
                 },
             },
-            letterBoxWidth
+            letterBoxWidth,
         );
         path = [
             { x: width / 2 + letterBoxWidth / 2, y: height / 2 },
@@ -694,7 +694,7 @@ class Logo {
                     y: height - letterBoxWidth / 2,
                 },
             },
-            letterBoxWidth
+            letterBoxWidth,
         );
     }
 
@@ -703,7 +703,7 @@ class Logo {
         width: number,
         height: number,
         letterBoxWidth: number,
-        bezierOffset: number
+        bezierOffset: number,
     ) {
         this.drawText(
             ctx,
@@ -714,7 +714,7 @@ class Logo {
                     y: letterBoxWidth / 2,
                 },
             },
-            letterBoxWidth
+            letterBoxWidth,
         );
         const mBezierOffset = bezierOffset * 0.8;
         let path: Path = [
@@ -753,7 +753,7 @@ class Logo {
                     y: height - letterBoxWidth / 2 - bezierOffset - letterBoxWidth / 2,
                 },
             },
-            letterBoxWidth
+            letterBoxWidth,
         );
         path = [
             { x: letterBoxWidth / 2, y: height - letterBoxWidth / 2 - bezierOffset },
@@ -774,7 +774,7 @@ class Logo {
                     y: height - letterBoxWidth / 2,
                 },
             },
-            letterBoxWidth
+            letterBoxWidth,
         );
     }
 }

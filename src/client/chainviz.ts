@@ -10,6 +10,7 @@ import { NetworkStatus, NetworkStatusUpdate } from './model/subvt/network-status
 import { ValidatorListUpdate, ValidatorSummary } from './model/subvt/validator-summary';
 import { Block } from '@polkadot/types/interfaces';
 import { Slot } from './model/chainviz/slot';
+import * as TWEEN from '@tweenjs/tween.js';
 
 THREE.Cache.enabled = true;
 
@@ -55,7 +56,7 @@ class Chainviz {
             ChainvizEvent.NETWORK_STATUS_UPDATE,
             (update: NetworkStatusUpdate) => {
                 this.onNetworkStatusUpdate(update);
-            }
+            },
         );
         // active validator list service events
         this.eventBus.register(ChainvizEvent.ACTIVE_VALIDATOR_LIST_SERVICE_CONNECTED, () => {
@@ -77,7 +78,7 @@ class Chainviz {
             ChainvizEvent.ACTIVE_VALIDATOR_LIST_UPDATE,
             (update: ValidatorListUpdate) => {
                 this.onActiveValidatorListUpdate(update);
-            }
+            },
         );
         this.eventBus.register(ChainvizEvent.NEW_BLOCK, (block: Block) => {
             this.onNewBlock(block);
@@ -89,6 +90,7 @@ class Chainviz {
 
     async init() {
         this.ui.init();
+        this.animate();
         this.ui.setLoadingInfo('connecting to blockchain');
         await this.connect();
     }
@@ -110,7 +112,7 @@ class Chainviz {
         this.ui.setLoadingInfo(
             `blockchain connection timed out<br>will retry in ${
                 Constants.CONNECTION_RETRY_MS / 1000
-            } seconds`
+            } seconds`,
         );
         setTimeout(() => {
             this.dataStore.connectSubstrateRPC();
@@ -161,7 +163,7 @@ class Chainviz {
             this.ui.setLoadingInfo(
                 `network service error<br>will retry in ${
                     Constants.CONNECTION_RETRY_MS / 1000
-                } seconds`
+                } seconds`,
             );
             this.dataStore.disconnectNetworkStatusService();
             setTimeout(() => {
@@ -199,7 +201,7 @@ class Chainviz {
             this.ui.setLoadingInfo(
                 `validator service error<br>will retry in ${
                     Constants.CONNECTION_RETRY_MS / 1000
-                } seconds`
+                } seconds`,
             );
             this.dataStore.disconnectActiveValidatorListService();
             setTimeout(() => {
@@ -268,6 +270,13 @@ class Chainviz {
                 this.ui.updateSlot(this.slots[i]);
             }
         }
+    }
+
+    private animate() {
+        requestAnimationFrame(() => {
+            this.animate();
+        });
+        TWEEN.update();
     }
 
     start() {

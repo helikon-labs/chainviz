@@ -10,15 +10,17 @@
             href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css"
         />
         <link rel="stylesheet" href="./css/chainviz.css" />
+        <script src="https://unpkg.com/@lottiefiles/lottie-player@latest/dist/lottie-player.js"></script>
         <script src="https://kit.fontawesome.com/ebf2cd1147.js" crossorigin="anonymous"></script>
     </head>
     <body id="root">
         <script src="bundle.js"></script>
-        <div class="background">
+        <div class="background" id="background">
             <div><div class="blue"></div></div>
             <div><div class="red"></div></div>
             <div><div class="green"></div></div>
         </div>
+        <div class="scene-container" id="scene-container"></div>
         <div class="content">
             <div id="left-panel" class="left-panel">
                 <canvas class="main-logo" id="main-logo"></canvas>
@@ -98,7 +100,15 @@
             </div>
         </div>
         <div class="loading-container" id="loading-container">
-            <canvas class="loading-logo" id="loading-logo"></canvas>
+            <lottie-player
+                class="loading-logo"
+                src="./img/anim/logo_loader.json"
+                background="transparent"
+                speed="1"
+                style="width: 120px; height: 120px"
+                loop
+                autoplay
+            ></lottie-player>
             <div class="loading-info" id="loading-info">:: connecting to services ::</div>
         </div>
     </body>

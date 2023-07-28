@@ -8,7 +8,7 @@ function formatNumber(
     value: bigint,
     decimals: number,
     formatDecimals: number,
-    ticker?: string
+    ticker?: string,
 ): string {
     let formatted = value.toString();
     while (formatted.length < decimals + 1) {
@@ -33,4 +33,12 @@ function getCondensedAddress(address: string) {
     return `${address.slice(0, 6)}...${address.slice(-6)}`;
 }
 
-export { formatNumber, getCondensedAddress };
+function getCondensedHash(hash: string, size: number) {
+    return `${hash.slice(0, size)}...${hash.slice(-size)}`;
+}
+
+function capitalize(text: string): string {
+    return text[0].toUpperCase() + text.substring(1);
+} 
+
+export { formatNumber, getCondensedAddress, getCondensedHash, capitalize };

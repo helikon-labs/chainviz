@@ -45,14 +45,14 @@ class NetworkStatusBoard {
         this.ui.totalStake.innerHTML = formatNumber(
             status.totalStake,
             network.tokenDecimals + 6,
-            2
+            2,
         );
         this.ui.minStake.innerHTML = formatNumber(status.minStake, network.tokenDecimals, 2);
         this.ui.maxStake.innerHTML = formatNumber(status.maxStake, network.tokenDecimals, 2);
         this.ui.averageStake.innerHTML = formatNumber(
             status.averageStake,
             network.tokenDecimals,
-            2
+            2,
         );
     }
 }

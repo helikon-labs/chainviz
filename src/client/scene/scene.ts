@@ -19,12 +19,12 @@ class Chainviz3DScene {
             20,
             window.innerWidth / window.innerHeight,
             0.1,
-            1000
+            1000,
         );
         this.camera.position.set(
             Constants.CAMERA_START_POSITION.x,
             Constants.CAMERA_START_POSITION.y,
-            Constants.CAMERA_START_POSITION.z
+            Constants.CAMERA_START_POSITION.z,
         );
         this.camera.lookAt(new THREE.Vector3());
 
@@ -35,13 +35,8 @@ class Chainviz3DScene {
         this.renderer.shadowMap.enabled = true;
         this.renderer.shadowMap.type = THREE.PCFSoftShadowMap;
         // this.renderer.outputColorSpace  = THREE.LinearSRGBColorSpace;
-        document.body.appendChild(this.renderer.domElement);
-        document.addEventListener('click', (event) => {
-            this.onClick(event);
-        });
-        document.addEventListener('mousemove', (event) => {
-            this.onMouseMove(event);
-        });
+        document.getElementById('scene-container')?.appendChild(this.renderer.domElement);
+        
 
         // stats
         this.stats = new Stats();
@@ -56,7 +51,7 @@ class Chainviz3DScene {
             () => {
                 this.onWindowResize();
             },
-            false
+            false,
         );
     }
 
@@ -84,7 +79,7 @@ class Chainviz3DScene {
                 this.camera.rotation.y = 0;
                 this.camera.rotation.z = 0;
                 this.controls.enabled = true;
-            }
+            },
         ).start();
     }
 

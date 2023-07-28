@@ -4,6 +4,7 @@ class Slot {
     readonly number: number;
     private isFinalized: boolean;
     private blocks: Block[];
+    private readonly expandedBlockHashes: string[] = [];
 
     constructor(number: number, isFinalized: boolean, blocks: Block[]) {
         this.number = number;
@@ -32,6 +33,19 @@ class Slot {
     finalize(block: Block) {
         this.blocks = [block];
         this.isFinalized = true;
+    }
+
+    toggleBlockExpand(hash: string) {
+        let index = this.expandedBlockHashes.indexOf(hash);
+        if (index >= 0) {
+            this.expandedBlockHashes.splice(index, 1);
+        } else {
+            this.expandedBlockHashes.push(hash);
+        }
+    }
+
+    blockIsExpanded(hash: string): boolean {
+        return this.expandedBlockHashes.indexOf(hash) >= 0;
     }
 }
 

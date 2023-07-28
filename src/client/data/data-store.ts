@@ -49,22 +49,22 @@ class DataStore {
         {
             onConnected: () => {
                 this.eventBus.dispatch<string>(
-                    ChainvizEvent.ACTIVE_VALIDATOR_LIST_SERVICE_CONNECTED
+                    ChainvizEvent.ACTIVE_VALIDATOR_LIST_SERVICE_CONNECTED,
                 );
             },
             onSubscribed: (_subscriptionId: number) => {
                 this.eventBus.dispatch<string>(
-                    ChainvizEvent.ACTIVE_VALIDATOR_LIST_SERVICE_SUBSCRIBED
+                    ChainvizEvent.ACTIVE_VALIDATOR_LIST_SERVICE_SUBSCRIBED,
                 );
             },
             onUnsubscribed: (_subscriptionId: number) => {
                 this.eventBus.dispatch<string>(
-                    ChainvizEvent.ACTIVE_VALIDATOR_LIST_SERVICE_UNSUBSCRIBED
+                    ChainvizEvent.ACTIVE_VALIDATOR_LIST_SERVICE_UNSUBSCRIBED,
                 );
             },
             onDisconnected: () => {
                 this.eventBus.dispatch<string>(
-                    ChainvizEvent.ACTIVE_VALIDATOR_LIST_SERVICE_DISCONNECTED
+                    ChainvizEvent.ACTIVE_VALIDATOR_LIST_SERVICE_DISCONNECTED,
                 );
             },
             onUpdate: (update: ValidatorListUpdate) => {
@@ -100,7 +100,7 @@ class DataStore {
             this.network.networkStatusServiceURL,
             'subscribe_networkStatus',
             'unsubscribe_networkStatus',
-            this.networkStatusListener
+            this.networkStatusListener,
         );
         this.networkStatusClient.connect();
     }
@@ -118,7 +118,7 @@ class DataStore {
             this.network.activeValidatorListServiceURL,
             'subscribe_validatorList',
             'unsubscribe_validatorList',
-            this.activeValidatorListListener
+            this.activeValidatorListListener,
         );
         this.activeValidatorListClient.connect();
     }
@@ -138,7 +138,7 @@ class DataStore {
     processActiveValidatorListUpdate(update: ValidatorListUpdate) {
         this.eventBus.dispatch<ValidatorListUpdate>(
             ChainvizEvent.ACTIVE_VALIDATOR_LIST_UPDATE,
-            update
+            update,
         );
     }
 
@@ -150,7 +150,7 @@ class DataStore {
             await this.substrateClient.rpc.chain.getBlock(finalizedBlockHash)
         ).block;
         finalizedSlots.push(
-            new Slot(lastFinalizedBlock.header.number.toNumber(), true, [lastFinalizedBlock])
+            new Slot(lastFinalizedBlock.header.number.toNumber(), true, [lastFinalizedBlock]),
         );
         let finalizedBlock = lastFinalizedBlock;
         for (let i = Constants.INITIAL_SLOT_COUNT - 1; i > 0; i--) {
@@ -158,7 +158,7 @@ class DataStore {
                 await this.substrateClient.rpc.chain.getBlock(finalizedBlock.header.parentHash)
             ).block;
             finalizedSlots.push(
-                new Slot(finalizedBlock.header.number.toNumber(), true, [finalizedBlock])
+                new Slot(finalizedBlock.header.number.toNumber(), true, [finalizedBlock]),
             );
         }
         // get non-finalized blocks
@@ -168,7 +168,7 @@ class DataStore {
             .block;
         while (nonFinalizedBlock.header.hash.toHex() != lastFinalizedBlock.header.hash.toHex()) {
             nonFinalizedSlots.push(
-                new Slot(nonFinalizedBlock.header.number.toNumber(), false, [nonFinalizedBlock])
+                new Slot(nonFinalizedBlock.header.number.toNumber(), false, [nonFinalizedBlock]),
             );
             nonFinalizedBlock = (
                 await this.substrateClient.rpc.chain.getBlock(nonFinalizedBlock.header.parentHash)
@@ -189,7 +189,7 @@ class DataStore {
             async (header) => {
                 const block = (await this.substrateClient.rpc.chain.getBlock(header.hash)).block;
                 this.eventBus.dispatch<Block>(ChainvizEvent.NEW_BLOCK, block);
-            }
+            },
         );
     }
 
@@ -201,7 +201,7 @@ class DataStore {
             async (header) => {
                 const block = (await this.substrateClient.rpc.chain.getBlock(header.hash)).block;
                 this.eventBus.dispatch<Block>(ChainvizEvent.NEW_FINALIZED_BLOCK, block);
-            }
+            },
         );
     }
 
