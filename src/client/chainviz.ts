@@ -8,9 +8,9 @@ import { ChainvizEvent } from './event/event';
 import { Constants } from './util/constants';
 import { NetworkStatus, NetworkStatusUpdate } from './model/subvt/network-status';
 import { ValidatorListUpdate, ValidatorSummary } from './model/subvt/validator-summary';
-import { Block } from '@polkadot/types/interfaces';
 import { Slot } from './model/chainviz/slot';
 import * as TWEEN from '@tweenjs/tween.js';
+import { Block } from './model/chainviz/block';
 
 THREE.Cache.enabled = true;
 
@@ -243,13 +243,13 @@ class Chainviz {
 
     private onNewBlock(block: Block) {
         for (let i = 0; i < this.slots.length; i++) {
-            if (this.slots[i].number == block.header.number.toNumber()) {
+            if (this.slots[i].number == block.block.header.number.toNumber()) {
                 this.slots[i].insertBlock(block);
                 this.ui.updateSlot(this.slots[i]);
                 return;
             }
         }
-        const slot = new Slot(block.header.number.toNumber(), false, [block]);
+        const slot = new Slot(block.block.header.number.toNumber(), false, [block]);
         this.slots = [slot, ...this.slots];
         if (this.slots.length > Constants.MAX_SLOT_COUNT) {
             this.slots = this.slots.slice(0, Constants.MAX_SLOT_COUNT);
@@ -260,10 +260,10 @@ class Chainviz {
     private async onNewFinalizedBlock(block: Block) {
         let finalizedNumber = -1;
         for (let i = 0; i < this.slots.length; i++) {
-            if (this.slots[i].number == block.header.number.toNumber()) {
+            if (this.slots[i].number == block.block.header.number.toNumber()) {
                 this.slots[i].finalize(block);
                 this.ui.updateSlot(this.slots[i]);
-                finalizedNumber = block.header.number.toNumber();
+                finalizedNumber = block.block.header.number.toNumber();
             } else if (this.slots[i].number < finalizedNumber && !this.slots[i].getIsFinalized()) {
                 const block = await this.dataStore.getBlockByNumber(this.slots[i].number);
                 this.slots[i].finalize(block);

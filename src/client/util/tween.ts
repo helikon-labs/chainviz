@@ -10,13 +10,13 @@ export function createTween<T, U>(
     onStart?: () => void,
     onUpdate?: () => void,
     onComplete?: () => void,
+    /* eslint-disable @typescript-eslint/no-explicit-any */
 ): TWEEN.Tween<any> {
     /* eslint-disable @typescript-eslint/no-explicit-any */
     return new TWEEN.Tween(property as any)
         .to(targetProperties as any, durationMs)
         .easing(curve)
         .onStart(() => {
-            console.log('start');
             if (onStart) {
                 onStart();
             }

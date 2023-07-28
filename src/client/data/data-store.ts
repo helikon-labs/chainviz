@@ -10,9 +10,11 @@ import { setAsyncTimeout } from '../util/async-util';
 import { EventBus } from '../event/event-bus';
 import { Constants } from '../util/constants';
 import { ChainvizEvent } from '../event/event';
-import { Block } from '@polkadot/types/interfaces';
 import { UnsubscribePromise } from '@polkadot/api/types';
 import { Slot } from '../model/chainviz/slot';
+import { Block } from '../model/chainviz/block';
+import { BlockHash } from '@polkadot/types/interfaces';
+import { AnyJson } from '@polkadot/types/types';
 
 class DataStore {
     private network!: Network;
@@ -146,32 +148,39 @@ class DataStore {
         const finalizedSlots: Slot[] = [];
         // get finalized blocks
         const finalizedBlockHash = await this.substrateClient.rpc.chain.getFinalizedHead();
-        const lastFinalizedBlock = (
-            await this.substrateClient.rpc.chain.getBlock(finalizedBlockHash)
-        ).block;
+        const lastFinalizedBlock = await this.getBlockByHash(finalizedBlockHash);
         finalizedSlots.push(
-            new Slot(lastFinalizedBlock.header.number.toNumber(), true, [lastFinalizedBlock]),
+            new Slot(lastFinalizedBlock.block.header.number.toNumber(), true, [lastFinalizedBlock]),
         );
         let finalizedBlock = lastFinalizedBlock;
         for (let i = Constants.INITIAL_SLOT_COUNT - 1; i > 0; i--) {
-            finalizedBlock = (
-                await this.substrateClient.rpc.chain.getBlock(finalizedBlock.header.parentHash)
-            ).block;
+            finalizedBlock = await this.getBlockByHash(finalizedBlock.block.header.parentHash);
             finalizedSlots.push(
-                new Slot(finalizedBlock.header.number.toNumber(), true, [finalizedBlock]),
+                new Slot(finalizedBlock.block.header.number.toNumber(), true, [finalizedBlock]),
             );
         }
         // get non-finalized blocks
         const nonFinalizedSlots: Slot[] = [];
         const lastHeader = await this.substrateClient.rpc.chain.getHeader();
-        let nonFinalizedBlock = (await this.substrateClient.rpc.chain.getBlock(lastHeader.hash))
-            .block;
-        while (nonFinalizedBlock.header.hash.toHex() != lastFinalizedBlock.header.hash.toHex()) {
-            nonFinalizedSlots.push(
-                new Slot(nonFinalizedBlock.header.number.toNumber(), false, [nonFinalizedBlock]),
+        let nonFinalizedSubstrateBlock = (
+            await this.substrateClient.rpc.chain.getBlock(lastHeader.hash)
+        ).block;
+        while (
+            nonFinalizedSubstrateBlock.header.hash.toHex() !=
+            lastFinalizedBlock.block.header.hash.toHex()
+        ) {
+            const nonFinalizedBlock = await this.getBlockByHash(
+                nonFinalizedSubstrateBlock.header.hash,
             );
-            nonFinalizedBlock = (
-                await this.substrateClient.rpc.chain.getBlock(nonFinalizedBlock.header.parentHash)
+            nonFinalizedSlots.push(
+                new Slot(nonFinalizedBlock.block.header.number.toNumber(), false, [
+                    nonFinalizedBlock,
+                ]),
+            );
+            nonFinalizedSubstrateBlock = (
+                await this.substrateClient.rpc.chain.getBlock(
+                    nonFinalizedBlock.block.header.parentHash,
+                )
             ).block;
         }
         return [...nonFinalizedSlots, ...finalizedSlots];
@@ -187,7 +196,7 @@ class DataStore {
         }
         this.newBlockSubscription = this.substrateClient.rpc.chain.subscribeNewHeads(
             async (header) => {
-                const block = (await this.substrateClient.rpc.chain.getBlock(header.hash)).block;
+                const block = await this.getBlockByHash(header.hash);
                 this.eventBus.dispatch<Block>(ChainvizEvent.NEW_BLOCK, block);
             },
         );
@@ -199,16 +208,30 @@ class DataStore {
         }
         this.finalizedHeaderSubscription = this.substrateClient.rpc.chain.subscribeFinalizedHeads(
             async (header) => {
-                const block = (await this.substrateClient.rpc.chain.getBlock(header.hash)).block;
+                const block = await this.getBlockByHash(header.hash);
                 this.eventBus.dispatch<Block>(ChainvizEvent.NEW_FINALIZED_BLOCK, block);
             },
         );
     }
 
+    async getBlockByHash(hash: BlockHash): Promise<Block> {
+        const substrateBlock = (await this.substrateClient.rpc.chain.getBlock(hash)).block;
+        const apiAt = await this.substrateClient.at(hash);
+        const timestamp = (await apiAt.query.timestamp.now()).toJSON() as number;
+        const events = (await apiAt.query.system.events()).toHuman() as AnyJson[];
+        const runtimeVersion = await this.substrateClient.rpc.state.getRuntimeVersion(hash);
+        const block = new Block(
+            substrateBlock,
+            timestamp,
+            events,
+            runtimeVersion.specVersion.toNumber(),
+        );
+        return block;
+    }
+
     async getBlockByNumber(number: number): Promise<Block> {
         const hash = await this.substrateClient.rpc.chain.getBlockHash(number);
-        const block = (await this.substrateClient.rpc.chain.getBlock(hash)).block;
-        return block;
+        return this.getBlockByHash(hash);
     }
 }
 

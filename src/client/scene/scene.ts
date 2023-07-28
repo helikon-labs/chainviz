@@ -36,7 +36,6 @@ class Chainviz3DScene {
         this.renderer.shadowMap.type = THREE.PCFSoftShadowMap;
         // this.renderer.outputColorSpace  = THREE.LinearSRGBColorSpace;
         document.getElementById('scene-container')?.appendChild(this.renderer.domElement);
-        
 
         // stats
         this.stats = new Stats();

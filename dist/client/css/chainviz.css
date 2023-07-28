@@ -278,12 +278,13 @@ img {
 .block-content-row {
     display: flex;
     flex-direction: row;
-    font-size: 12px;
+    font-size: 10px;
     justify-content: space-between;
+    overflow-x: hidden;
 }
 
 .block-content-row .header {
-    font-size: 14px;
+    font-size: 12px;
 }
 
 .content .right-panel-content .slot-list .slot .block .hash {

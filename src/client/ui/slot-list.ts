@@ -1,6 +1,6 @@
-import { Block } from '@polkadot/types/interfaces';
+import { Block } from '../model/chainviz/block';
 import { Slot } from '../model/chainviz/slot';
-import { capitalize, getCondensedHash } from '../util/format';
+import { capitalize, getBlockTimeFormatted, getCondensedHash } from '../util/format';
 
 interface UI {
     root: HTMLElement;
@@ -23,23 +23,21 @@ class SlotList {
     }
 
     private getBlockHTML(slot: Slot, block: Block): string {
-        const hash = block.header.hash.toHex();
+        const hash = block.block.header.hash.toHex();
         let html = `<div class="block" id="block-${hash}">`;
         html += '<div class="block-header">';
-        html += `<span>${block.header.number.toNumber()}</span>`;
+        html += `<span>${block.block.header.number.toNumber()}</span>`;
         html += '<span>|</span>';
         html += `<span class="hash">${getCondensedHash(hash, 11)}</span>`;
         html += '</div>';
-        
+
         if (slot.blockIsExpanded(hash)) {
             html += '<div class="block-content-separator"></div>';
             // block time
-            /*
             html += '<div class="block-content-row">';
             html += '<span>Timestamp</span>';
-            html += '<span>2023-07-28 17:11:06</span>';
+            html += `<span>${getBlockTimeFormatted(block.time)}</span>`;
             html += '</div>';
-            */
             // status
             html += '<div class="block-content-row">';
             html += '<span>Status</span>';
@@ -48,27 +46,57 @@ class SlotList {
             // parent hash
             html += '<div class="block-content-row">';
             html += '<span>Parent Hash</span>';
-            html += `<span class="hash">${getCondensedHash(block.header.parentHash.toHex(), 8)}</span>`;
+            html += `<span class="hash">${getCondensedHash(
+                block.block.header.parentHash.toHex(),
+                9,
+            )}</span>`;
             html += '</div>';
             // state root
             html += '<div class="block-content-row">';
             html += '<span>State Root</span>';
-            html += `<span class="hash">${getCondensedHash(block.header.stateRoot.toHex(), 8)}</span>`;
+            html += `<span class="hash">${getCondensedHash(
+                block.block.header.stateRoot.toHex(),
+                9,
+            )}</span>`;
             html += '</div>';
             // extrinsics root
             html += '<div class="block-content-row">';
             html += '<span>Extrinsics Root</span>';
-            html += `<span class="hash">${getCondensedHash(block.header.extrinsicsRoot.toHex(), 8)}</span>`;
+            html += `<span class="hash">${getCondensedHash(
+                block.block.header.extrinsicsRoot.toHex(),
+                9,
+            )}</span>`;
+            html += '</div>';
+            // runtime
+            html += '<div class="block-content-row">';
+            html += '<span>Runtime</span>';
+            html += `<span>${block.runtimeVersion}</span>`;
             html += '</div>';
 
             // extrinsics
             html += '<div class="block-content-separator"></div>';
             html += '<div class="block-content-row">';
-            html += `<span class="header">${block.extrinsics.length} Extrinsics</span>`;
+            html += `<span class="header">${block.block.extrinsics.length} Extrinsics</span>`;
             html += '</div>';
-            for (const extrinsic of block.extrinsics) {
+            for (const extrinsic of block.block.extrinsics) {
                 html += '<div class="block-content-row">';
-                html += `<span>${capitalize(extrinsic.method.section)}.${capitalize(extrinsic.method.method)}</span>`;
+                html += `<span>${capitalize(extrinsic.method.section)}.${capitalize(
+                    extrinsic.method.method,
+                )}</span>`;
+                html += '</div>';
+            }
+
+            // events
+            html += '<div class="block-content-separator"></div>';
+            html += '<div class="block-content-row">';
+            html += `<span class="header">${block.events.length} Events</span>`;
+            html += '</div>';
+            for (const blockEvent of block.events) {
+                /* eslint-disable @typescript-eslint/ban-ts-comment */
+                // @ts-ignore
+                const { _, event, _ } = blockEvent;
+                html += '<div class="block-content-row">';
+                html += `<span>${capitalize(event.section)}.${event.method}</span>`;
                 html += '</div>';
             }
         }
@@ -90,10 +118,9 @@ class SlotList {
 
     private setBlockOnClick(slot: Slot, block: Block) {
         setTimeout(() => {
-            const hash = block.header.hash.toHex();
+            const hash = block.block.header.hash.toHex();
             const blockDiv = document.getElementById(`block-${hash}`);
             blockDiv?.addEventListener('click', (_event) => {
-                console.log('click', block.header.number.toNumber());
                 slot.toggleBlockExpand(hash);
                 this.updateSlot(slot);
             });
@@ -136,7 +163,9 @@ class SlotList {
         }
         let html = '';
         for (const block of slot.getBlocks()) {
-            const blockDiv = <HTMLDivElement>document.getElementById(`block-${block.header.hash.toHex()}`);
+            const blockDiv = <HTMLDivElement>(
+                document.getElementById(`block-${block.block.header.hash.toHex()}`)
+            );
             if (blockDiv) {
                 blockDiv.parentNode!.removeChild(blockDiv);
             }

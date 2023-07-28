@@ -1,4 +1,4 @@
-import { Block } from '@polkadot/types/interfaces';
+import { Block } from './block';
 
 class Slot {
     readonly number: number;
@@ -22,7 +22,7 @@ class Slot {
 
     insertBlock(block: Block) {
         const existingBlocks = this.blocks.filter(function (existingBlock: Block) {
-            return block.header.hash.toHex() == existingBlock.header.hash.toHex();
+            return block.block.header.hash.toHex() == existingBlock.block.header.hash.toHex();
         });
         if (existingBlocks.length > 0) {
             return;
@@ -36,7 +36,7 @@ class Slot {
     }
 
     toggleBlockExpand(hash: string) {
-        let index = this.expandedBlockHashes.indexOf(hash);
+        const index = this.expandedBlockHashes.indexOf(hash);
         if (index >= 0) {
             this.expandedBlockHashes.splice(index, 1);
         } else {

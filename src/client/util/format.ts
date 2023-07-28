@@ -39,6 +39,22 @@ function getCondensedHash(hash: string, size: number) {
 
 function capitalize(text: string): string {
     return text[0].toUpperCase() + text.substring(1);
-} 
+}
 
-export { formatNumber, getCondensedAddress, getCondensedHash, capitalize };
+function pad(n: number, width: number): string {
+    const z = '0';
+    const nStr = n.toString();
+    return nStr.length >= width ? nStr : new Array(width - nStr.length + 1).join(z) + nStr;
+}
+
+function getBlockTimeFormatted(date: Date): string {
+    const year = date.getFullYear().toString();
+    const month = pad(date.getMonth() + 1, 2);
+    const day = pad(date.getDate(), 2);
+    const hour = pad(date.getHours(), 2);
+    const minute = pad(date.getMinutes(), 2);
+    const second = pad(date.getSeconds(), 2);
+    return `${year}.${month}.${day} ${hour}:${minute}:${second}`;
+}
+
+export { formatNumber, getCondensedAddress, getCondensedHash, capitalize, getBlockTimeFormatted };
