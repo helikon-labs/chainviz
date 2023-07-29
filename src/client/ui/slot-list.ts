@@ -94,7 +94,7 @@ class SlotList {
             for (const blockEvent of block.events) {
                 /* eslint-disable @typescript-eslint/ban-ts-comment */
                 // @ts-ignore
-                const { phase, event, topics } = blockEvent;
+                const { _phase, event, _topics } = blockEvent;
                 html += '<div class="block-content-row">';
                 html += `<span>${capitalize(event.section)}.${event.method}</span>`;
                 html += '</div>';

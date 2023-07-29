@@ -40,6 +40,7 @@ export class EventBus implements IEventBus {
         Object.keys(subscriber).forEach((key) => subscriber[key](arg));
     }
 
+    // prettier-ignore
     public register(event: string, callback: Function): Registry { // eslint-disable-line @typescript-eslint/ban-types
         const id = this.getNextId();
         if (!this.subscribers[event]) this.subscribers[event] = {};

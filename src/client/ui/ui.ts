@@ -11,6 +11,8 @@ import * as TWEEN from '@tweenjs/tween.js';
 
 class UI {
     private readonly root: HTMLElement;
+    private readonly sceneContainer: HTMLDivElement;
+    readonly scene: HTMLDivElement;
     private readonly background: HTMLDivElement;
     private readonly leftPanel: HTMLDivElement;
     private readonly rightPanel: HTMLDivElement;
@@ -23,6 +25,8 @@ class UI {
 
     constructor() {
         this.root = <HTMLElement>document.getElementById('root');
+        this.sceneContainer = <HTMLDivElement>document.getElementById('scene-container');
+        this.scene = <HTMLDivElement>document.getElementById('scene');
         this.background = <HTMLDivElement>document.getElementById('background');
         this.leftPanel = <HTMLDivElement>document.getElementById('left-panel');
         this.rightPanel = <HTMLDivElement>document.getElementById('right-panel');
@@ -42,16 +46,23 @@ class UI {
         hide(this.background);
         hide(this.leftPanel);
         hide(this.rightPanel);
+        hide(this.sceneContainer);
     }
 
     setLoadingInfo(info: string) {
         this.loadingInfo.innerHTML = info;
     }
 
-    start() {
+    start(onComplete?: () => void) {
         this.fadeOutLoadingContainer(() => {
             this.fadeInBackground(() => {
-                this.fadeInContent(() => {});
+                this.fadeInContent(() => {
+                    this.fadeInSceneContainer(() => {
+                        if (onComplete) {
+                            onComplete();
+                        }
+                    });
+                });
             });
         });
     }
@@ -106,6 +117,23 @@ class UI {
             () => {
                 this.leftPanel.style.opacity = `${opacity.opacity}%`;
                 this.rightPanel.style.opacity = `${opacity.opacity}%`;
+            },
+            onComplete,
+        ).start();
+    }
+
+    private fadeInSceneContainer(onComplete: () => void) {
+        this.sceneContainer.style.opacity = '0%';
+        show(this.sceneContainer);
+        const opacity = { opacity: 0 };
+        createTween(
+            opacity,
+            { opacity: 100 },
+            TWEEN.Easing.Exponential.InOut,
+            Constants.CONTENT_FADE_ANIM_DURATION_MS,
+            undefined,
+            () => {
+                this.sceneContainer.style.opacity = `${opacity.opacity}%`;
             },
             onComplete,
         ).start();

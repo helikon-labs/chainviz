@@ -11,12 +11,13 @@ import { ValidatorListUpdate, ValidatorSummary } from './model/subvt/validator-s
 import { Slot } from './model/chainviz/slot';
 import * as TWEEN from '@tweenjs/tween.js';
 import { Block } from './model/chainviz/block';
+import { Para } from './model/substrate/para';
 
 THREE.Cache.enabled = true;
 
 class Chainviz {
     private readonly ui: UI;
-    private readonly scene = new Chainviz3DScene();
+    private readonly scene: Chainviz3DScene;
     private readonly dataStore: DataStore;
     private readonly eventBus = EventBus.getInstance();
     private network: Network = Kusama;
@@ -24,10 +25,12 @@ class Chainviz {
     private networkStatus!: NetworkStatus;
     private validatorMap = new Map<string, ValidatorSummary>();
     private slots: Slot[] = [];
-    private paraIds: number[] = [];
+    private paras: Para[] = [];
 
     constructor() {
-        this.ui = new UI();
+        const ui = new UI();
+        this.ui = ui;
+        this.scene = new Chainviz3DScene(ui.scene);
         this.dataStore = new DataStore();
         // substrate api events
         this.eventBus.register(ChainvizEvent.SUBSTRATE_API_READY, () => {
@@ -212,7 +215,15 @@ class Chainviz {
 
     private async getParas() {
         this.ui.setLoadingInfo('fetching parachains');
-        this.paraIds = await this.dataStore.getParaIds();
+        this.paras = [];
+        const paraIds = await this.dataStore.getParaIds();
+        for (const paraId of paraIds) {
+            const para = this.network.paras.find((para) => para.paraId == paraId)!;
+            if (para) {
+                this.paras.push(para);
+            }
+        }
+
         setTimeout(() => {
             this.getInitialBlocks();
         }, Constants.UI_STATE_CHANGE_DELAY_MS);
@@ -282,9 +293,10 @@ class Chainviz {
     start() {
         this.started = true;
         this.ui.initializeSlots(this.slots);
-        this.ui.start();
+        this.scene.start(this.paras);
         this.dataStore.subsribeToNewBlocks();
         this.dataStore.subsribeToFinalizedBlocks();
+        this.ui.start();
     }
 }
 

@@ -1,3 +1,7 @@
+import { KUSAMA_PARAS } from '../../data/kusama-paras';
+import { POLKADOT_PARAS } from '../../data/polkadot-paras';
+import { Para } from './para';
+
 interface Network {
     readonly display: string;
     readonly tokenTicker: string;
@@ -6,6 +10,7 @@ interface Network {
     readonly rpcURL: string;
     readonly networkStatusServiceURL: string;
     readonly activeValidatorListServiceURL: string;
+    readonly paras: Para[];
 }
 
 const Kusama = {
@@ -16,6 +21,7 @@ const Kusama = {
     rpcURL: 'wss://rpc.dotters.network/kusama',
     networkStatusServiceURL: 'wss://rpc.kusama.subvt.io:17888',
     activeValidatorListServiceURL: 'wss://rpc.kusama.subvt.io:17889',
+    paras: KUSAMA_PARAS,
 } as Network;
 
 const Polkadot = {
@@ -26,6 +32,7 @@ const Polkadot = {
     rpcURL: 'wss://rpc.dotters.network/polkadot',
     networkStatusServiceURL: 'wss://rpc.polkadot.subvt.io:18888',
     activeValidatorListServiceURL: 'wss://rpc.polkadot.subvt.io:18889',
+    paras: POLKADOT_PARAS,
 } as Network;
 
 export { Network, Kusama, Polkadot };

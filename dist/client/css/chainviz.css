@@ -18,6 +18,20 @@ body {
     position: absolute;
     left: 0px;
     top: 0px;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: row;
+}
+
+.scene-container .scene {
+    flex-grow: 1;
+    height: 100%;
+}
+
+.scene-container .scene-spacer {
+    width: 286px;
+    height: 100%;
 }
 
 .mono {
@@ -47,7 +61,7 @@ a:active {
     display: flex;
     flex-direction: row;
     gap: 0px 0px;
-    opacity: 30%;
+    opacity: 45%;
     margin-top: 10%;
 }
 

@@ -1,10 +1,10 @@
 import * as THREE from 'three';
-import * as TWEEN from '@tweenjs/tween.js';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
 import Stats from 'three/examples/jsm/libs/stats.module';
 import * as Visibility from 'visibilityjs';
 import { Constants } from '../util/constants';
 import { createTween } from '../util/tween';
+import { Para } from '../model/substrate/para';
 
 class Chainviz3DScene {
     private readonly scene: THREE.Scene;
@@ -12,12 +12,14 @@ class Chainviz3DScene {
     private readonly controls: OrbitControls;
     private readonly renderer: THREE.WebGLRenderer;
     private readonly stats: Stats;
+    private readonly container: HTMLDivElement;
 
-    constructor() {
+    constructor(container: HTMLDivElement) {
+        this.container = container;
         this.scene = new THREE.Scene();
         this.camera = new THREE.PerspectiveCamera(
             20,
-            window.innerWidth / window.innerHeight,
+            container.clientWidth / container.clientHeight,
             0.1,
             1000,
         );
@@ -29,13 +31,14 @@ class Chainviz3DScene {
         this.camera.lookAt(new THREE.Vector3());
 
         // renderer
-        this.renderer = new THREE.WebGLRenderer({ antialias: true });
-        this.renderer.setSize(window.innerWidth, window.innerHeight);
+        this.renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+        this.renderer.setSize(container.clientWidth, container.clientHeight);
         this.renderer.setPixelRatio(window.devicePixelRatio);
         this.renderer.shadowMap.enabled = true;
         this.renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+        this.renderer.setClearColor(0x000000, 0);
         // this.renderer.outputColorSpace  = THREE.LinearSRGBColorSpace;
-        document.getElementById('scene-container')?.appendChild(this.renderer.domElement);
+        container.appendChild(this.renderer.domElement);
 
         // stats
         this.stats = new Stats();
@@ -44,7 +47,7 @@ class Chainviz3DScene {
         // orbit controls
         this.controls = new OrbitControls(this.camera, this.renderer.domElement);
         this.controls.enabled = false;
-        this.limitOrbitControls();
+        // this.limitOrbitControls();
         window.addEventListener(
             'resize',
             () => {
@@ -106,12 +109,10 @@ class Chainviz3DScene {
     private onMouseMove(_event: MouseEvent) {}
 
     private onWindowResize() {
-        /*
-        this.camera.aspect = window.innerWidth / window.innerHeight;
+        this.camera.aspect = this.container.clientWidth / this.container.clientHeight;
         this.camera.updateProjectionMatrix();
-        this.renderer.setSize(window.innerWidth, window.innerHeight);
+        this.renderer.setSize(this.container.clientWidth, this.container.clientHeight);
         this.render();
-        */
     }
 
     private animate() {
@@ -120,7 +121,6 @@ class Chainviz3DScene {
         });
         this.controls.update();
         this.render();
-        TWEEN.update();
         this.stats.update();
     }
 
@@ -145,8 +145,48 @@ class Chainviz3DScene {
         );
     }
 
-    start() {
+    start(paras: Para[]) {
         this.animate();
+        this.initParachains(paras);
+    }
+
+    initParachains(paras: Para[]) {
+        const material = new THREE.LineBasicMaterial({
+            color: 0xffffff,
+            transparent: true,
+            opacity: 0.5,
+        });
+        material.opacity = 0.3;
+        let points = [];
+        points.push(new THREE.Vector3(-75, 0, 0));
+        points.push(new THREE.Vector3(75, 0, 0));
+        let lineGeometry = new THREE.BufferGeometry().setFromPoints(points);
+        let line = new THREE.Line(lineGeometry, material);
+        this.scene.add(line);
+
+        points = [];
+        points.push(new THREE.Vector3(0, 53, 0));
+        points.push(new THREE.Vector3(0, -53, 0));
+        lineGeometry = new THREE.BufferGeometry().setFromPoints(points);
+        line = new THREE.Line(lineGeometry, material);
+        this.scene.add(line);
+
+        const radius = 48;
+        const delta = (Math.PI / paras.length) * 2;
+        let current = 0.0;
+        const geometry = new THREE.CircleGeometry(1.35, 24, 24);
+        for (const para of paras) {
+            const texture = new THREE.TextureLoader().load(para.ui.logo);
+            const material = new THREE.MeshBasicMaterial({
+                map: texture,
+                transparent: true,
+                opacity: 0.75,
+            });
+            const mesh = new THREE.Mesh(geometry, material);
+            mesh.position.set(Math.sin(current) * radius, Math.cos(current) * radius, 0);
+            this.scene.add(mesh);
+            current += delta;
+        }
     }
 }
 

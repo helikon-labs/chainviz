@@ -187,7 +187,7 @@ class DataStore {
     }
 
     async getParaIds(): Promise<number[]> {
-        return (await this.substrateClient.query.paras.parachains()).toHuman() as number[];
+        return (await this.substrateClient.query.paras.parachains()).toJSON() as number[];
     }
 
     subsribeToNewBlocks() {
