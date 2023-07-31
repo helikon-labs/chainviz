@@ -8,6 +8,8 @@ import { Logo, getRandomCharacterType, getRandomShapeType } from './logo';
 import { NetworkStatusBoard } from './network-status-board';
 import { SlotList } from './slot-list';
 import * as TWEEN from '@tweenjs/tween.js';
+import { XCMMessageList } from './xcm-message-list';
+import { Para } from '../model/substrate/para';
 
 class UI {
     private readonly root: HTMLElement;
@@ -22,6 +24,7 @@ class UI {
     private readonly logo: Logo;
     private readonly networkStatusBoard: NetworkStatusBoard;
     private readonly slotList: SlotList;
+    private readonly xcmMessageList: XCMMessageList;
 
     constructor() {
         this.root = <HTMLElement>document.getElementById('root');
@@ -36,6 +39,7 @@ class UI {
         this.logo = new Logo(getRandomShapeType(), getRandomCharacterType());
         this.networkStatusBoard = new NetworkStatusBoard();
         this.slotList = new SlotList();
+        this.xcmMessageList = new XCMMessageList();
     }
 
     init() {
@@ -153,6 +157,20 @@ class UI {
 
     updateSlot(slot: Slot) {
         this.slotList.updateSlot(slot);
+    }
+
+    insertXCMMessage(
+        originExtrinsicHash: string,
+        relayChain: Network,
+        originPara: Para | undefined,
+        destinationPara: Para | undefined,
+    ) {
+        this.xcmMessageList.insertMessage(
+            originExtrinsicHash,
+            relayChain,
+            originPara,
+            destinationPara,
+        );
     }
 }
 

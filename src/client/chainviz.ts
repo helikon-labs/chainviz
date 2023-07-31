@@ -1,7 +1,7 @@
 import * as THREE from 'three';
 import { Chainviz3DScene } from './scene/scene';
 import { UI } from './ui/ui';
-import { Network, Kusama } from './model/substrate/network';
+import { Network, Kusama, getNetworkPara } from './model/substrate/network';
 import { DataStore } from './data/data-store';
 import { EventBus } from './event/event-bus';
 import { ChainvizEvent } from './event/event';
@@ -12,6 +12,7 @@ import { Slot } from './model/chainviz/slot';
 import * as TWEEN from '@tweenjs/tween.js';
 import { Block } from './model/chainviz/block';
 import { Para } from './model/substrate/para';
+import { XCMMessage } from './model/polkaholic/xcm';
 
 THREE.Cache.enabled = true;
 
@@ -88,6 +89,9 @@ class Chainviz {
         });
         this.eventBus.register(ChainvizEvent.NEW_FINALIZED_BLOCK, (block: Block) => {
             this.onNewFinalizedBlock(block);
+        });
+        this.eventBus.register(ChainvizEvent.NEW_XCM_MESSAGE, (message: XCMMessage) => {
+            this.onNewXCMMessage(message);
         });
     }
 
@@ -218,12 +222,11 @@ class Chainviz {
         this.paras = [];
         const paraIds = await this.dataStore.getParaIds();
         for (const paraId of paraIds) {
-            const para = this.network.paras.find((para) => para.paraId == paraId)!;
+            const para = getNetworkPara(this.network, paraId);
             if (para) {
                 this.paras.push(para);
             }
         }
-
         setTimeout(() => {
             this.getInitialBlocks();
         }, Constants.UI_STATE_CHANGE_DELAY_MS);
@@ -232,6 +235,11 @@ class Chainviz {
     private async getInitialBlocks() {
         this.ui.setLoadingInfo('fetching blocks');
         this.slots = await this.dataStore.getInitialSlots();
+        this.subscribeToXCMInfo();
+    }
+
+    private subscribeToXCMInfo() {
+        this.dataStore.subscribeToXCMInfo();
         this.start();
     }
 
@@ -264,6 +272,7 @@ class Chainviz {
         this.slots = [slot, ...this.slots];
         if (this.slots.length > Constants.MAX_SLOT_COUNT) {
             this.slots = this.slots.slice(0, Constants.MAX_SLOT_COUNT);
+            // TODO remove slots from the UI
         }
         this.ui.insertSlot(slot);
     }
@@ -281,6 +290,21 @@ class Chainviz {
                 this.ui.updateSlot(this.slots[i]);
             }
         }
+    }
+
+    onNewXCMMessage(message: XCMMessage) {
+        if (message.relayChain.relayChain != this.network.id) {
+            console.log('Ignore', message.relayChain.relayChain, 'XCM message.');
+            return;
+        }
+        const originPara = getNetworkPara(this.network, message.origination.paraID);
+        const destionationPara = getNetworkPara(this.network, message.destination.paraID);
+        this.ui.insertXCMMessage(
+            message.origination.extrinsicHash,
+            this.network,
+            originPara,
+            destionationPara,
+        );
     }
 
     private animate() {

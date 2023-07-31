@@ -122,12 +122,13 @@ a:active {
     bottom: 30px;
     left: 30px;
     height: 28px;
+    width: 134px;
     border: 1px solid #ffffff55;
     border-radius: 10px;
     padding: 0px 8px;
     display: flex;
-    gap: 12px;
     align-items: center;
+    justify-content: space-between;
 }
 
 .icon-container a,
@@ -153,17 +154,16 @@ img {
     flex-grow: 1;
     display: flex;
     flex-direction: column;
-    justify-content: center;
     align-items: center;
 }
 
 .content .left-panel .network-selector {
-    margin-top: 24px;
     border: 1px solid #ffffff55;
     border-radius: 12px;
     display: flex;
     padding: 1px;
     gap: 2px;
+    margin-top: 24px;
 }
 
 .content .left-panel .network-selector .network {
@@ -200,8 +200,47 @@ img {
     margin-top: 1.5px;
 }
 
-.content .left-panel .left-panel-spacer {
+.content .left-panel .left-panel-content {
+    display: flex;
+    flex-direction: row;
+    width: 100%;
+    height: 100%;
+}
+
+.content .left-panel .left-panel-content .xcm-message-list {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    overflow-y: scroll;
+    margin-left: 30px;
+    height: 100%;
+}
+
+.content .left-panel .left-panel-content .xcm-message-list .xcm-message {
+    border-radius: 12px;
+    border: 1px solid #ffffff55;
+    padding: 6px 8px 6px 8px;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    cursor: pointer;
+}
+
+.content .left-panel .left-panel-content .xcm-message-list .xcm-message img.xcm-chain-logo {
+    width: 20px;
+    height: 20px;
+    border-radius: 10px;
+}
+
+.content .left-panel .left-panel-content .xcm-message-list .xcm-message img.xcm-arrow {
+    height: 10px;
+    opacity: 0.75;
+}
+
+.content .left-panel .left-panel-content .left-panel-content-spacer {
     flex-grow: 1;
+    height: 100%;
 }
 
 .content .right-panel {

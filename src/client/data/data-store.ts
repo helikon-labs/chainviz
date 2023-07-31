@@ -15,6 +15,8 @@ import { Slot } from '../model/chainviz/slot';
 import { Block } from '../model/chainviz/block';
 import { BlockHash } from '@polkadot/types/interfaces';
 import { AnyJson } from '@polkadot/types/types';
+import Ably from 'ably';
+import { XCMMessage, isXCMMessage } from '../model/polkaholic/xcm';
 
 class DataStore {
     private network!: Network;
@@ -232,6 +234,19 @@ class DataStore {
     async getBlockByNumber(number: number): Promise<Block> {
         const hash = await this.substrateClient.rpc.chain.getBlockHash(number);
         return this.getBlockByHash(hash);
+    }
+
+    subscribeToXCMInfo() {
+        const client = new Ably.Realtime(Constants.POLKAHOLIC_ABLY_API_KEY);
+        const channel = client.channels.get('xcminfo');
+        channel.subscribe((message) => {
+            const data = message.data;
+            if (isXCMMessage(data)) {
+                this.eventBus.dispatch<XCMMessage>(ChainvizEvent.NEW_XCM_MESSAGE, data);
+            } else {
+                console.log(JSON.stringify(message));
+            }
+        });
     }
 }
 
