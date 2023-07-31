@@ -1,59 +1,4 @@
 import { Para } from '../model/substrate/para';
-import {
-    chainsAbandPNG,
-    chainsAltairSVG,
-    chainsAmplitudeSVG,
-    chainsDorafactoryPNG,
-    chainsGenshiroSVG,
-    chainsGmJPEG,
-    chainsKaruraSVG,
-    chainsKicoPNG,
-    chainsKintsugiPNG,
-    chainsListenPNG,
-    chainsMangataPNG,
-    chainsRiodefiPNG,
-    chainsShidenPNG,
-    chainsTinkerPNG,
-    chainsTuringPNG,
-    chainsUnorthodoxPNG,
-} from '../ui/para-logos/para-logos';
-import {
-    nodesApronPNG,
-    nodesAresMarsPNG,
-    nodesAssetHubSVG,
-    nodesBajunPNG,
-    nodesBasiliskPNG,
-    nodesBifrostSVG,
-    nodesBitcountryPNG,
-    nodesBridgeHubBlackSVG,
-    nodesCalamariPNG,
-    nodesCrabSVG,
-    nodesDatahighwayPNG,
-    nodesEncointerBlueSVG,
-    nodesImbuePNG,
-    nodesIntegriteeSVG,
-    nodesIpciSVG,
-    nodesKabochaSVG,
-    nodesKhalaSVG,
-    nodesKrestPNG,
-    nodesLitmusPNG,
-    nodesLoomNetworkPNG,
-    nodesMoonriverSVG,
-    nodesParallelSVG,
-    nodesPicassoPNG,
-    nodesPichiuPNG,
-    nodesPolkasmithSVG,
-    nodesQuartzPNG,
-    nodesRobonomicsSVG,
-    nodesSakuraSVG,
-    nodesShadowSVG,
-    nodesSnowPNG,
-    nodesSoraSubstrateSVG,
-    nodesSubgameSVG,
-    nodesSubsocialXSVG,
-    nodesTrustbasePNG,
-    nodesZeroSVG,
-} from '../ui/para-logos/para-logos';
 
 export const KUSAMA_PARAS: Para[] = [
     {
@@ -66,7 +11,7 @@ export const KUSAMA_PARAS: Para[] = [
         text: 'Aband',
         ui: {
             color: '#7358ff',
-            logo: chainsAbandPNG,
+            logo: 'aband.png',
         },
     },
     {
@@ -80,7 +25,7 @@ export const KUSAMA_PARAS: Para[] = [
         text: 'Altair',
         ui: {
             color: '#ffb700',
-            logo: chainsAltairSVG,
+            logo: 'altair.svg',
         },
     },
     {
@@ -94,7 +39,7 @@ export const KUSAMA_PARAS: Para[] = [
         text: 'Amplitude',
         ui: {
             color: '#5DEFA7',
-            logo: chainsAmplitudeSVG,
+            logo: 'amplitude.svg',
         },
     },
     {
@@ -109,7 +54,7 @@ export const KUSAMA_PARAS: Para[] = [
         text: 'Bajun Network',
         ui: {
             color: '#161212',
-            logo: nodesBajunPNG,
+            logo: 'bajun.png',
         },
     },
     {
@@ -124,7 +69,7 @@ export const KUSAMA_PARAS: Para[] = [
         text: 'Basilisk',
         ui: {
             color: '#49E49F',
-            logo: nodesBasiliskPNG,
+            logo: 'basilisk.png',
         },
     },
     {
@@ -139,7 +84,7 @@ export const KUSAMA_PARAS: Para[] = [
         text: 'Bifrost',
         ui: {
             color: '#5a25f0',
-            logo: nodesBifrostSVG,
+            logo: 'bifrost.svg',
         },
     },
     {
@@ -152,7 +97,7 @@ export const KUSAMA_PARAS: Para[] = [
         text: 'Bit.Country Pioneer',
         ui: {
             color: '#000000',
-            logo: nodesBitcountryPNG,
+            logo: 'bitcountry.png',
         },
     },
     {
@@ -165,7 +110,7 @@ export const KUSAMA_PARAS: Para[] = [
         text: 'Calamari',
         ui: {
             color: '#000000',
-            logo: nodesCalamariPNG,
+            logo: 'calamari.png',
         },
     },
     {
@@ -181,7 +126,7 @@ export const KUSAMA_PARAS: Para[] = [
         text: 'Crab2',
         ui: {
             color: '#512DBC',
-            logo: nodesCrabSVG,
+            logo: 'crab.svg',
         },
     },
     {
@@ -193,7 +138,7 @@ export const KUSAMA_PARAS: Para[] = [
         },
         text: 'Crust Shadow',
         ui: {
-            logo: nodesShadowSVG,
+            logo: 'shadow.svg',
         },
     },
     {
@@ -207,7 +152,7 @@ export const KUSAMA_PARAS: Para[] = [
         },
         text: 'Crust Shadow 2',
         ui: {
-            logo: nodesShadowSVG,
+            logo: 'shadow.svg',
         },
     },
     {
@@ -219,7 +164,7 @@ export const KUSAMA_PARAS: Para[] = [
         },
         text: 'DAO IPCI',
         ui: {
-            logo: nodesIpciSVG,
+            logo: 'ipci.svg',
         },
     },
     {
@@ -232,7 +177,7 @@ export const KUSAMA_PARAS: Para[] = [
         text: 'Dora Factory',
         ui: {
             color: '#FF761C',
-            logo: chainsDorafactoryPNG,
+            logo: 'dorafactory.png',
         },
     },
     {
@@ -245,7 +190,7 @@ export const KUSAMA_PARAS: Para[] = [
         text: 'Genshiro',
         ui: {
             color: '#e8662d',
-            logo: chainsGenshiroSVG,
+            logo: 'genshiro.svg',
         },
     },
     {
@@ -259,7 +204,7 @@ export const KUSAMA_PARAS: Para[] = [
         text: 'Genshiro crowdloan 2',
         ui: {
             color: '#e8662d',
-            logo: chainsGenshiroSVG,
+            logo: 'genshiro.svg',
         },
     },
     {
@@ -277,7 +222,7 @@ export const KUSAMA_PARAS: Para[] = [
         text: 'GM',
         ui: {
             color: '#f47b36',
-            logo: chainsGmJPEG,
+            logo: 'gm.jpeg',
         },
     },
     {
@@ -290,7 +235,7 @@ export const KUSAMA_PARAS: Para[] = [
         text: 'Imbue Network',
         ui: {
             color: '#baff36',
-            logo: nodesImbuePNG,
+            logo: 'imbue.png',
         },
     },
     {
@@ -304,7 +249,7 @@ export const KUSAMA_PARAS: Para[] = [
         text: 'Integritee Network',
         ui: {
             color: '#658ea9',
-            logo: nodesIntegriteeSVG,
+            logo: 'integritee.svg',
         },
     },
     {
@@ -319,7 +264,7 @@ export const KUSAMA_PARAS: Para[] = [
         text: 'InvArch Tinkernet',
         ui: {
             color: '#161616',
-            logo: chainsTinkerPNG,
+            logo: 'tinker.png',
         },
     },
     {
@@ -332,7 +277,7 @@ export const KUSAMA_PARAS: Para[] = [
         text: 'Kabocha',
         ui: {
             color: 'repeating-radial-gradient(black, black 4px, yellow 5px)',
-            logo: nodesKabochaSVG,
+            logo: 'kabocha.svg',
         },
     },
     {
@@ -351,7 +296,7 @@ export const KUSAMA_PARAS: Para[] = [
         text: 'Karura',
         ui: {
             color: '#ff4c3b',
-            logo: chainsKaruraSVG,
+            logo: 'karura.svg',
         },
     },
     {
@@ -366,7 +311,7 @@ export const KUSAMA_PARAS: Para[] = [
         text: 'Khala Network',
         ui: {
             color: '#03f3f3',
-            logo: nodesKhalaSVG,
+            logo: 'khala.svg',
         },
     },
     {
@@ -380,7 +325,7 @@ export const KUSAMA_PARAS: Para[] = [
         text: 'KICO',
         ui: {
             color: '#29B58D',
-            logo: chainsKicoPNG,
+            logo: 'kico.png',
         },
     },
     {
@@ -393,7 +338,7 @@ export const KUSAMA_PARAS: Para[] = [
         text: 'KICO 2',
         ui: {
             color: '#29B58D',
-            logo: chainsKicoPNG,
+            logo: 'kico.png',
         },
     },
     {
@@ -409,7 +354,7 @@ export const KUSAMA_PARAS: Para[] = [
         text: 'Kintsugi BTC',
         ui: {
             color: '#1a0a2d',
-            logo: chainsKintsugiPNG,
+            logo: 'kintsugi.png',
         },
     },
     {
@@ -423,7 +368,7 @@ export const KUSAMA_PARAS: Para[] = [
         text: 'Kpron',
         ui: {
             color: 'linear-gradient(45deg, #0099F7 0%, #2E49EB 100%)',
-            logo: nodesApronPNG,
+            logo: 'apron.png',
         },
     },
     {
@@ -435,7 +380,7 @@ export const KUSAMA_PARAS: Para[] = [
         },
         text: 'Krest',
         ui: {
-            logo: nodesKrestPNG,
+            logo: 'krest.png',
         },
     },
     {
@@ -449,7 +394,7 @@ export const KUSAMA_PARAS: Para[] = [
         text: 'Listen Network',
         ui: {
             color: '#FFAD0A',
-            logo: chainsListenPNG,
+            logo: 'listen.png',
         },
     },
     {
@@ -462,7 +407,7 @@ export const KUSAMA_PARAS: Para[] = [
         text: 'Litmus',
         ui: {
             color: '#3913D3',
-            logo: nodesLitmusPNG,
+            logo: 'litmus.png',
         },
     },
     {
@@ -474,7 +419,7 @@ export const KUSAMA_PARAS: Para[] = [
         },
         text: 'Loom Network',
         ui: {
-            logo: nodesLoomNetworkPNG,
+            logo: 'loom_network.png',
         },
     },
     {
@@ -488,7 +433,7 @@ export const KUSAMA_PARAS: Para[] = [
         text: 'Mangata',
         ui: {
             color: '#030408',
-            logo: chainsMangataPNG,
+            logo: 'mangata.png',
         },
     },
     {
@@ -501,7 +446,7 @@ export const KUSAMA_PARAS: Para[] = [
         text: 'Mars',
         ui: {
             color: '#E56239',
-            logo: nodesAresMarsPNG,
+            logo: 'ares-mars.png',
         },
     },
     {
@@ -518,7 +463,7 @@ export const KUSAMA_PARAS: Para[] = [
         text: 'Moonriver',
         ui: {
             color: '#171e43',
-            logo: nodesMoonriverSVG,
+            logo: 'moonriver.svg',
         },
     },
     {
@@ -532,7 +477,7 @@ export const KUSAMA_PARAS: Para[] = [
         text: 'Parallel Heiko',
         ui: {
             color: '#42d5de',
-            logo: nodesParallelSVG,
+            logo: 'parallel.svg',
         },
     },
     {
@@ -544,7 +489,7 @@ export const KUSAMA_PARAS: Para[] = [
         text: 'Parallel Heiko 2',
         ui: {
             color: '#42d5de',
-            logo: nodesParallelSVG,
+            logo: 'parallel.svg',
         },
     },
     {
@@ -559,7 +504,7 @@ export const KUSAMA_PARAS: Para[] = [
         text: 'Picasso',
         ui: {
             color: '#000000',
-            logo: nodesPicassoPNG,
+            logo: 'picasso.png',
         },
     },
     {
@@ -572,7 +517,7 @@ export const KUSAMA_PARAS: Para[] = [
         text: 'Pichiu',
         ui: {
             color: '#ed007e',
-            logo: nodesPichiuPNG,
+            logo: 'pichiu.png',
         },
     },
     {
@@ -585,7 +530,7 @@ export const KUSAMA_PARAS: Para[] = [
         text: 'PolkaSmith by PolkaFoundry',
         ui: {
             color: '#0DDDFB',
-            logo: nodesPolkasmithSVG,
+            logo: 'polkasmith.svg',
         },
     },
     {
@@ -602,7 +547,7 @@ export const KUSAMA_PARAS: Para[] = [
         text: 'QUARTZ by UNIQUE',
         ui: {
             color: '#FF4D6A',
-            logo: nodesQuartzPNG,
+            logo: 'quartz.png',
         },
     },
     {
@@ -615,7 +560,7 @@ export const KUSAMA_PARAS: Para[] = [
         text: 'RioDeFi',
         ui: {
             color: '#4E7AED',
-            logo: chainsRiodefiPNG,
+            logo: 'riodefi.png',
         },
     },
     {
@@ -631,7 +576,7 @@ export const KUSAMA_PARAS: Para[] = [
         text: 'Robonomics',
         ui: {
             color: '#2949d3',
-            logo: nodesRobonomicsSVG,
+            logo: 'robonomics.svg',
         },
     },
     {
@@ -648,7 +593,7 @@ export const KUSAMA_PARAS: Para[] = [
         text: 'Robonomics 2',
         ui: {
             color: '#2949d3',
-            logo: nodesRobonomicsSVG,
+            logo: 'robonomics.svg',
         },
     },
     {
@@ -662,7 +607,7 @@ export const KUSAMA_PARAS: Para[] = [
         text: 'Sakura',
         ui: {
             color: '#ff5995',
-            logo: nodesSakuraSVG,
+            logo: 'sakura.svg',
         },
     },
     {
@@ -679,7 +624,7 @@ export const KUSAMA_PARAS: Para[] = [
         text: 'Shiden',
         ui: {
             color: '#5923B2',
-            logo: chainsShidenPNG,
+            logo: 'shiden.png',
         },
     },
     {
@@ -693,7 +638,7 @@ export const KUSAMA_PARAS: Para[] = [
         text: 'Shiden Crowdloan 2',
         ui: {
             color: '#5923B2',
-            logo: chainsShidenPNG,
+            logo: 'shiden.png',
         },
     },
     {
@@ -705,7 +650,7 @@ export const KUSAMA_PARAS: Para[] = [
         },
         text: 'SNOW Network',
         ui: {
-            logo: nodesSnowPNG,
+            logo: 'snow.png',
         },
     },
     {
@@ -718,7 +663,7 @@ export const KUSAMA_PARAS: Para[] = [
         text: 'SORA',
         ui: {
             color: '#2D2926',
-            logo: nodesSoraSubstrateSVG,
+            logo: 'sora-substrate.svg',
         },
     },
     {
@@ -731,7 +676,7 @@ export const KUSAMA_PARAS: Para[] = [
         text: 'SubGame Gamma',
         ui: {
             color: '#EB027D',
-            logo: nodesSubgameSVG,
+            logo: 'subgame.svg',
         },
     },
     {
@@ -744,7 +689,7 @@ export const KUSAMA_PARAS: Para[] = [
         text: 'SubsocialX',
         ui: {
             color: '#69058C',
-            logo: nodesSubsocialXSVG,
+            logo: 'subsocialX.svg',
         },
     },
     {
@@ -757,7 +702,7 @@ export const KUSAMA_PARAS: Para[] = [
         text: 'subzero',
         ui: {
             color: '#000000',
-            logo: nodesZeroSVG,
+            logo: 'zero.svg',
         },
     },
     {
@@ -770,7 +715,7 @@ export const KUSAMA_PARAS: Para[] = [
         text: 'Tanganika',
         ui: {
             color: 'linear-gradient(-90deg, #9400D3 0%, #5A5CA9 50%, #00BFFF 100%)',
-            logo: nodesDatahighwayPNG,
+            logo: 'datahighway.png',
         },
     },
     {
@@ -782,7 +727,7 @@ export const KUSAMA_PARAS: Para[] = [
         text: 'TrustBase',
         ui: {
             color: '#ff43aa',
-            logo: nodesTrustbasePNG,
+            logo: 'trustbase.png',
         },
     },
     {
@@ -796,7 +741,7 @@ export const KUSAMA_PARAS: Para[] = [
         text: 'Turing Network',
         ui: {
             color: '#A8278C',
-            logo: chainsTuringPNG,
+            logo: 'turing.png',
         },
     },
     {
@@ -809,7 +754,7 @@ export const KUSAMA_PARAS: Para[] = [
         text: 'Unorthodox',
         ui: {
             color: 'radial-gradient(circle, rgba(255,255,255,1) 0%, rgba(42,244,187,1) 35%, rgba(10,10,10,1) 100%)',
-            logo: chainsUnorthodoxPNG,
+            logo: 'unorthodox.png',
         },
     },
     {
@@ -829,7 +774,7 @@ export const KUSAMA_PARAS: Para[] = [
         text: 'AssetHub',
         ui: {
             color: '#113911',
-            logo: nodesAssetHubSVG,
+            logo: 'assetHub.svg',
         },
     },
     {
@@ -844,7 +789,7 @@ export const KUSAMA_PARAS: Para[] = [
         },
         text: 'BridgeHub',
         ui: {
-            logo: nodesBridgeHubBlackSVG,
+            logo: 'bridgeHubBlack.svg',
         },
     },
     {
@@ -861,7 +806,7 @@ export const KUSAMA_PARAS: Para[] = [
         text: 'Encointer Network',
         ui: {
             color: '#0000cc',
-            logo: nodesEncointerBlueSVG,
+            logo: 'encointer-blue.svg',
         },
     },
 ];

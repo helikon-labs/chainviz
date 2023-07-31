@@ -1,56 +1,4 @@
 import { Para } from '../model/substrate/para';
-import {
-    chainsAcalaSVG,
-    chainsBitgreenPNG,
-    chainsComposableFinancePNG,
-    chainsEquilibriumSVG,
-    chainsFrequencySVG,
-    chainsGeminisPNG,
-    chainsInvarchJPEG,
-    chainsOakPNG,
-    chainsOrigintrailPNG,
-    chainsPeaqPNG,
-    chainsPendulumSVG,
-    chainsSnakenetSVG,
-    chainsTotemSVG,
-    chainsWatrPNG,
-} from '../ui/para-logos/para-logos';
-import {
-    nodesAjunaPNG,
-    nodesAresOdysseySVG,
-    nodesAssetHubSVG,
-    nodesAstarPNG,
-    nodesAventusSVG,
-    nodesBifrostSVG,
-    nodesBridgeHubSVG,
-    nodesCentrifugePNG,
-    nodesCloverSVG,
-    nodesCoinversationPNG,
-    nodesCrustParachainSVG,
-    nodesDarwiniaSVG,
-    nodesEfinitySVG,
-    nodesHashedPNG,
-    nodesIntegriteeSVG,
-    nodesInterlaySVG,
-    nodesKiltPNG,
-    nodesKylinPNG,
-    nodesLitentryPNG,
-    nodesMantaPNG,
-    nodesMoonbeamSVG,
-    nodesMoonsamaSVG,
-    nodesNodleSVG,
-    nodesOmnibtcSVG,
-    nodesParallelSVG,
-    nodesPhalaSVG,
-    nodesPolkadexSVG,
-    nodesSoraSubstrateSVG,
-    nodesSubdaoPNG,
-    nodesSubgameSVG,
-    nodesSubsocialSVG,
-    nodesT3rnPNG,
-    nodesUniqueSVG,
-    nodesZeitgeistPNG,
-} from '../ui/para-logos/para-logos';
 
 export const POLKADOT_PARAS: Para[] = [
     {
@@ -70,7 +18,7 @@ export const POLKADOT_PARAS: Para[] = [
         text: 'Acala',
         ui: {
             color: '#645AFF',
-            logo: chainsAcalaSVG,
+            logo: 'acala.svg',
         },
     },
     {
@@ -85,7 +33,7 @@ export const POLKADOT_PARAS: Para[] = [
         text: 'Ajuna Network',
         ui: {
             color: '#161212',
-            logo: nodesAjunaPNG,
+            logo: 'ajuna.png',
         },
     },
     {
@@ -98,7 +46,7 @@ export const POLKADOT_PARAS: Para[] = [
         text: 'Ares Odyssey',
         ui: {
             color: '#1295F0',
-            logo: nodesAresOdysseySVG,
+            logo: 'ares-odyssey.svg',
         },
     },
     {
@@ -117,7 +65,7 @@ export const POLKADOT_PARAS: Para[] = [
         text: 'Astar',
         ui: {
             color: '#1b6dc1d9',
-            logo: nodesAstarPNG,
+            logo: 'astar.png',
         },
     },
     {
@@ -130,7 +78,7 @@ export const POLKADOT_PARAS: Para[] = [
         text: 'Aventus',
         ui: {
             color: '#1d2733',
-            logo: nodesAventusSVG,
+            logo: 'aventus.svg',
         },
     },
     {
@@ -144,7 +92,7 @@ export const POLKADOT_PARAS: Para[] = [
         text: 'Bifrost',
         ui: {
             color: '#5a25f0',
-            logo: nodesBifrostSVG,
+            logo: 'bifrost.svg',
         },
     },
     {
@@ -157,7 +105,7 @@ export const POLKADOT_PARAS: Para[] = [
         text: 'Bitgreen',
         ui: {
             color: '#224851',
-            logo: chainsBitgreenPNG,
+            logo: 'bitgreen.png',
         },
     },
     {
@@ -172,7 +120,7 @@ export const POLKADOT_PARAS: Para[] = [
         text: 'Centrifuge',
         ui: {
             color: '#fcc367',
-            logo: nodesCentrifugePNG,
+            logo: 'centrifuge.png',
         },
     },
     {
@@ -186,7 +134,7 @@ export const POLKADOT_PARAS: Para[] = [
         text: 'Clover',
         ui: {
             color: 'linear-gradient(to right, #52ad75, #7cc773)',
-            logo: nodesCloverSVG,
+            logo: 'clover.svg',
         },
     },
     {
@@ -199,7 +147,7 @@ export const POLKADOT_PARAS: Para[] = [
         text: 'Coinversation',
         ui: {
             color: '#e6017a',
-            logo: nodesCoinversationPNG,
+            logo: 'coinversation.png',
         },
     },
     {
@@ -214,7 +162,7 @@ export const POLKADOT_PARAS: Para[] = [
         text: 'Composable Finance',
         ui: {
             color: '#C90E8A',
-            logo: chainsComposableFinancePNG,
+            logo: 'composableFinance.png',
         },
     },
     {
@@ -226,7 +174,7 @@ export const POLKADOT_PARAS: Para[] = [
         },
         text: 'Crust',
         ui: {
-            logo: nodesCrustParachainSVG,
+            logo: 'crustParachain.svg',
         },
     },
     {
@@ -241,7 +189,7 @@ export const POLKADOT_PARAS: Para[] = [
         text: 'Darwinia2',
         ui: {
             color: '#FF0083',
-            logo: nodesDarwiniaSVG,
+            logo: 'darwinia.svg',
         },
     },
     {
@@ -260,7 +208,7 @@ export const POLKADOT_PARAS: Para[] = [
         text: 'Efinity',
         ui: {
             color: '#496ddb',
-            logo: nodesEfinitySVG,
+            logo: 'efinity.svg',
         },
     },
     {
@@ -274,7 +222,7 @@ export const POLKADOT_PARAS: Para[] = [
         text: 'Equilibrium',
         ui: {
             color: '#1792ff',
-            logo: chainsEquilibriumSVG,
+            logo: 'equilibrium.svg',
         },
     },
     {
@@ -289,7 +237,7 @@ export const POLKADOT_PARAS: Para[] = [
         text: 'Frequency',
         ui: {
             color: '#4b64ff',
-            logo: chainsFrequencySVG,
+            logo: 'frequency.svg',
         },
     },
     {
@@ -302,7 +250,7 @@ export const POLKADOT_PARAS: Para[] = [
         },
         text: 'Geminis',
         ui: {
-            logo: chainsGeminisPNG,
+            logo: 'geminis.png',
         },
     },
     {
@@ -317,7 +265,7 @@ export const POLKADOT_PARAS: Para[] = [
         text: 'Hashed Network',
         ui: {
             color: '#9199A9',
-            logo: nodesHashedPNG,
+            logo: 'hashed.png',
         },
     },
     {
@@ -334,7 +282,7 @@ export const POLKADOT_PARAS: Para[] = [
         text: 'HydraDX',
         ui: {
             color: '#f653a2',
-            logo: chainsSnakenetSVG,
+            logo: 'snakenet.svg',
         },
     },
     {
@@ -348,7 +296,7 @@ export const POLKADOT_PARAS: Para[] = [
         text: 'Integritee Shell',
         ui: {
             color: '#658ea9',
-            logo: nodesIntegriteeSVG,
+            logo: 'integritee.svg',
         },
     },
     {
@@ -364,7 +312,7 @@ export const POLKADOT_PARAS: Para[] = [
         text: 'Interlay',
         ui: {
             color: '#3E96FF',
-            logo: nodesInterlaySVG,
+            logo: 'interlay.svg',
         },
     },
     {
@@ -375,7 +323,7 @@ export const POLKADOT_PARAS: Para[] = [
         text: 'InvArch',
         ui: {
             color: 'linear-gradient(156deg, rgba(245,129,246,1) 0%, rgba(91,221,238,1) 100%)',
-            logo: chainsInvarchJPEG,
+            logo: 'invarch.jpeg',
         },
     },
     {
@@ -389,7 +337,7 @@ export const POLKADOT_PARAS: Para[] = [
         text: 'Kapex',
         ui: {
             color: 'linear-gradient(158deg, rgba(226,157,0,1) 0%, rgba(234,55,203,1) 100%)',
-            logo: chainsTotemSVG,
+            logo: 'totem.svg',
         },
     },
     {
@@ -404,7 +352,7 @@ export const POLKADOT_PARAS: Para[] = [
         text: 'KILT Spiritnet',
         ui: {
             color: '#8c145a',
-            logo: nodesKiltPNG,
+            logo: 'kilt.png',
         },
     },
     {
@@ -417,7 +365,7 @@ export const POLKADOT_PARAS: Para[] = [
         text: 'Kylin',
         ui: {
             color: '#ed007e',
-            logo: nodesKylinPNG,
+            logo: 'kylin.png',
         },
     },
     {
@@ -431,7 +379,7 @@ export const POLKADOT_PARAS: Para[] = [
         text: 'Litentry',
         ui: {
             color: '#15B786',
-            logo: nodesLitentryPNG,
+            logo: 'litentry.png',
         },
     },
     {
@@ -444,7 +392,7 @@ export const POLKADOT_PARAS: Para[] = [
         text: 'Manta',
         ui: {
             color: '#2070a6',
-            logo: nodesMantaPNG,
+            logo: 'manta.png',
         },
     },
     {
@@ -462,7 +410,7 @@ export const POLKADOT_PARAS: Para[] = [
         text: 'Moonbeam',
         ui: {
             color: '#53cbc9',
-            logo: nodesMoonbeamSVG,
+            logo: 'moonbeam.svg',
         },
     },
     {
@@ -475,7 +423,7 @@ export const POLKADOT_PARAS: Para[] = [
         text: 'Moonsama',
         ui: {
             color: '#1a202c',
-            logo: nodesMoonsamaSVG,
+            logo: 'moonsama.svg',
         },
     },
     {
@@ -489,7 +437,7 @@ export const POLKADOT_PARAS: Para[] = [
         text: 'Nodle',
         ui: {
             color: '#1ab394',
-            logo: nodesNodleSVG,
+            logo: 'nodle.svg',
         },
     },
     {
@@ -503,7 +451,7 @@ export const POLKADOT_PARAS: Para[] = [
         text: 'OAK Network',
         ui: {
             color: '#A8278C',
-            logo: chainsOakPNG,
+            logo: 'oak.png',
         },
     },
     {
@@ -517,7 +465,7 @@ export const POLKADOT_PARAS: Para[] = [
         text: 'OmniBTC',
         ui: {
             color: '#6759E9',
-            logo: nodesOmnibtcSVG,
+            logo: 'omnibtc.svg',
         },
     },
     {
@@ -530,7 +478,7 @@ export const POLKADOT_PARAS: Para[] = [
         text: 'OriginTrail',
         ui: {
             color: '#FB5DEB',
-            logo: chainsOrigintrailPNG,
+            logo: 'origintrail.png',
         },
     },
     {
@@ -544,7 +492,7 @@ export const POLKADOT_PARAS: Para[] = [
         text: 'Parallel',
         ui: {
             color: '#ef18ac',
-            logo: nodesParallelSVG,
+            logo: 'parallel.svg',
         },
     },
     {
@@ -554,7 +502,7 @@ export const POLKADOT_PARAS: Para[] = [
         providers: {},
         text: 'peaq',
         ui: {
-            logo: chainsPeaqPNG,
+            logo: 'peaq.png',
         },
     },
     {
@@ -567,7 +515,7 @@ export const POLKADOT_PARAS: Para[] = [
         text: 'Pendulum',
         ui: {
             color: '#49E2FD',
-            logo: chainsPendulumSVG,
+            logo: 'pendulum.svg',
         },
     },
     {
@@ -582,7 +530,7 @@ export const POLKADOT_PARAS: Para[] = [
         text: 'Phala Network',
         ui: {
             color: '#c6fa4c',
-            logo: nodesPhalaSVG,
+            logo: 'phala.svg',
         },
     },
     {
@@ -595,7 +543,7 @@ export const POLKADOT_PARAS: Para[] = [
         text: 'Polkadex',
         ui: {
             color: '#7C30DD',
-            logo: nodesPolkadexSVG,
+            logo: 'polkadex.svg',
         },
     },
     {
@@ -608,7 +556,7 @@ export const POLKADOT_PARAS: Para[] = [
         text: 'SORA',
         ui: {
             color: '#2D2926',
-            logo: nodesSoraSubstrateSVG,
+            logo: 'sora-substrate.svg',
         },
     },
     {
@@ -622,7 +570,7 @@ export const POLKADOT_PARAS: Para[] = [
         text: 'SubDAO',
         ui: {
             color: 'linear-gradient(50deg, #F20092 0%, #FF4D5D 100%)',
-            logo: nodesSubdaoPNG,
+            logo: 'subdao.png',
         },
     },
     {
@@ -635,7 +583,7 @@ export const POLKADOT_PARAS: Para[] = [
         text: 'SubGame Gamma',
         ui: {
             color: '#EB027D',
-            logo: nodesSubgameSVG,
+            logo: 'subgame.svg',
         },
     },
     {
@@ -648,7 +596,7 @@ export const POLKADOT_PARAS: Para[] = [
         text: 'Subsocial',
         ui: {
             color: '#b9018c',
-            logo: nodesSubsocialSVG,
+            logo: 'subsocial.svg',
         },
     },
     {
@@ -661,7 +609,7 @@ export const POLKADOT_PARAS: Para[] = [
         text: 't3rn',
         ui: {
             color: '#6f3bb2',
-            logo: nodesT3rnPNG,
+            logo: 't3rn.png',
         },
     },
     {
@@ -678,7 +626,7 @@ export const POLKADOT_PARAS: Para[] = [
         text: 'Unique Network',
         ui: {
             color: '#40BCFF',
-            logo: nodesUniqueSVG,
+            logo: 'unique.svg',
         },
     },
     {
@@ -691,7 +639,7 @@ export const POLKADOT_PARAS: Para[] = [
         text: 'Watr Network',
         ui: {
             color: '#373b39',
-            logo: chainsWatrPNG,
+            logo: 'watr.png',
         },
     },
     {
@@ -706,7 +654,7 @@ export const POLKADOT_PARAS: Para[] = [
         text: 'Zeitgeist',
         ui: {
             color: 'linear-gradient(180deg, rgba(32,90,172,1) 0%, rgba(26,72,138,1) 50%, rgba(13,36,69,1) 100%)',
-            logo: nodesZeitgeistPNG,
+            logo: 'zeitgeist.png',
         },
     },
     {
@@ -726,7 +674,7 @@ export const POLKADOT_PARAS: Para[] = [
         text: 'AssetHub',
         ui: {
             color: '#86e62a',
-            logo: nodesAssetHubSVG,
+            logo: 'AssetHub.svg',
         },
     },
     {
@@ -741,7 +689,7 @@ export const POLKADOT_PARAS: Para[] = [
         },
         text: 'BridgeHub',
         ui: {
-            logo: nodesBridgeHubSVG,
+            logo: 'bridgeHub.svg',
         },
     },
     {

@@ -151,40 +151,50 @@ class Chainviz3DScene {
     }
 
     initParachains(paras: Para[]) {
-        const material = new THREE.LineBasicMaterial({
+        const lineMaterial = new THREE.LineBasicMaterial({
             color: 0xffffff,
             transparent: true,
-            opacity: 0.5,
+            opacity: 0.2,
         });
-        material.opacity = 0.3;
-        let points = [];
-        points.push(new THREE.Vector3(-75, 0, 0));
-        points.push(new THREE.Vector3(75, 0, 0));
-        let lineGeometry = new THREE.BufferGeometry().setFromPoints(points);
-        let line = new THREE.Line(lineGeometry, material);
+        let linePoints = [];
+        linePoints.push(new THREE.Vector3(-75, 0, 0));
+        linePoints.push(new THREE.Vector3(75, 0, 0));
+        let lineGeometry = new THREE.BufferGeometry().setFromPoints(linePoints);
+        let line = new THREE.Line(lineGeometry, lineMaterial);
         this.scene.add(line);
 
-        points = [];
-        points.push(new THREE.Vector3(0, 53, 0));
-        points.push(new THREE.Vector3(0, -53, 0));
-        lineGeometry = new THREE.BufferGeometry().setFromPoints(points);
-        line = new THREE.Line(lineGeometry, material);
+        linePoints = [];
+        linePoints.push(new THREE.Vector3(0, 53, 0));
+        linePoints.push(new THREE.Vector3(0, -53, 0));
+        lineGeometry = new THREE.BufferGeometry().setFromPoints(linePoints);
+        line = new THREE.Line(lineGeometry, lineMaterial);
         this.scene.add(line);
 
         const radius = 48;
         const delta = (Math.PI / paras.length) * 2;
         let current = 0.0;
-        const geometry = new THREE.CircleGeometry(1.35, 24, 24);
+        const backgroundGeometry = new THREE.CircleGeometry(1.75, 32, 32);
+        const logoGeometry = new THREE.CircleGeometry(1.6, 32, 32);
+        const backgroundMaterial = new THREE.MeshBasicMaterial({
+            color: 0xffffff,
+            transparent: true,
+            opacity: 0.25,
+        });
         for (const para of paras) {
-            const texture = new THREE.TextureLoader().load(para.ui.logo);
-            const material = new THREE.MeshBasicMaterial({
-                map: texture,
+            // add background circle
+            const background = new THREE.Mesh(backgroundGeometry, backgroundMaterial);
+            background.position.set(Math.sin(current) * radius, Math.cos(current) * radius, 0);
+            this.scene.add(background);
+            // add logo
+            const logoTexture = new THREE.TextureLoader().load('/img/paras/' + para.ui.logo);
+            const logoMaterial = new THREE.MeshBasicMaterial({
+                map: logoTexture,
                 transparent: true,
-                opacity: 0.75,
+                opacity: 0.6,
             });
-            const mesh = new THREE.Mesh(geometry, material);
-            mesh.position.set(Math.sin(current) * radius, Math.cos(current) * radius, 0);
-            this.scene.add(mesh);
+            const logo = new THREE.Mesh(logoGeometry, logoMaterial);
+            logo.position.set(Math.sin(current) * radius, Math.cos(current) * radius, 0);
+            this.scene.add(logo);
             current += delta;
         }
     }
