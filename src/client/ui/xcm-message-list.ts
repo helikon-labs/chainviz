@@ -58,13 +58,9 @@ class XCMMessageList {
             );
         }
 
-        let originId = relayChain.id;
-        if (originPara) {
-            originId = originPara.info;
-        }
         setTimeout(() => {
             const messageDiv = document.getElementById(`xcm-message-${originExtrinsicHash}`);
-            const url = `https://${originId}.polkaholic.io/tx/${originExtrinsicHash}`;
+            const url = `https://polkaholic.io/tx/${originExtrinsicHash}`;
             messageDiv?.addEventListener('click', (_event) => {
                 window.open(url);
             });
