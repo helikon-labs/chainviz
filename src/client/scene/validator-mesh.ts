@@ -1,6 +1,8 @@
 import * as THREE from 'three';
 import { ValidatorSummary } from '../model/subvt/validator-summary';
 import { Constants } from '../util/constants';
+import { createTween } from '../util/tween';
+import * as TWEEN from '@tweenjs/tween.js';
 
 const VALIDATOR_GEOMETRY = new THREE.SphereGeometry(
     Constants.VALIDATOR_SPHERE_MAX_RADIUS,
@@ -34,7 +36,6 @@ class ValidatorArc {
         validatorMap: Map<string, ValidatorSummary>,
         maxRewardPoints: number,
         arcIndex: number,
-        arcCount: number,
     ) {
         const arcPoints = ARC_CURVE.getPoints(Constants.VALIDATOR_ARC_POINTS);
         const arcGeometry = new THREE.BufferGeometry().setFromPoints(arcPoints);
@@ -52,7 +53,7 @@ class ValidatorArc {
         for (let j = 0; j < validatorMapKeys.length; j++) {
             const validator = validatorMap.get(validatorMapKeys[j])!;
             const object = new THREE.Object3D();
-            object.translateX(Constants.VALIDATOR_ARC_RADIUS * Math.sin(currentAngle));
+            object.translateX(-Constants.VALIDATOR_ARC_RADIUS * Math.sin(currentAngle));
             object.translateY(Constants.VALIDATOR_ARC_RADIUS * Math.cos(currentAngle));
             const scale = Math.max(
                 validator.rewardPoints / maxRewardPoints,
@@ -68,7 +69,7 @@ class ValidatorArc {
         const group = new THREE.Group();
         group.add(this.mesh);
         group.add(this.arc);
-        group.rotateY(arcIndex * ((2 * Math.PI) / arcCount));
+        // group.rotateY(arcIndex * ((2 * Math.PI) / arcCount));
         group.updateMatrix();
         this.group = group;
     }
@@ -80,7 +81,6 @@ class ValidatorArc {
 
 class ValidatorMesh {
     private readonly group: THREE.Group;
-    private rotationY = 0;
 
     constructor() {
         this.group = new THREE.Group();
@@ -100,7 +100,7 @@ class ValidatorMesh {
             const beginIndex = i * validatorsPerArc;
             const endIndex = Math.min(i * validatorsPerArc + validatorsPerArc, validatorMap.size);
             const arcValidatorMap = new Map(Array.from(validatorMap).slice(beginIndex, endIndex));
-            const arc = new ValidatorArc(arcValidatorMap, maxRewardPoints, i, arcCount);
+            const arc = new ValidatorArc(arcValidatorMap, maxRewardPoints, i);
             arc.addToGroup(this.group);
         }
         this.group.rotateX(Constants.VALIDATOR_MESH_ROTATE_X);
@@ -108,6 +108,24 @@ class ValidatorMesh {
 
     addToScene(scene: THREE.Scene) {
         scene.add(this.group);
+        const progress = { progress: 0.0 };
+        const arcCount = this.group.children.length;
+        setTimeout(() => {
+            createTween(
+                progress,
+                { progress: 1.0 },
+                TWEEN.Easing.Exponential.InOut,
+                2000,
+                undefined,
+                () => {
+                    for (let i = 0; i < arcCount; i++) {
+                        const rotationY = i * ((2 * Math.PI) / arcCount) * progress.progress;
+                        this.group.children[i].rotation.y = rotationY;
+                        this.group.children[i].updateMatrix();
+                    }
+                },
+            ).start();
+        }, 1400);
     }
 
     animate() {
