@@ -193,10 +193,7 @@ class Chainviz {
     onActiveValidatorListServiceDisconnected() {}
 
     onActiveValidatorListServiceSubscribed() {
-        this.ui.setLoadingInfo('validator service subscribed');
-        setTimeout(() => {
-            this.getParas();
-        }, Constants.UI_STATE_CHANGE_DELAY_MS);
+        this.ui.setLoadingInfo('validator service subscribed<br>waiting for data');
     }
 
     onActiveValidatorListServiceUnsubscribed() {}
@@ -244,6 +241,11 @@ class Chainviz {
     }
 
     private onActiveValidatorListUpdate(update: ValidatorListUpdate) {
+        if (this.validatorMap.size == 0) {
+            setTimeout(() => {
+                this.getParas();
+            }, Constants.UI_STATE_CHANGE_DELAY_MS);
+        }
         for (const validator of update.insert) {
             this.validatorMap.set(validator.address, validator);
         }
@@ -317,7 +319,7 @@ class Chainviz {
     start() {
         this.started = true;
         this.ui.initializeSlots(this.slots);
-        this.scene.start(this.paras);
+        this.scene.start(this.paras, this.validatorMap);
         this.dataStore.subsribeToNewBlocks();
         this.dataStore.subsribeToFinalizedBlocks();
         this.ui.start();

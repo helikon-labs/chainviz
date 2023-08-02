@@ -1,10 +1,11 @@
 import * as THREE from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
 import Stats from 'three/examples/jsm/libs/stats.module';
-import * as Visibility from 'visibilityjs';
 import { Constants } from '../util/constants';
-import { createTween } from '../util/tween';
 import { Para } from '../model/substrate/para';
+import { ValidatorSummary } from '../model/subvt/validator-summary';
+import { ValidatorMesh } from './validator-mesh';
+import { ParaMesh } from './para-mesh';
 
 class Chainviz3DScene {
     private readonly scene: THREE.Scene;
@@ -13,9 +14,13 @@ class Chainviz3DScene {
     private readonly renderer: THREE.WebGLRenderer;
     private readonly stats: Stats;
     private readonly container: HTMLDivElement;
+    private readonly paraMesh: ParaMesh;
+    private readonly validatorMesh: ValidatorMesh;
 
     constructor(container: HTMLDivElement) {
         this.container = container;
+        this.paraMesh = new ParaMesh();
+        this.validatorMesh = new ValidatorMesh();
         this.scene = new THREE.Scene();
         this.camera = new THREE.PerspectiveCamera(
             20,
@@ -47,7 +52,6 @@ class Chainviz3DScene {
         // orbit controls
         this.controls = new OrbitControls(this.camera, this.renderer.domElement);
         this.controls.enabled = false;
-        // this.limitOrbitControls();
         window.addEventListener(
             'resize',
             () => {
@@ -55,53 +59,6 @@ class Chainviz3DScene {
             },
             false,
         );
-    }
-
-    private resetCamera() {
-        if (Visibility.hidden()) {
-            this.camera.position.x = 0;
-            this.camera.position.y = 0;
-            this.camera.position.z = Constants.ORBIT_DEFAULT_DISTANCE;
-            return;
-        }
-
-        createTween(
-            this.camera.position,
-            {
-                x: 0,
-                y: 0,
-                z: Constants.ORBIT_DEFAULT_DISTANCE,
-            },
-            Constants.CAMERA_RESET_ANIM_CURVE,
-            Constants.CAMERA_RESET_ANIM_LENGTH_MS,
-            undefined,
-            undefined,
-            () => {
-                this.camera.rotation.x = 0;
-                this.camera.rotation.y = 0;
-                this.camera.rotation.z = 0;
-                this.controls.enabled = true;
-            },
-        ).start();
-    }
-
-    private limitOrbitControls() {
-        this.controls.minPolarAngle = Constants.ORBIT_MIN_POLAR_ANGLE;
-        this.controls.maxPolarAngle = Constants.ORBIT_MAX_POLAR_ANGLE;
-        this.controls.minAzimuthAngle = Constants.ORBIT_MIN_AZIMUTH_ANGLE;
-        this.controls.maxAzimuthAngle = Constants.ORBIT_MAX_AZIMUTH_ANGLE;
-        this.controls.minDistance = Constants.ORBIT_MIN_DISTANCE;
-        this.controls.maxDistance = Constants.ORBIT_MAX_DISTANCE;
-        this.controls.screenSpacePanning = true;
-        const minPan = new THREE.Vector3(-Constants.ORBIT_MAX_PAN_X, -Constants.ORBIT_MAX_PAN_Y, 0);
-        const maxPan = new THREE.Vector3(Constants.ORBIT_MAX_PAN_X, Constants.ORBIT_MAX_PAN_Y, 0);
-        const _v = new THREE.Vector3();
-        this.controls.addEventListener('change', () => {
-            _v.copy(this.controls.target);
-            this.controls.target.clamp(minPan, maxPan);
-            _v.sub(this.controls.target);
-            this.camera.position.sub(_v);
-        });
     }
 
     private onClick(_event: MouseEvent) {}
@@ -120,8 +77,9 @@ class Chainviz3DScene {
             this.animate();
         });
         this.controls.update();
-        this.render();
         this.stats.update();
+        this.render();
+        this.validatorMesh.animate();
     }
 
     private setPointerCursor() {
@@ -145,58 +103,27 @@ class Chainviz3DScene {
         );
     }
 
-    start(paras: Para[]) {
+    start(paras: Para[], validatorMap: Map<string, ValidatorSummary>) {
         this.animate();
+        const relayChainValidatorMap = new Map<string, ValidatorSummary>();
+        for (const key of validatorMap.keys()) {
+            const validator = validatorMap.get(key)!;
+            if (!validator.isParaValidator) {
+                relayChainValidatorMap.set(key, validator);
+            }
+        }
         this.initParachains(paras);
+        this.initValidators(relayChainValidatorMap);
     }
 
-    initParachains(paras: Para[]) {
-        const lineMaterial = new THREE.LineBasicMaterial({
-            color: 0xffffff,
-            transparent: true,
-            opacity: 0.2,
-        });
-        let linePoints = [];
-        linePoints.push(new THREE.Vector3(-75, 0, 0));
-        linePoints.push(new THREE.Vector3(75, 0, 0));
-        let lineGeometry = new THREE.BufferGeometry().setFromPoints(linePoints);
-        let line = new THREE.Line(lineGeometry, lineMaterial);
-        this.scene.add(line);
+    private initParachains(paras: Para[]) {
+        this.paraMesh.init(paras);
+        this.paraMesh.addToScene(this.scene);
+    }
 
-        linePoints = [];
-        linePoints.push(new THREE.Vector3(0, 53, 0));
-        linePoints.push(new THREE.Vector3(0, -53, 0));
-        lineGeometry = new THREE.BufferGeometry().setFromPoints(linePoints);
-        line = new THREE.Line(lineGeometry, lineMaterial);
-        this.scene.add(line);
-
-        const radius = 48;
-        const delta = (Math.PI / paras.length) * 2;
-        let current = 0.0;
-        const backgroundGeometry = new THREE.CircleGeometry(1.75, 32, 32);
-        const logoGeometry = new THREE.CircleGeometry(1.6, 32, 32);
-        const backgroundMaterial = new THREE.MeshBasicMaterial({
-            color: 0xffffff,
-            transparent: true,
-            opacity: 0.25,
-        });
-        for (const para of paras) {
-            // add background circle
-            const background = new THREE.Mesh(backgroundGeometry, backgroundMaterial);
-            background.position.set(Math.sin(current) * radius, Math.cos(current) * radius, 0);
-            this.scene.add(background);
-            // add logo
-            const logoTexture = new THREE.TextureLoader().load('/img/paras/' + para.ui.logo);
-            const logoMaterial = new THREE.MeshBasicMaterial({
-                map: logoTexture,
-                transparent: true,
-                opacity: 0.6,
-            });
-            const logo = new THREE.Mesh(logoGeometry, logoMaterial);
-            logo.position.set(Math.sin(current) * radius, Math.cos(current) * radius, 0);
-            this.scene.add(logo);
-            current += delta;
-        }
+    private initValidators(validatorMap: Map<string, ValidatorSummary>) {
+        this.validatorMesh.init(validatorMap);
+        this.validatorMesh.addToScene(this.scene);
     }
 }
 

@@ -6,8 +6,10 @@
 body {
     overflow: hidden;
     margin: 0px;
-    background-color: #000000dd;
-    color: #ffffffe9;
+    /*background-color: #000000dd;*/
+    background-color: #000000;
+    /*color: #ffffffe9;*/
+    color: #ffffff;
     font-family: 'Mont';
     font-variant-numeric: tabular-nums;
     font-size: 14px;
