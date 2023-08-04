@@ -116,10 +116,10 @@ class Chainviz3DScene {
         this.validatorMeshIsRotating = true;
     }
 
-    reset() {
+    reset(onComplete?: () => void) {
         this.validatorMeshIsRotating = false;
         this.paraMesh.reset();
-        this.validatorMesh.reset();
+        this.validatorMesh.reset(onComplete);
     }
 }
 

@@ -43,21 +43,6 @@ class NetworkStatusBoard {
         };
     }
 
-    reset() {
-        this.ui.bestBlock.innerHTML = '-';
-        this.ui.finalizedBlock.innerHTML = '-';
-        this.ui.eraIndex.innerHTML = '-';
-        this.ui.eraRewardPoints.innerHTML = '-';
-        this.ui.totalStakeTitle.innerHTML = 'Total Stake';
-        this.ui.totalStake.innerHTML = '-';
-        this.ui.minStakeTitle.innerHTML = 'Min Stake';
-        this.ui.minStake.innerHTML = '-';
-        this.ui.maxStakeTitle.innerHTML = 'Max Stake';
-        this.ui.maxStake.innerHTML = '-';
-        this.ui.averageStakeTitle.innerHTML = 'Avg Stake';
-        this.ui.averageStake.innerHTML = '-';
-    }
-
     display(network: Network, status: NetworkStatus) {
         this.ui.bestBlock.innerHTML = status.bestBlockNumber.toString();
         this.ui.finalizedBlock.innerHTML = status.finalizedBlockNumber.toString();

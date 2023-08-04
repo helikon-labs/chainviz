@@ -82,78 +82,83 @@ class ValidatorArc {
 }
 
 class ValidatorMesh {
-    private readonly group: THREE.Group;
-
-    constructor() {
-        this.group = new THREE.Group();
-    }
+    private group!: THREE.Group;
 
     start(
         scene: THREE.Scene,
         validatorMap: Map<string, ValidatorSummary>,
         onComplete?: () => void,
     ) {
-        const maxRewardPoints = Math.max(
-            ...Array.from(validatorMap.values()).map((validator) => validator.rewardPoints),
-        );
+        if (this.group) {
+            scene.remove(this.group);
+        }
+        this.group = new THREE.Group();
+        let maxRewardPoints = 0;
+        for (const validator of validatorMap.values()) {
+            if (validator.rewardPoints > maxRewardPoints) {
+                maxRewardPoints = validator.rewardPoints;
+            }
+        }
         let arcCount = Constants.MIN_ARC_COUNT;
-        let validatorsPerArc = validatorMap.size / arcCount;
+        let validatorsPerArc = Math.ceil(validatorMap.size / arcCount);
         while (validatorsPerArc > Constants.MAX_VALIDATORS_PER_ARC) {
             arcCount++;
-            validatorsPerArc = validatorMap.size / arcCount;
+            validatorsPerArc = Math.ceil(validatorMap.size / arcCount);
         }
-        for (let i = 0; i < arcCount; i++) {
-            const beginIndex = i * validatorsPerArc;
-            const endIndex = Math.min(i * validatorsPerArc + validatorsPerArc, validatorMap.size);
-            const arcValidatorMap = new Map(Array.from(validatorMap).slice(beginIndex, endIndex));
-            const arc = new ValidatorArc(arcValidatorMap, maxRewardPoints, arcCount, i);
+        let index = 0;
+        while (index < validatorMap.size) {
+            const endIndex = Math.min(index + validatorsPerArc, validatorMap.size - 1);
+            const arcValidatorMap = new Map(Array.from(validatorMap).slice(index, endIndex));
+            const arc = new ValidatorArc(
+                arcValidatorMap,
+                maxRewardPoints,
+                arcCount,
+                Math.floor(index / validatorsPerArc),
+            );
             arc.addToGroup(this.group);
+            index += validatorsPerArc;
         }
         scene.add(this.group);
-        this.animate(100, false, onComplete);
+        this.animate(false, onComplete);
     }
 
-    private animate(delayMs: number, isReverse: boolean, onComplete?: () => void) {
+    private animate(isReverse: boolean, onComplete?: () => void) {
         const progress = { progress: isReverse ? 1.0 : 0.0 };
         const currentRotationY = this.group.rotation.y;
-        setTimeout(() => {
-            createTween(
-                progress,
-                { progress: isReverse ? 0.0 : 1.0 },
-                TWEEN.Easing.Exponential.InOut,
-                2000,
-                undefined,
-                () => {
-                    for (let i = 0; i < this.group.children.length; i++) {
-                        let rotationY =
-                            i * ((2 * Math.PI) / this.group.children.length) * progress.progress;
-                        if (i >= this.group.children.length / 2) {
-                            const target =
-                                ((i - this.group.children.length / 2) * Math.PI) /
-                                Math.ceil(this.group.children.length / 2);
-                            rotationY = Math.PI + target * progress.progress;
-                        }
-                        this.group.children[i].rotation.y = rotationY;
-                        this.group.children[i].updateMatrix();
-                        this.group.rotation.x =
-                            Constants.VALIDATOR_MESH_ROTATE_X * progress.progress;
-                        this.group.rotation.y =
-                            currentRotationY *
-                            (isReverse ? progress.progress : 1 - progress.progress);
-                        this.group.updateMatrix();
+        createTween(
+            progress,
+            { progress: isReverse ? 0.0 : 1.0 },
+            TWEEN.Easing.Exponential.InOut,
+            Constants.SCENE_STATE_TRANSITION_ANIM_DURATION_MS,
+            undefined,
+            () => {
+                for (let i = 0; i < this.group.children.length; i++) {
+                    let rotationY =
+                        i * ((2 * Math.PI) / this.group.children.length) * progress.progress;
+                    if (i >= this.group.children.length / 2) {
+                        const target =
+                            ((i - this.group.children.length / 2) * Math.PI) /
+                            Math.ceil(this.group.children.length / 2);
+                        rotationY = Math.PI + target * progress.progress;
                     }
-                },
-                onComplete,
-            ).start();
-        }, delayMs);
+                    this.group.children[i].rotation.y = rotationY;
+                    this.group.children[i].updateMatrix();
+                    this.group.rotation.x = Constants.VALIDATOR_MESH_ROTATE_X * progress.progress;
+                    this.group.rotation.y =
+                        currentRotationY * (isReverse ? progress.progress : 1 - progress.progress);
+                    this.group.updateMatrix();
+                }
+            },
+            onComplete,
+        ).start();
     }
 
     rotate() {
         this.group.rotateY(Constants.VALIDATOR_MESH_ROTATE_Y_DELTA);
     }
 
-    reset() {
-        this.animate(0, true);
+    reset(onComplete?: () => void) {
+        this.animate(true, onComplete);
     }
 }
 

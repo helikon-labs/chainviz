@@ -53,6 +53,8 @@ class UI {
 
         this.scene = new Chainviz3DScene(this.sceneDiv);
 
+        this.background.style.opacity = '0%';
+
         this.kusamaSelector.addEventListener('click', (_event) => {
             this.kusamaSelector.classList.add('active');
             this.polkadotSelector.classList.remove('active');
@@ -67,6 +69,7 @@ class UI {
 
     init() {
         this.logo.draw(this.mainLogoCanvas, 0.6);
+        this.animate();
     }
 
     displayLoading() {
@@ -77,6 +80,10 @@ class UI {
     }
 
     animate() {
+        requestAnimationFrame(() => {
+            this.animate();
+        });
+        TWEEN.update();
         this.scene.animate();
     }
 
@@ -96,7 +103,25 @@ class UI {
                 this.loadingContainer.style.opacity = `${opacity.opacity}%`;
             },
             () => {
-                this.loadingContainer.parentNode?.removeChild(this.loadingContainer);
+                this.loadingContainer.style.display = 'none';
+                onComplete();
+            },
+        ).start();
+    }
+
+    private fadeInLoadingContainer(onComplete: () => void) {
+        this.loadingContainer.style.display = 'flex';
+        const opacity = { opacity: 0 };
+        createTween(
+            opacity,
+            { opacity: 100 },
+            TWEEN.Easing.Exponential.InOut,
+            Constants.CONTENT_FADE_ANIM_DURATION_MS,
+            undefined,
+            () => {
+                this.loadingContainer.style.opacity = `${opacity.opacity}%`;
+            },
+            () => {
                 onComplete();
             },
         ).start();
@@ -119,9 +144,24 @@ class UI {
         ).start();
     }
 
-    private fadeInContent(onComplete: () => void) {
+    private fadeInLeftPanel(onComplete?: () => void) {
         this.leftPanel.style.opacity = '0%';
         show(this.leftPanel);
+        const opacity = { opacity: 0 };
+        createTween(
+            opacity,
+            { opacity: 100 },
+            TWEEN.Easing.Exponential.InOut,
+            Constants.CONTENT_FADE_ANIM_DURATION_MS,
+            undefined,
+            () => {
+                this.leftPanel.style.opacity = `${opacity.opacity}%`;
+            },
+            onComplete,
+        ).start();
+    }
+
+    private fadeInRightPanel(onComplete: () => void) {
         this.rightPanel.style.opacity = '0%';
         show(this.rightPanel);
         const opacity = { opacity: 0 };
@@ -132,7 +172,21 @@ class UI {
             Constants.CONTENT_FADE_ANIM_DURATION_MS,
             undefined,
             () => {
-                this.leftPanel.style.opacity = `${opacity.opacity}%`;
+                this.rightPanel.style.opacity = `${opacity.opacity}%`;
+            },
+            onComplete,
+        ).start();
+    }
+
+    private fadeOutRightPanel(onComplete: () => void) {
+        const opacity = { opacity: 100 };
+        createTween(
+            opacity,
+            { opacity: 0 },
+            TWEEN.Easing.Exponential.InOut,
+            Constants.CONTENT_FADE_ANIM_DURATION_MS,
+            undefined,
+            () => {
                 this.rightPanel.style.opacity = `${opacity.opacity}%`;
             },
             onComplete,
@@ -156,18 +210,35 @@ class UI {
         ).start();
     }
 
+    private fadeOutSceneContainer(onComplete: () => void) {
+        const opacity = { opacity: 100 };
+        createTween(
+            opacity,
+            { opacity: 0 },
+            TWEEN.Easing.Exponential.InOut,
+            Constants.CONTENT_FADE_ANIM_DURATION_MS,
+            undefined,
+            () => {
+                this.sceneContainer.style.opacity = `${opacity.opacity}%`;
+            },
+            onComplete,
+        ).start();
+    }
+
     start(
         slots: Slot[],
         paras: Para[],
         validatorMap: Map<string, ValidatorSummary>,
         onComplete?: () => void,
     ) {
+        this.clearSlots();
         this.fadeOutLoadingContainer(() => {
             this.fadeInBackground(() => {
-                this.fadeInContent(() => {
+                this.fadeInLeftPanel();
+                this.fadeInRightPanel(() => {
+                    this.scene.start(paras, validatorMap);
                     this.fadeInSceneContainer(() => {
                         this.slotList.initialize(slots);
-                        this.scene.start(paras, validatorMap);
                         if (onComplete) {
                             onComplete();
                         }
@@ -177,19 +248,23 @@ class UI {
         });
     }
 
-    reset() {
-        this.resetNetworkStatus();
-        this.clearSlots();
+    reset(onComplete?: () => void) {
         this.clearXCMMessages();
-        this.scene.reset();
+        this.scene.reset(() => {
+            this.fadeOutSceneContainer(() => {
+                this.fadeOutRightPanel(() => {
+                    this.fadeInLoadingContainer(() => {
+                        if (onComplete) {
+                            onComplete();
+                        }
+                    });
+                });
+            });
+        });
     }
 
     displayNetworkStatus(network: Network, status: NetworkStatus) {
         this.networkStatusBoard.display(network, status);
-    }
-
-    private resetNetworkStatus() {
-        this.networkStatusBoard.reset();
     }
 
     private clearSlots() {

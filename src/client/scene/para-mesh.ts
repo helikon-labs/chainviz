@@ -5,13 +5,13 @@ import { createTween } from '../util/tween';
 import * as TWEEN from '@tweenjs/tween.js';
 
 class ParaMesh {
-    private readonly group: THREE.Group;
-
-    constructor() {
-        this.group = new THREE.Group();
-    }
+    private group!: THREE.Group;
 
     start(scene: THREE.Scene, paras: Para[]) {
+        if (this.group) {
+            scene.remove(this.group);
+        }
+        this.group = new THREE.Group();
         const lineMaterial = new THREE.LineBasicMaterial({
             color: Constants.PARAS_CROSSHAIR_COLOR,
             transparent: true,
@@ -82,57 +82,50 @@ class ParaMesh {
             this.group.add(paraGroup);
         }
         scene.add(this.group);
-        this.animate(100, false);
+        this.animate(false);
     }
 
-    private animate(delayMs: number, isReverse: boolean) {
+    private animate(isReverse: boolean) {
         const progress = { progress: isReverse ? 1.0 : 0.0 };
         const initialRadius = Constants.VALIDATOR_ARC_RADIUS;
         const deltaRadius = Constants.PARAS_CIRCLE_RADIUS - Constants.VALIDATOR_ARC_RADIUS;
-        setTimeout(() => {
-            createTween(
-                progress,
-                { progress: isReverse ? 0.0 : 1.0 },
-                TWEEN.Easing.Exponential.InOut,
-                2000,
-                undefined,
-                () => {
-                    const ring = this.group.children[2];
-                    if (ring instanceof THREE.Mesh) {
-                        const scale =
-                            (Constants.PARAS_CIRCLE_RADIUS / Constants.VALIDATOR_ARC_RADIUS - 1) *
-                                progress.progress +
-                            1;
-                        ring.scale.x = scale;
-                        ring.scale.y = scale;
-                        ring.material.opacity =
-                            progress.progress * Constants.PARAS_CROSSHAIR_OPACITY;
-                    }
-                    for (let i = 3; i < this.group.children.length; i++) {
-                        const angle = (Math.PI / (this.group.children.length - 3)) * 2 * (i - 3);
-                        for (const child of this.group.children[i].children) {
-                            if (child instanceof THREE.Mesh) {
-                                child.material.opacity = progress.progress;
-                            }
-                            child.scale.x = progress.progress;
-                            child.scale.y = progress.progress;
-                            child.scale.z = progress.progress;
-                            const radius = initialRadius + deltaRadius * progress.progress;
-                            child.position.set(
-                                Math.sin(angle) * radius,
-                                Math.cos(angle) * radius,
-                                0,
-                            );
-                            child.updateMatrix();
+        createTween(
+            progress,
+            { progress: isReverse ? 0.0 : 1.0 },
+            TWEEN.Easing.Exponential.InOut,
+            Constants.SCENE_STATE_TRANSITION_ANIM_DURATION_MS,
+            undefined,
+            () => {
+                const ring = this.group.children[2];
+                if (ring instanceof THREE.Mesh) {
+                    const scale =
+                        (Constants.PARAS_CIRCLE_RADIUS / Constants.VALIDATOR_ARC_RADIUS - 1) *
+                            progress.progress +
+                        1;
+                    ring.scale.x = scale;
+                    ring.scale.y = scale;
+                    ring.material.opacity = progress.progress * Constants.PARAS_CROSSHAIR_OPACITY;
+                }
+                for (let i = 3; i < this.group.children.length; i++) {
+                    const angle = (Math.PI / (this.group.children.length - 3)) * 2 * (i - 3);
+                    for (const child of this.group.children[i].children) {
+                        if (child instanceof THREE.Mesh) {
+                            child.material.opacity = progress.progress;
                         }
+                        child.scale.x = progress.progress;
+                        child.scale.y = progress.progress;
+                        child.scale.z = progress.progress;
+                        const radius = initialRadius + deltaRadius * progress.progress;
+                        child.position.set(Math.sin(angle) * radius, Math.cos(angle) * radius, 0);
+                        child.updateMatrix();
                     }
-                },
-            ).start();
-        }, 100);
+                }
+            },
+        ).start();
     }
 
     reset() {
-        this.animate(0, true);
+        this.animate(true);
     }
 }
 

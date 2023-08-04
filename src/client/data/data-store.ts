@@ -254,6 +254,14 @@ class DataStore {
     }
 
     async disconnectSubstrateClient() {
+        if (this.newBlockSubscription) {
+            (await this.newBlockSubscription)();
+            this.newBlockSubscription = undefined;
+        }
+        if (this.finalizedHeaderSubscription) {
+            (await this.finalizedHeaderSubscription)();
+            this.finalizedHeaderSubscription = undefined;
+        }
         await this.substrateClient.disconnect();
     }
 }

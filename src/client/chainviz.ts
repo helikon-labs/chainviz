@@ -8,7 +8,6 @@ import { Constants } from './util/constants';
 import { NetworkStatus, NetworkStatusUpdate } from './model/subvt/network-status';
 import { ValidatorListUpdate, ValidatorSummary } from './model/subvt/validator-summary';
 import { Slot } from './model/chainviz/slot';
-import * as TWEEN from '@tweenjs/tween.js';
 import { Block } from './model/chainviz/block';
 import { Para } from './model/substrate/para';
 import { XCMMessage } from './model/polkaholic/xcm';
@@ -98,14 +97,13 @@ class Chainviz {
 
     async init() {
         this.ui.init();
-        this.animate();
-        this.ui.setLoadingInfo('connecting to blockchain');
         await this.connect();
     }
 
     async connect() {
         this.ui.displayLoading();
         this.dataStore.setNetwork(this.network);
+        this.ui.setLoadingInfo('connecting to blockchain');
         this.dataStore.connectSubstrateRPC();
     }
 
@@ -316,15 +314,15 @@ class Chainviz {
         this.dataStore.disconnectActiveValidatorListService();
         this.dataStore.unsubscribeXCMInfo();
         this.slots = [];
-        this.ui.reset();
-    }
-
-    private animate() {
-        requestAnimationFrame(() => {
-            this.animate();
+        this.validatorMap.clear();
+        this.paras = [];
+        this.network = network;
+        this.dataStore.setNetwork(this.network);
+        this.ui.reset(() => {
+            this.started = false;
+            this.ui.setLoadingInfo('connecting to blockchain');
+            this.dataStore.connectSubstrateRPC();
         });
-        TWEEN.update();
-        this.ui.animate();
     }
 
     start() {
