@@ -3,7 +3,7 @@
 </p>
 
 ![](https://github.com/helikon-labs/chainviz-v1/actions/workflows/prettier_eslint.yml/badge.svg)
-[![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=helikon-labs_chainviz&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=helikon-labs_chainviz)
+[![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=helikon-labs_chainviz-v1&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=helikon-labs_chainviz)
 
 ChainViz ([alpha.chainviz.app](https://v1.chainviz.app)) is a real-time 3D chain visualization of the Polkadot machine.
 
