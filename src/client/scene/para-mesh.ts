@@ -17,19 +17,33 @@ class ParaMesh {
             transparent: true,
             opacity: Constants.PARAS_CROSSHAIR_OPACITY,
         });
+        // horizontal line
         let linePoints = [];
         linePoints.push(new THREE.Vector3(-Constants.PARAS_CROSSHAIR_HORIZONTAL_RADIUS, 0, 0));
         linePoints.push(new THREE.Vector3(Constants.PARAS_CROSSHAIR_HORIZONTAL_RADIUS, 0, 0));
         let lineGeometry = new THREE.BufferGeometry().setFromPoints(linePoints);
         let line = new THREE.Line(lineGeometry, lineMaterial);
         this.group.add(line);
-
+        // vertical line
         linePoints = [];
         linePoints.push(new THREE.Vector3(0, Constants.PARAS_CROSSHAIR_VERTICAL_RADIUS, 0));
         linePoints.push(new THREE.Vector3(0, -Constants.PARAS_CROSSHAIR_VERTICAL_RADIUS, 0));
         lineGeometry = new THREE.BufferGeometry().setFromPoints(linePoints);
         line = new THREE.Line(lineGeometry, lineMaterial);
         this.group.add(line);
+        // ring
+        const ringMaterial = new THREE.LineBasicMaterial({
+            color: Constants.PARAS_CROSSHAIR_COLOR,
+            transparent: true,
+            opacity: 0.0,
+        });
+        const ringGeometry = new THREE.RingGeometry(
+            Constants.VALIDATOR_ARC_RADIUS,
+            Constants.VALIDATOR_ARC_RADIUS + 0.075,
+            64,
+        );
+        const ring = new THREE.Mesh(ringGeometry, ringMaterial);
+        this.group.add(ring);
 
         const initialRadius = Constants.VALIDATOR_ARC_RADIUS;
         const backgroundGeometry = new THREE.CircleGeometry(Constants.PARA_BG_RADIUS);
@@ -83,8 +97,19 @@ class ParaMesh {
                 2000,
                 undefined,
                 () => {
-                    for (let i = 2; i < this.group.children.length; i++) {
-                        const angle = (Math.PI / (this.group.children.length - 2)) * 2 * (i - 2);
+                    const ring = this.group.children[2];
+                    if (ring instanceof THREE.Mesh) {
+                        const scale =
+                            (Constants.PARAS_CIRCLE_RADIUS / Constants.VALIDATOR_ARC_RADIUS - 1) *
+                                progress.progress +
+                            1;
+                        ring.scale.x = scale;
+                        ring.scale.y = scale;
+                        ring.material.opacity =
+                            progress.progress * Constants.PARAS_CROSSHAIR_OPACITY;
+                    }
+                    for (let i = 3; i < this.group.children.length; i++) {
+                        const angle = (Math.PI / (this.group.children.length - 3)) * 2 * (i - 3);
                         for (const child of this.group.children[i].children) {
                             if (child instanceof THREE.Mesh) {
                                 child.material.opacity = progress.progress;

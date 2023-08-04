@@ -35,6 +35,7 @@ class ValidatorArc {
     constructor(
         validatorMap: Map<string, ValidatorSummary>,
         maxRewardPoints: number,
+        arcCount: number,
         arcIndex: number,
     ) {
         const arcPoints = ARC_CURVE.getPoints(Constants.VALIDATOR_ARC_POINTS);
@@ -46,9 +47,8 @@ class ValidatorArc {
             VALIDATOR_MATERIAL,
             validatorMap.size,
         );
-        const angleDelta =
-            Math.PI / (arcIndex == 0 ? validatorMap.size - 1 : validatorMap.size + 1);
-        let currentAngle = arcIndex == 0 ? 0 : angleDelta;
+        const angleDelta = Math.PI / (validatorMap.size + 1);
+        let currentAngle = angleDelta;
         const validatorMapKeys = Array.from(validatorMap.keys());
         for (let j = 0; j < validatorMapKeys.length; j++) {
             const validator = validatorMap.get(validatorMapKeys[j])!;
@@ -69,6 +69,9 @@ class ValidatorArc {
         const group = new THREE.Group();
         group.add(this.mesh);
         group.add(this.arc);
+        if (arcIndex >= arcCount / 2) {
+            group.rotation.y = Math.PI;
+        }
         group.updateMatrix();
         this.group = group;
     }
@@ -99,7 +102,7 @@ class ValidatorMesh {
             const beginIndex = i * validatorsPerArc;
             const endIndex = Math.min(i * validatorsPerArc + validatorsPerArc, validatorMap.size);
             const arcValidatorMap = new Map(Array.from(validatorMap).slice(beginIndex, endIndex));
-            const arc = new ValidatorArc(arcValidatorMap, maxRewardPoints, i);
+            const arc = new ValidatorArc(arcValidatorMap, maxRewardPoints, arcCount, i);
             arc.addToGroup(this.group);
         }
         scene.add(this.group);
@@ -117,8 +120,14 @@ class ValidatorMesh {
                 undefined,
                 () => {
                     for (let i = 0; i < this.group.children.length; i++) {
-                        const rotationY =
+                        let rotationY =
                             i * ((2 * Math.PI) / this.group.children.length) * progress.progress;
+                        if (i >= this.group.children.length / 2) {
+                            const target =
+                                ((i - this.group.children.length / 2) * Math.PI) /
+                                Math.ceil(this.group.children.length / 2);
+                            rotationY = Math.PI + target * progress.progress;
+                        }
                         this.group.children[i].rotation.y = rotationY;
                         this.group.children[i].updateMatrix();
                         this.group.rotation.x =

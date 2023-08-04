@@ -31,7 +31,7 @@ export abstract class Constants {
     static readonly PARA_BG_COLOR = 0xffffff;
     static readonly PARA_BG_OPACITY = 0.25;
     static readonly PARA_LOGO_RADIUS = 1.6;
-    static readonly VALIDATOR_MESH_ROTATE_X = Math.PI / 6;
+    static readonly VALIDATOR_MESH_ROTATE_X = Math.PI / 4;
     static readonly VALIDATOR_MESH_ROTATE_Y_DELTA = Math.PI / 2800;
     // orbit control
     static readonly ORBIT_DEFAULT_DISTANCE = 380;
