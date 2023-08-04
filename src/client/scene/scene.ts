@@ -16,6 +16,7 @@ class Chainviz3DScene {
     private readonly container: HTMLDivElement;
     private readonly paraMesh: ParaMesh;
     private readonly validatorMesh: ValidatorMesh;
+    private validatorMeshIsRotating = false;
 
     constructor(container: HTMLDivElement) {
         this.container = container;
@@ -72,14 +73,17 @@ class Chainviz3DScene {
         this.render();
     }
 
-    private animate() {
-        requestAnimationFrame(() => {
-            this.animate();
-        });
+    animate() {
         this.controls.update();
         this.stats.update();
         this.render();
-        this.validatorMesh.animate();
+        if (this.validatorMeshIsRotating) {
+            this.validatorMesh.rotate();
+        }
+    }
+
+    private render() {
+        this.renderer.render(this.scene, this.camera);
     }
 
     private setPointerCursor() {
@@ -88,10 +92,6 @@ class Chainviz3DScene {
 
     private setDefaultCursor() {
         document.getElementsByTagName('html')[0].style.cursor = 'default';
-    }
-
-    private render() {
-        this.renderer.render(this.scene, this.camera);
     }
 
     private bezierCurve(p0: number, p1: number, p2: number, p3: number, t: number) {
@@ -104,7 +104,6 @@ class Chainviz3DScene {
     }
 
     start(paras: Para[], validatorMap: Map<string, ValidatorSummary>) {
-        this.animate();
         const relayChainValidatorMap = new Map<string, ValidatorSummary>();
         for (const key of validatorMap.keys()) {
             const validator = validatorMap.get(key)!;
@@ -114,6 +113,13 @@ class Chainviz3DScene {
         }
         this.paraMesh.start(this.scene, paras);
         this.validatorMesh.start(this.scene, validatorMap);
+        this.validatorMeshIsRotating = true;
+    }
+
+    reset() {
+        this.validatorMeshIsRotating = false;
+        this.paraMesh.reset();
+        this.validatorMesh.reset();
     }
 }
 

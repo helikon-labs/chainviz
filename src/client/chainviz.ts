@@ -17,7 +17,6 @@ THREE.Cache.enabled = true;
 
 class Chainviz {
     private readonly ui: UI;
-
     private readonly dataStore: DataStore;
     private readonly eventBus = EventBus.getInstance();
     private network: Network = Kusama;
@@ -91,6 +90,9 @@ class Chainviz {
         });
         this.eventBus.register(ChainvizEvent.NEW_XCM_MESSAGE, (message: XCMMessage) => {
             this.onNewXCMMessage(message);
+        });
+        this.eventBus.register(ChainvizEvent.NETWORK_SELECTED, (network: Network) => {
+            this.onNetworkSelected(network);
         });
     }
 
@@ -308,11 +310,21 @@ class Chainviz {
         );
     }
 
+    async onNetworkSelected(network: Network) {
+        await this.dataStore.disconnectSubstrateClient();
+        this.dataStore.disconnectNetworkStatusService();
+        this.dataStore.disconnectActiveValidatorListService();
+        this.dataStore.unsubscribeXCMInfo();
+        this.slots = [];
+        this.ui.reset();
+    }
+
     private animate() {
         requestAnimationFrame(() => {
             this.animate();
         });
         TWEEN.update();
+        this.ui.animate();
     }
 
     start() {

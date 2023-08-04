@@ -88,7 +88,11 @@ class ValidatorMesh {
         this.group = new THREE.Group();
     }
 
-    start(scene: THREE.Scene, validatorMap: Map<string, ValidatorSummary>) {
+    start(
+        scene: THREE.Scene,
+        validatorMap: Map<string, ValidatorSummary>,
+        onComplete?: () => void,
+    ) {
         const maxRewardPoints = Math.max(
             ...Array.from(validatorMap.values()).map((validator) => validator.rewardPoints),
         );
@@ -106,15 +110,16 @@ class ValidatorMesh {
             arc.addToGroup(this.group);
         }
         scene.add(this.group);
-        this.startInitialAnimation();
+        this.animate(100, false, onComplete);
     }
 
-    private startInitialAnimation() {
-        const progress = { progress: 0.0 };
+    private animate(delayMs: number, isReverse: boolean, onComplete?: () => void) {
+        const progress = { progress: isReverse ? 1.0 : 0.0 };
+        const currentRotationY = this.group.rotation.y;
         setTimeout(() => {
             createTween(
                 progress,
-                { progress: 1.0 },
+                { progress: isReverse ? 0.0 : 1.0 },
                 TWEEN.Easing.Exponential.InOut,
                 2000,
                 undefined,
@@ -132,15 +137,23 @@ class ValidatorMesh {
                         this.group.children[i].updateMatrix();
                         this.group.rotation.x =
                             Constants.VALIDATOR_MESH_ROTATE_X * progress.progress;
+                        this.group.rotation.y =
+                            currentRotationY *
+                            (isReverse ? progress.progress : 1 - progress.progress);
                         this.group.updateMatrix();
                     }
                 },
+                onComplete,
             ).start();
-        }, 100);
+        }, delayMs);
     }
 
-    animate() {
+    rotate() {
         this.group.rotateY(Constants.VALIDATOR_MESH_ROTATE_Y_DELTA);
+    }
+
+    reset() {
+        this.animate(0, true);
     }
 }
 

@@ -34,6 +34,10 @@ class XCMMessageList {
         return html;
     }
 
+    clear() {
+        this.ui.root.innerHTML = '';
+    }
+
     insertMessage(
         originExtrinsicHash: string,
         relayChain: Network,

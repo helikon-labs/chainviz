@@ -28,11 +28,11 @@
             <div id="left-panel" class="left-panel">
                 <canvas class="main-logo" id="main-logo"></canvas>
                 <div class="network-selector">
-                    <div class="network active">
+                    <div class="network active" id="kusama-selector">
                         <img src="./img/icon/kusama-icon.svg" alt="Kusama" />
                         <span>Kusama</span>
                     </div>
-                    <div class="network">
+                    <div class="network" id="polkadot-selector">
                         <img src="./img/icon/polkadot-icon.svg" alt="Polkadot" />
                         <span>Polkadot</span>
                     </div>
@@ -98,19 +98,19 @@
                             <span id="network-era-reward-points">-</span>
                         </div>
                         <div class="network-status-row">
-                            <span>Total Stake (MKSM)</span>
+                            <span id="network-total-stake-title">Total Stake (MKSM)</span>
                             <span id="network-total-stake">-</span>
                         </div>
                         <div class="network-status-row">
-                            <span>Min Stake (KSM)</span>
+                            <span id="network-min-stake-title">Min Stake (KSM)</span>
                             <span id="network-min-stake">-</span>
                         </div>
                         <div class="network-status-row">
-                            <span>Avg Stake (KSM)</span>
+                            <span id="network-average-stake-title">Avg Stake (KSM)</span>
                             <span id="network-average-stake">-</span>
                         </div>
                         <div class="network-status-row">
-                            <span>Max Stake (KSM)</span>
+                            <span id="network-max-stake-title">Max Stake (KSM)</span>
                             <span id="network-max-stake">-</span>
                         </div>
                     </div>

@@ -82,17 +82,17 @@ class ParaMesh {
             this.group.add(paraGroup);
         }
         scene.add(this.group);
-        this.startInitialAnimation();
+        this.animate(100, false);
     }
 
-    private startInitialAnimation() {
-        const progress = { progress: 0.0 };
+    private animate(delayMs: number, isReverse: boolean) {
+        const progress = { progress: isReverse ? 1.0 : 0.0 };
         const initialRadius = Constants.VALIDATOR_ARC_RADIUS;
         const deltaRadius = Constants.PARAS_CIRCLE_RADIUS - Constants.VALIDATOR_ARC_RADIUS;
         setTimeout(() => {
             createTween(
                 progress,
-                { progress: 1.0 },
+                { progress: isReverse ? 0.0 : 1.0 },
                 TWEEN.Easing.Exponential.InOut,
                 2000,
                 undefined,
@@ -129,6 +129,10 @@ class ParaMesh {
                 },
             ).start();
         }, 100);
+    }
+
+    reset() {
+        this.animate(0, true);
     }
 }
 

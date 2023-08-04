@@ -23,4 +23,5 @@ export abstract class ChainvizEvent {
     static readonly NEW_BLOCK = 'event.new_block';
     static readonly NEW_FINALIZED_BLOCK = 'event.new_finalized_block';
     static readonly NEW_XCM_MESSAGE = 'event.new_xcm_message';
+    static readonly NETWORK_SELECTED = 'event.network_selected';
 }

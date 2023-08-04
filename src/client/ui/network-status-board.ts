@@ -10,9 +10,13 @@ interface UI {
     eraIndex: HTMLElement;
     eraRewardPoints: HTMLElement;
     //return: HTMLElement;
+    totalStakeTitle: HTMLElement;
     totalStake: HTMLElement;
+    minStakeTitle: HTMLElement;
     minStake: HTMLElement;
+    maxStakeTitle: HTMLElement;
     maxStake: HTMLElement;
+    averageStakeTitle: HTMLElement;
     averageStake: HTMLElement;
 }
 
@@ -28,11 +32,30 @@ class NetworkStatusBoard {
             eraIndex: <HTMLElement>document.getElementById('network-era-index'),
             eraRewardPoints: <HTMLElement>document.getElementById('network-era-reward-points'),
             //return: <HTMLElement>document.getElementById('network-return'),
+            totalStakeTitle: <HTMLElement>document.getElementById('network-total-stake-title'),
             totalStake: <HTMLElement>document.getElementById('network-total-stake'),
+            minStakeTitle: <HTMLElement>document.getElementById('network-min-stake-title'),
             minStake: <HTMLElement>document.getElementById('network-min-stake'),
+            maxStakeTitle: <HTMLElement>document.getElementById('network-max-stake-title'),
             maxStake: <HTMLElement>document.getElementById('network-max-stake'),
+            averageStakeTitle: <HTMLElement>document.getElementById('network-average-stake-title'),
             averageStake: <HTMLElement>document.getElementById('network-average-stake'),
         };
+    }
+
+    reset() {
+        this.ui.bestBlock.innerHTML = '-';
+        this.ui.finalizedBlock.innerHTML = '-';
+        this.ui.eraIndex.innerHTML = '-';
+        this.ui.eraRewardPoints.innerHTML = '-';
+        this.ui.totalStakeTitle.innerHTML = 'Total Stake';
+        this.ui.totalStake.innerHTML = '-';
+        this.ui.minStakeTitle.innerHTML = 'Min Stake';
+        this.ui.minStake.innerHTML = '-';
+        this.ui.maxStakeTitle.innerHTML = 'Max Stake';
+        this.ui.maxStake.innerHTML = '-';
+        this.ui.averageStakeTitle.innerHTML = 'Avg Stake';
+        this.ui.averageStake.innerHTML = '-';
     }
 
     display(network: Network, status: NetworkStatus) {

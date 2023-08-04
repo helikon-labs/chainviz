@@ -26,6 +26,8 @@ class DataStore {
     private readonly eventBus = EventBus.getInstance();
     private newBlockSubscription?: UnsubscribePromise;
     private finalizedHeaderSubscription?: UnsubscribePromise;
+    private readonly xcmClient = new Ably.Realtime(Constants.POLKAHOLIC_ABLY_API_KEY);
+    private readonly xcmChannel = this.xcmClient.channels.get('xcminfo');
 
     private readonly networkStatusListener: RPCSubscriptionServiceListener<NetworkStatusUpdate> = {
         onConnected: () => {
@@ -237,9 +239,7 @@ class DataStore {
     }
 
     subscribeToXCMInfo() {
-        const client = new Ably.Realtime(Constants.POLKAHOLIC_ABLY_API_KEY);
-        const channel = client.channels.get('xcminfo');
-        channel.subscribe((message) => {
+        this.xcmChannel.subscribe((message) => {
             const data = message.data;
             if (isXCMMessage(data)) {
                 this.eventBus.dispatch<XCMMessage>(ChainvizEvent.NEW_XCM_MESSAGE, data);
@@ -247,6 +247,14 @@ class DataStore {
                 console.log(JSON.stringify(message));
             }
         });
+    }
+
+    unsubscribeXCMInfo() {
+        this.xcmChannel.unsubscribe();
+    }
+
+    async disconnectSubstrateClient() {
+        await this.substrateClient.disconnect();
     }
 }
 

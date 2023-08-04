@@ -1,5 +1,5 @@
 import { Slot } from '../model/chainviz/slot';
-import { Network } from '../model/substrate/network';
+import { Kusama, Network, Polkadot } from '../model/substrate/network';
 import { NetworkStatus } from '../model/subvt/network-status';
 import { Constants } from '../util/constants';
 import { createTween } from '../util/tween';
@@ -12,6 +12,8 @@ import { XCMMessageList } from './xcm-message-list';
 import { Para } from '../model/substrate/para';
 import { Chainviz3DScene } from '../scene/scene';
 import { ValidatorSummary } from '../model/subvt/validator-summary';
+import { EventBus } from '../event/event-bus';
+import { ChainvizEvent } from '../event/event';
 
 class UI {
     private readonly scene: Chainviz3DScene;
@@ -20,6 +22,8 @@ class UI {
     private readonly sceneDiv: HTMLDivElement;
     private readonly background: HTMLDivElement;
     private readonly leftPanel: HTMLDivElement;
+    private readonly kusamaSelector: HTMLDivElement;
+    private readonly polkadotSelector: HTMLDivElement;
     private readonly rightPanel: HTMLDivElement;
     private readonly mainLogoCanvas: HTMLCanvasElement;
     private readonly loadingContainer: HTMLDivElement;
@@ -28,6 +32,7 @@ class UI {
     private readonly networkStatusBoard: NetworkStatusBoard;
     private readonly slotList: SlotList;
     private readonly xcmMessageList: XCMMessageList;
+    private readonly eventBus = EventBus.getInstance();
 
     constructor() {
         this.root = <HTMLElement>document.getElementById('root');
@@ -35,6 +40,8 @@ class UI {
         this.sceneDiv = <HTMLDivElement>document.getElementById('scene');
         this.background = <HTMLDivElement>document.getElementById('background');
         this.leftPanel = <HTMLDivElement>document.getElementById('left-panel');
+        this.kusamaSelector = <HTMLDivElement>document.getElementById('kusama-selector');
+        this.polkadotSelector = <HTMLDivElement>document.getElementById('polkadot-selector');
         this.rightPanel = <HTMLDivElement>document.getElementById('right-panel');
         this.mainLogoCanvas = <HTMLCanvasElement>document.getElementById('main-logo');
         this.loadingContainer = <HTMLDivElement>document.getElementById('loading-container');
@@ -45,6 +52,17 @@ class UI {
         this.xcmMessageList = new XCMMessageList();
 
         this.scene = new Chainviz3DScene(this.sceneDiv);
+
+        this.kusamaSelector.addEventListener('click', (_event) => {
+            this.kusamaSelector.classList.add('active');
+            this.polkadotSelector.classList.remove('active');
+            this.selectNetwork(Kusama);
+        });
+        this.polkadotSelector.addEventListener('click', (_event) => {
+            this.kusamaSelector.classList.remove('active');
+            this.polkadotSelector.classList.add('active');
+            this.selectNetwork(Polkadot);
+        });
     }
 
     init() {
@@ -56,6 +74,10 @@ class UI {
         hide(this.leftPanel);
         hide(this.rightPanel);
         hide(this.sceneContainer);
+    }
+
+    animate() {
+        this.scene.animate();
     }
 
     setLoadingInfo(info: string) {
@@ -155,15 +177,35 @@ class UI {
         });
     }
 
+    reset() {
+        this.resetNetworkStatus();
+        this.clearSlots();
+        this.clearXCMMessages();
+        this.scene.reset();
+    }
+
     displayNetworkStatus(network: Network, status: NetworkStatus) {
         this.networkStatusBoard.display(network, status);
     }
+
+    private resetNetworkStatus() {
+        this.networkStatusBoard.reset();
+    }
+
+    private clearSlots() {
+        this.slotList.initialize([]);
+    }
+
     insertSlot(slot: Slot) {
         this.slotList.insertSlot(slot, true);
     }
 
     updateSlot(slot: Slot) {
         this.slotList.updateSlot(slot);
+    }
+
+    private clearXCMMessages() {
+        this.xcmMessageList.clear();
     }
 
     insertXCMMessage(
@@ -178,6 +220,10 @@ class UI {
             originPara,
             destinationPara,
         );
+    }
+
+    private selectNetwork(network: Network) {
+        this.eventBus.dispatch<Network>(ChainvizEvent.NETWORK_SELECTED, network);
     }
 }
 
