@@ -112,18 +112,8 @@ class Chainviz3DScene {
                 relayChainValidatorMap.set(key, validator);
             }
         }
-        this.initParachains(paras);
-        this.initValidators(relayChainValidatorMap);
-    }
-
-    private initParachains(paras: Para[]) {
-        this.paraMesh.init(paras);
-        this.paraMesh.addToScene(this.scene);
-    }
-
-    private initValidators(validatorMap: Map<string, ValidatorSummary>) {
-        this.validatorMesh.init(validatorMap);
-        this.validatorMesh.addToScene(this.scene);
+        this.paraMesh.start(this.scene, paras);
+        this.validatorMesh.start(this.scene, validatorMap);
     }
 }
 

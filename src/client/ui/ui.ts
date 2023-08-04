@@ -10,11 +10,14 @@ import { SlotList } from './slot-list';
 import * as TWEEN from '@tweenjs/tween.js';
 import { XCMMessageList } from './xcm-message-list';
 import { Para } from '../model/substrate/para';
+import { Chainviz3DScene } from '../scene/scene';
+import { ValidatorSummary } from '../model/subvt/validator-summary';
 
 class UI {
+    private readonly scene: Chainviz3DScene;
     private readonly root: HTMLElement;
     private readonly sceneContainer: HTMLDivElement;
-    readonly scene: HTMLDivElement;
+    private readonly sceneDiv: HTMLDivElement;
     private readonly background: HTMLDivElement;
     private readonly leftPanel: HTMLDivElement;
     private readonly rightPanel: HTMLDivElement;
@@ -29,7 +32,7 @@ class UI {
     constructor() {
         this.root = <HTMLElement>document.getElementById('root');
         this.sceneContainer = <HTMLDivElement>document.getElementById('scene-container');
-        this.scene = <HTMLDivElement>document.getElementById('scene');
+        this.sceneDiv = <HTMLDivElement>document.getElementById('scene');
         this.background = <HTMLDivElement>document.getElementById('background');
         this.leftPanel = <HTMLDivElement>document.getElementById('left-panel');
         this.rightPanel = <HTMLDivElement>document.getElementById('right-panel');
@@ -40,6 +43,8 @@ class UI {
         this.networkStatusBoard = new NetworkStatusBoard();
         this.slotList = new SlotList();
         this.xcmMessageList = new XCMMessageList();
+
+        this.scene = new Chainviz3DScene(this.sceneDiv);
     }
 
     init() {
@@ -55,20 +60,6 @@ class UI {
 
     setLoadingInfo(info: string) {
         this.loadingInfo.innerHTML = info;
-    }
-
-    start(onComplete?: () => void) {
-        this.fadeOutLoadingContainer(() => {
-            this.fadeInBackground(() => {
-                this.fadeInContent(() => {
-                    this.fadeInSceneContainer(() => {
-                        if (onComplete) {
-                            onComplete();
-                        }
-                    });
-                });
-            });
-        });
     }
 
     private fadeOutLoadingContainer(onComplete: () => void) {
@@ -143,14 +134,30 @@ class UI {
         ).start();
     }
 
+    start(
+        slots: Slot[],
+        paras: Para[],
+        validatorMap: Map<string, ValidatorSummary>,
+        onComplete?: () => void,
+    ) {
+        this.fadeOutLoadingContainer(() => {
+            this.fadeInBackground(() => {
+                this.fadeInContent(() => {
+                    this.fadeInSceneContainer(() => {
+                        this.slotList.initialize(slots);
+                        this.scene.start(paras, validatorMap);
+                        if (onComplete) {
+                            onComplete();
+                        }
+                    });
+                });
+            });
+        });
+    }
+
     displayNetworkStatus(network: Network, status: NetworkStatus) {
         this.networkStatusBoard.display(network, status);
     }
-
-    initializeSlots(slots: Slot[]) {
-        this.slotList.initialize(slots);
-    }
-
     insertSlot(slot: Slot) {
         this.slotList.insertSlot(slot, true);
     }

@@ -1,6 +1,8 @@
 import { Para } from '../model/substrate/para';
 import * as THREE from 'three';
 import { Constants } from '../util/constants';
+import { createTween } from '../util/tween';
+import * as TWEEN from '@tweenjs/tween.js';
 
 class ParaMesh {
     private readonly group: THREE.Group;
@@ -9,7 +11,7 @@ class ParaMesh {
         this.group = new THREE.Group();
     }
 
-    init(paras: Para[]) {
+    start(scene: THREE.Scene, paras: Para[]) {
         const lineMaterial = new THREE.LineBasicMaterial({
             color: Constants.PARAS_CROSSHAIR_COLOR,
             transparent: true,
@@ -29,9 +31,7 @@ class ParaMesh {
         line = new THREE.Line(lineGeometry, lineMaterial);
         this.group.add(line);
 
-        const radius = Constants.PARAS_CIRCLE_RADIUS;
-        const delta = (Math.PI / paras.length) * 2;
-        let current = 0.0;
+        const initialRadius = Constants.VALIDATOR_ARC_RADIUS;
         const backgroundGeometry = new THREE.CircleGeometry(Constants.PARA_BG_RADIUS);
         const logoGeometry = new THREE.CircleGeometry(Constants.PARA_LOGO_RADIUS);
         const backgroundMaterial = new THREE.MeshBasicMaterial({
@@ -39,11 +39,20 @@ class ParaMesh {
             transparent: true,
             opacity: Constants.PARA_BG_OPACITY,
         });
-        for (const para of paras) {
+        for (let i = 0; i < paras.length; i++) {
+            const para = paras[i];
+            const paraGroup = new THREE.Group();
+            const angle = (Math.PI / paras.length) * 2 * i;
             // add background circle
             const background = new THREE.Mesh(backgroundGeometry, backgroundMaterial);
-            background.position.set(Math.sin(current) * radius, Math.cos(current) * radius, 0);
-            this.group.add(background);
+            background.position.set(
+                Math.sin(angle) * initialRadius,
+                Math.cos(angle) * initialRadius,
+                0,
+            );
+            background.material.opacity = 0;
+            paraGroup.add(background);
+
             // add logo
             const logoTexture = new THREE.TextureLoader().load('/img/paras/' + para.ui.logo);
             const logoMaterial = new THREE.MeshBasicMaterial({
@@ -52,14 +61,49 @@ class ParaMesh {
                 opacity: 1.0,
             });
             const logo = new THREE.Mesh(logoGeometry, logoMaterial);
-            logo.position.set(Math.sin(current) * radius, Math.cos(current) * radius, 0);
-            this.group.add(logo);
-            current += delta;
+            logo.position.set(Math.sin(angle) * initialRadius, Math.cos(angle) * initialRadius, 0);
+            logo.material.opacity = 0;
+            paraGroup.add(logo);
+            // add to the main group
+            this.group.add(paraGroup);
         }
+        scene.add(this.group);
+        this.startInitialAnimation();
     }
 
-    addToScene(scene: THREE.Scene) {
-        scene.add(this.group);
+    private startInitialAnimation() {
+        const progress = { progress: 0.0 };
+        const initialRadius = Constants.VALIDATOR_ARC_RADIUS;
+        const deltaRadius = Constants.PARAS_CIRCLE_RADIUS - Constants.VALIDATOR_ARC_RADIUS;
+        setTimeout(() => {
+            createTween(
+                progress,
+                { progress: 1.0 },
+                TWEEN.Easing.Exponential.InOut,
+                2000,
+                undefined,
+                () => {
+                    for (let i = 2; i < this.group.children.length; i++) {
+                        const angle = (Math.PI / (this.group.children.length - 2)) * 2 * (i - 2);
+                        for (const child of this.group.children[i].children) {
+                            if (child instanceof THREE.Mesh) {
+                                child.material.opacity = progress.progress;
+                            }
+                            child.scale.x = progress.progress;
+                            child.scale.y = progress.progress;
+                            child.scale.z = progress.progress;
+                            const radius = initialRadius + deltaRadius * progress.progress;
+                            child.position.set(
+                                Math.sin(angle) * radius,
+                                Math.cos(angle) * radius,
+                                0,
+                            );
+                            child.updateMatrix();
+                        }
+                    }
+                },
+            ).start();
+        }, 100);
     }
 }
 

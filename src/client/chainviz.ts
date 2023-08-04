@@ -1,5 +1,4 @@
 import * as THREE from 'three';
-import { Chainviz3DScene } from './scene/scene';
 import { UI } from './ui/ui';
 import { Network, Kusama, getNetworkPara } from './model/substrate/network';
 import { DataStore } from './data/data-store';
@@ -18,7 +17,7 @@ THREE.Cache.enabled = true;
 
 class Chainviz {
     private readonly ui: UI;
-    private readonly scene: Chainviz3DScene;
+
     private readonly dataStore: DataStore;
     private readonly eventBus = EventBus.getInstance();
     private network: Network = Kusama;
@@ -31,7 +30,7 @@ class Chainviz {
     constructor() {
         const ui = new UI();
         this.ui = ui;
-        this.scene = new Chainviz3DScene(ui.scene);
+
         this.dataStore = new DataStore();
         // substrate api events
         this.eventBus.register(ChainvizEvent.SUBSTRATE_API_READY, () => {
@@ -317,12 +316,11 @@ class Chainviz {
     }
 
     start() {
+        this.ui.start(this.slots, this.paras, this.validatorMap, () => {
+            this.dataStore.subsribeToNewBlocks();
+            this.dataStore.subsribeToFinalizedBlocks();
+        });
         this.started = true;
-        this.ui.initializeSlots(this.slots);
-        this.scene.start(this.paras, this.validatorMap);
-        this.dataStore.subsribeToNewBlocks();
-        this.dataStore.subsribeToFinalizedBlocks();
-        this.ui.start();
     }
 }
 

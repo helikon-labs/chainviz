@@ -69,7 +69,6 @@ class ValidatorArc {
         const group = new THREE.Group();
         group.add(this.mesh);
         group.add(this.arc);
-        // group.rotateY(arcIndex * ((2 * Math.PI) / arcCount));
         group.updateMatrix();
         this.group = group;
     }
@@ -86,7 +85,7 @@ class ValidatorMesh {
         this.group = new THREE.Group();
     }
 
-    init(validatorMap: Map<string, ValidatorSummary>) {
+    start(scene: THREE.Scene, validatorMap: Map<string, ValidatorSummary>) {
         const maxRewardPoints = Math.max(
             ...Array.from(validatorMap.values()).map((validator) => validator.rewardPoints),
         );
@@ -103,13 +102,12 @@ class ValidatorMesh {
             const arc = new ValidatorArc(arcValidatorMap, maxRewardPoints, i);
             arc.addToGroup(this.group);
         }
-        this.group.rotateX(Constants.VALIDATOR_MESH_ROTATE_X);
+        scene.add(this.group);
+        this.startInitialAnimation();
     }
 
-    addToScene(scene: THREE.Scene) {
-        scene.add(this.group);
+    private startInitialAnimation() {
         const progress = { progress: 0.0 };
-        const arcCount = this.group.children.length;
         setTimeout(() => {
             createTween(
                 progress,
@@ -118,14 +116,18 @@ class ValidatorMesh {
                 2000,
                 undefined,
                 () => {
-                    for (let i = 0; i < arcCount; i++) {
-                        const rotationY = i * ((2 * Math.PI) / arcCount) * progress.progress;
+                    for (let i = 0; i < this.group.children.length; i++) {
+                        const rotationY =
+                            i * ((2 * Math.PI) / this.group.children.length) * progress.progress;
                         this.group.children[i].rotation.y = rotationY;
                         this.group.children[i].updateMatrix();
+                        this.group.rotation.x =
+                            Constants.VALIDATOR_MESH_ROTATE_X * progress.progress;
+                        this.group.updateMatrix();
                     }
                 },
             ).start();
-        }, 1400);
+        }, 100);
     }
 
     animate() {
