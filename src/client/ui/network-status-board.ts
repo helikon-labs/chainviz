@@ -1,4 +1,4 @@
-import { Network } from '../model/substrate/network';
+import { Kusama, Network } from '../model/substrate/network';
 import { NetworkStatus } from '../model/subvt/network-status';
 import { formatNumber } from '../util/format';
 
@@ -54,18 +54,43 @@ class NetworkStatusBoard {
         this.ui.eraRewardPoints.innerHTML = status.eraRewardPoints.toString();
         //this.ui.return.innerHTML =
         //    formatNumber(BigInt(status.returnRatePerMillion), 4, 2) + '%';
+        this.ui.totalStakeTitle.innerHTML = `Total Stake (M${network.tokenTicker})`;
         this.ui.totalStake.innerHTML = formatNumber(
             status.totalStake,
             network.tokenDecimals + 6,
             2,
         );
-        this.ui.minStake.innerHTML = formatNumber(status.minStake, network.tokenDecimals, 2);
-        this.ui.maxStake.innerHTML = formatNumber(status.maxStake, network.tokenDecimals, 2);
-        this.ui.averageStake.innerHTML = formatNumber(
-            status.averageStake,
-            network.tokenDecimals,
-            2,
-        );
+        if (network == Kusama) {
+            this.ui.minStakeTitle.innerHTML = `Min Stake (${network.tokenTicker})`;
+            this.ui.minStake.innerHTML = formatNumber(status.minStake, network.tokenDecimals, 2);
+            this.ui.maxStakeTitle.innerHTML = `Max Stake (${network.tokenTicker})`;
+            this.ui.maxStake.innerHTML = formatNumber(status.maxStake, network.tokenDecimals, 2);
+            this.ui.averageStakeTitle.innerHTML = `Avg Stake (${network.tokenTicker})`;
+            this.ui.averageStake.innerHTML = formatNumber(
+                status.averageStake,
+                network.tokenDecimals,
+                2,
+            );
+        } else {
+            this.ui.minStakeTitle.innerHTML = `Min Stake (M${network.tokenTicker})`;
+            this.ui.minStake.innerHTML = formatNumber(
+                status.minStake,
+                network.tokenDecimals + 6,
+                2,
+            );
+            this.ui.maxStakeTitle.innerHTML = `Max Stake (M${network.tokenTicker})`;
+            this.ui.maxStake.innerHTML = formatNumber(
+                status.maxStake,
+                network.tokenDecimals + 6,
+                2,
+            );
+            this.ui.averageStakeTitle.innerHTML = `Avg Stake (M${network.tokenTicker})`;
+            this.ui.averageStake.innerHTML = formatNumber(
+                status.averageStake,
+                network.tokenDecimals + 6,
+                2,
+            );
+        }
     }
 }
 
