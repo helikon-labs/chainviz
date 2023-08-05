@@ -318,7 +318,7 @@ class Chainviz {
         this.paras = [];
         this.network = network;
         this.dataStore.setNetwork(this.network);
-        this.ui.reset(() => {
+        this.ui.prepareForNetworkChange(() => {
             this.started = false;
             this.ui.setLoadingInfo('connecting to blockchain');
             this.dataStore.connectSubstrateRPC();

@@ -6,33 +6,16 @@
 body {
     overflow: hidden;
     margin: 0px;
-    /*background-color: #000000dd;*/
-    background-color: #000000;
+    background-color: #000000dd;
+    /* background-color: #000000; */
     /*color: #ffffffe9;*/
     color: #ffffff;
     font-family: 'Mont';
     font-variant-numeric: tabular-nums;
     font-size: 14px;
-    padding: 30px;
 }
 
 .scene-container {
-    position: absolute;
-    left: 0px;
-    top: 0px;
-    width: 100%;
-    height: 100%;
-    display: flex;
-    flex-direction: row;
-}
-
-.scene-container .scene {
-    flex-grow: 1;
-    height: 100%;
-}
-
-.scene-container .scene-spacer {
-    width: 286px;
     height: 100%;
 }
 
@@ -113,36 +96,6 @@ a:active {
     line-height: 18px;
 }
 
-.main-logo {
-    position: absolute;
-    top: 26px;
-    left: 30px;
-}
-
-.icon-container {
-    position: absolute;
-    bottom: 30px;
-    left: 30px;
-    height: 28px;
-    width: 134px;
-    border: 1px solid #ffffff55;
-    border-radius: 10px;
-    padding: 0px 8px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-}
-
-.icon-container a,
-img {
-    width: 18px;
-    height: 18px;
-}
-
-.icon-container #subvt-icon {
-    filter: invert(1);
-}
-
 .content {
     position: absolute;
     top: 0px;
@@ -153,22 +106,95 @@ img {
 }
 
 .content .left-panel {
+    width: 200px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.content .left-panel .main-logo {
+    margin-left: 26px;
+    margin-top: 26px;
+}
+
+.content .left-panel .validator-list {
+    margin-left: 26px;
+    flex-grow: 1;
+}
+
+.content .left-panel .xcm-message-list {
+    margin-left: 26px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    overflow-y: scroll;
+}
+
+.content .left-panel .xcm-message-list .xcm-message {
+    border-radius: 12px;
+    border: 1px solid #ffffff55;
+    padding: 6px 8px 6px 8px;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    cursor: pointer;
+}
+
+.content .left-panel .xcm-message-list .xcm-message img.xcm-chain-logo {
+    width: 20px;
+    height: 20px;
+    border-radius: 10px;
+}
+
+.content .left-panel .xcm-message-list .xcm-message img.xcm-arrow {
+    height: 10px;
+    opacity: 0.75;
+}
+
+.content .left-panel .icon-container {
+    margin-left: 26px;
+    margin-bottom: 26px;
+    border: 1px solid #ffffff55;
+    border-radius: 10px;
+    padding: 6px 8px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.content .left-panel .icon-container a,
+img {
+    width: 18px;
+    height: 18px;
+}
+
+.content .left-panel .icon-container #subvt-icon {
+    filter: invert(1);
+}
+
+.content .left-panel-spacer {
+    width: 80px;
+    height: 100px;
+}
+
+.content .center-panel {
     flex-grow: 1;
     display: flex;
     flex-direction: column;
-    align-items: center;
 }
 
-.content .left-panel .network-selector {
+.content .center-panel .network-selector {
+    margin-top: 26px;
     border: 1px solid #ffffff55;
     border-radius: 12px;
     display: flex;
+    flex-direction: row;
     padding: 1px;
     gap: 2px;
-    margin-top: 24px;
 }
 
-.content .left-panel .network-selector .network {
+.content .center-panel .network-selector .network {
     width: 104px;
     height: 26px;
     color: #ffffff88;
@@ -182,86 +208,37 @@ img {
     gap: 6px;
 }
 
-.content .left-panel .network-selector .network:hover {
+.content .center-panel .network-selector .network:hover {
     background-color: #ffffff22;
 }
 
-.content .left-panel .network-selector .active {
+.content .center-panel .network-selector .active {
     color: #ffffffe5;
     background-color: #ffffff22;
     border: 1px solid #ffffff55;
 }
 
-.content .left-panel .network-selector .network img {
+.content .center-panel .network-selector .network img {
     width: 20px;
     height: 20px;
 }
 
-.content .left-panel .network-selector .network span {
+.content .center-panel .network-selector .network span {
     font-size: 13px;
     margin-top: 1.5px;
 }
 
-.content .left-panel .left-panel-content {
-    display: flex;
-    flex-direction: row;
-    width: 100%;
-    height: 100%;
-}
-
-.content .left-panel .left-panel-content .xcm-message-list {
-    display: flex;
-    flex-direction: column;
-    gap: 4px;
-    overflow-y: scroll;
-    margin-left: 30px;
-    height: 100%;
-}
-
-.content .left-panel .left-panel-content .xcm-message-list .xcm-message {
-    border-radius: 12px;
-    border: 1px solid #ffffff55;
-    padding: 6px 8px 6px 8px;
-    display: flex;
-    flex-direction: row;
-    justify-content: space-between;
-    align-items: center;
-    cursor: pointer;
-}
-
-.content .left-panel .left-panel-content .xcm-message-list .xcm-message img.xcm-chain-logo {
-    width: 20px;
-    height: 20px;
-    border-radius: 10px;
-}
-
-.content .left-panel .left-panel-content .xcm-message-list .xcm-message img.xcm-arrow {
-    height: 10px;
-    opacity: 0.75;
-}
-
-.content .left-panel .left-panel-content .left-panel-content-spacer {
-    flex-grow: 1;
-    height: 100%;
-}
-
 .content .right-panel {
     height: 100%;
-    display: flex;
-}
-
-.content .right-panel-content {
-    flex-grow: 1;
-    width: 256px;
-    margin-top: 30px;
-    margin-right: 30px;
-    margin-bottom: 0px;
+    width: 280px;
     display: flex;
     flex-direction: column;
     gap: 12px;
 }
 
-.content .right-panel-content .network-status {
+.content .right-panel .network-status {
+    margin-top: 26px;
+    margin-right: 26px;
     border: 1px solid #ffffff55;
     border-radius: 12px;
     padding: 10px;
@@ -270,23 +247,23 @@ img {
     gap: 10px;
 }
 
-.content .right-panel-content .network-status .network-status-row {
+.content .right-panel .network-status .network-status-row {
     display: flex;
     flex-direction: row;
     justify-content: space-between;
     font-size: 12px;
 }
 
-.content .right-panel-content .slot-list {
+.content .right-panel .slot-list {
+    margin-right: 26px;
     flex-grow: 1;
     gap: 4px;
     display: flex;
     flex-direction: column;
     overflow-y: scroll;
-    padding-bottom: 10px;
 }
 
-.content .right-panel-content .slot-list .slot {
+.content .right-panel .slot-list .slot {
     border-radius: 12px;
     padding: 10px 10px 8px 10px;
     display: flex;
@@ -294,7 +271,7 @@ img {
     gap: 8px;
 }
 
-.content .right-panel-content .slot-list .non-finalized {
+.content .right-panel .slot-list .non-finalized {
     border: 1px solid #ffffff55;
     animation: non-finalized-border 1s infinite;
 }
@@ -305,11 +282,11 @@ img {
     }
 }
 
-.content .right-panel-content .slot-list .finalized {
+.content .right-panel .slot-list .finalized {
     border: 1px solid #ffffff55;
 }
 
-.content .right-panel-content .slot-list .slot .block {
+.content .right-panel .slot-list .slot .block {
     cursor: pointer;
     display: flex;
     flex-direction: column;
@@ -342,7 +319,7 @@ img {
     font-size: 12px;
 }
 
-.content .right-panel-content .slot-list .slot .block .hash {
+.content .right-panel .slot-list .slot .block .hash {
     font-family: 'Fira Mono';
     opacity: 0.8;
     font-size: 10.2px;

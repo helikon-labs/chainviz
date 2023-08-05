@@ -20,35 +20,12 @@
             <div><div class="red"></div></div>
             <div><div class="green"></div></div>
         </div>
-        <div class="scene-container" id="scene-container">
-            <div class="scene" id="scene"></div>
-            <div class="scene-spacer"></div>
-        </div>
-        <div class="content">
+        <div class="content" id="content">
             <div id="left-panel" class="left-panel">
                 <canvas class="main-logo" id="main-logo"></canvas>
-                <div class="network-selector">
-                    <div class="network active" id="kusama-selector">
-                        <img src="./img/icon/kusama-icon.svg" alt="Kusama" />
-                        <span>Kusama</span>
-                    </div>
-                    <div class="network" id="polkadot-selector">
-                        <img src="./img/icon/polkadot-icon.svg" alt="Polkadot" />
-                        <span>Polkadot</span>
-                    </div>
-                </div>
-                <div class="left-panel-content">
-                    <div
-                        class="xcm-message-list-container"
-                        style="width: 182px; display: flex; flex-direction: column"
-                    >
-                        <div style="height: 52px"></div>
-                        <div class="xcm-message-list" id="xcm-message-list">
-                            <div style="flex-grow: 1"></div>
-                        </div>
-                        <div style="height: 84px"></div>
-                    </div>
-                    <div class="left-panel-content-spacer"></div>
+                <div class="validator-list"></div>
+                <div class="xcm-message-list-container">
+                    <div class="xcm-message-list" id="xcm-message-list"></div>
                 </div>
                 <div class="icon-container">
                     <a href="https://helikon.io" target="_blank" rel="noopener">
@@ -77,45 +54,59 @@
                     </a>
                 </div>
             </div>
-            <div class="right-panel" id="right-panel">
-                <div class="right-panel-content">
-                    <div class="network-status" id="network-status">
-                        <div>CHAINVIZ v1.0.0</div>
-                        <div class="network-status-row">
-                            <span>Best Block</span>
-                            <span id="network-best-block">-</span>
+            <div class="left-panel-spacer"></div>
+            <div class="center-panel" id="center-panel">
+                <div style="display: flex; align-items: center; justify-content: center">
+                    <div class="network-selector">
+                        <div class="network active" id="kusama-selector">
+                            <img src="./img/icon/kusama-icon.svg" alt="Kusama" />
+                            <span>Kusama</span>
                         </div>
-                        <div class="network-status-row">
-                            <span>Finalized Block</span>
-                            <span id="network-finalized-block">-</span>
-                        </div>
-                        <div class="network-status-row">
-                            <span>Era</span>
-                            <span id="network-era-index">-</span>
-                        </div>
-                        <div class="network-status-row">
-                            <span>Era Reward Points</span>
-                            <span id="network-era-reward-points">-</span>
-                        </div>
-                        <div class="network-status-row">
-                            <span id="network-total-stake-title">Total Stake (MKSM)</span>
-                            <span id="network-total-stake">-</span>
-                        </div>
-                        <div class="network-status-row">
-                            <span id="network-min-stake-title">Min Stake (KSM)</span>
-                            <span id="network-min-stake">-</span>
-                        </div>
-                        <div class="network-status-row">
-                            <span id="network-average-stake-title">Avg Stake (KSM)</span>
-                            <span id="network-average-stake">-</span>
-                        </div>
-                        <div class="network-status-row">
-                            <span id="network-max-stake-title">Max Stake (KSM)</span>
-                            <span id="network-max-stake">-</span>
+                        <div class="network" id="polkadot-selector">
+                            <img src="./img/icon/polkadot-icon.svg" alt="Polkadot" />
+                            <span>Polkadot</span>
                         </div>
                     </div>
-                    <div class="slot-list" id="slot-list"></div>
                 </div>
+                <div class="scene-container" id="scene-container"></div>
+            </div>
+            <div class="right-panel" id="right-panel">
+                <div class="network-status" id="network-status">
+                    <div>CHAINVIZ v1.0.0</div>
+                    <div class="network-status-row">
+                        <span>Best Block</span>
+                        <span id="network-best-block">-</span>
+                    </div>
+                    <div class="network-status-row">
+                        <span>Finalized Block</span>
+                        <span id="network-finalized-block">-</span>
+                    </div>
+                    <div class="network-status-row">
+                        <span>Era</span>
+                        <span id="network-era-index">-</span>
+                    </div>
+                    <div class="network-status-row">
+                        <span>Era Reward Points</span>
+                        <span id="network-era-reward-points">-</span>
+                    </div>
+                    <div class="network-status-row">
+                        <span id="network-total-stake-title">Total Stake (MKSM)</span>
+                        <span id="network-total-stake">-</span>
+                    </div>
+                    <div class="network-status-row">
+                        <span id="network-min-stake-title">Min Stake (KSM)</span>
+                        <span id="network-min-stake">-</span>
+                    </div>
+                    <div class="network-status-row">
+                        <span id="network-average-stake-title">Avg Stake (KSM)</span>
+                        <span id="network-average-stake">-</span>
+                    </div>
+                    <div class="network-status-row">
+                        <span id="network-max-stake-title">Max Stake (KSM)</span>
+                        <span id="network-max-stake">-</span>
+                    </div>
+                </div>
+                <div class="slot-list" id="slot-list"></div>
             </div>
         </div>
         <div class="loading-container" id="loading-container">

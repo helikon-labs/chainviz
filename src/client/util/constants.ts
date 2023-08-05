@@ -18,22 +18,24 @@ export abstract class Constants {
     static readonly VALIDATOR_SPHERE_MAX_RADIUS = 0.5;
     static readonly VALIDATOR_SPHERE_WIDTH_SEGMENTS = 32;
     static readonly VALIDATOR_SPHERE_HEIGHT_SEGMENTS = 16;
-    static readonly VALIDATOR_ARC_RADIUS = 38;
+    static readonly VALIDATOR_ARC_RADIUS = 48;
     static readonly VALIDATOR_SPHERE_COLOR = 0xffffff;
     static readonly VALIDATOR_ARC_COLOR = 0xffffff;
     static readonly VALIDATOR_ARC_POINTS = 50;
     static readonly PARAS_CROSSHAIR_COLOR = 0xffffff;
     static readonly PARAS_CROSSHAIR_OPACITY = 0.2;
-    static readonly PARAS_CROSSHAIR_HORIZONTAL_RADIUS = 75;
-    static readonly PARAS_CROSSHAIR_VERTICAL_RADIUS = 53;
-    static readonly PARAS_CIRCLE_RADIUS = 48;
+    static readonly PARAS_CROSSHAIR_HORIZONTAL_RADIUS = 65;
+    static readonly PARAS_CROSSHAIR_VERTICAL_RADIUS = 65;
+    static readonly PARAS_CIRCLE_RADIUS = 54;
     static readonly PARA_BG_RADIUS = 1.75;
     static readonly PARA_BG_COLOR = 0xffffff;
-    static readonly PARA_BG_OPACITY = 0.25;
+    static readonly PARA_BG_OPACITY = 0.2;
     static readonly PARA_LOGO_RADIUS = 1.6;
     static readonly VALIDATOR_MESH_ROTATE_X = Math.PI / 4;
     static readonly VALIDATOR_MESH_ROTATE_Y_DELTA = Math.PI / 2800;
     static readonly SCENE_STATE_TRANSITION_ANIM_DURATION_MS = 2000;
+    static readonly SCENE_PARA_OPACITY = 0.5;
+    static readonly SCENE_VALIDATOR_OPACITY = 0.75;
     // orbit control
     static readonly ORBIT_DEFAULT_DISTANCE = 380;
     // format

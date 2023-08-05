@@ -34,6 +34,10 @@ class XCMMessageList {
         return html;
     }
 
+    setOpacity(opacity: number) {
+        this.ui.root.style.opacity = `${opacity}%`;
+    }
+
     clear() {
         this.ui.root.innerHTML = '';
     }

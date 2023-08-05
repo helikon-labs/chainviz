@@ -24,7 +24,11 @@ const ARC_MATERIAL = new THREE.MeshBasicMaterial({
     transparent: true,
     opacity: 0.6,
 });
-const VALIDATOR_MATERIAL = new THREE.MeshBasicMaterial({ color: Constants.VALIDATOR_SPHERE_COLOR });
+const VALIDATOR_MATERIAL = new THREE.MeshBasicMaterial({
+    color: Constants.VALIDATOR_SPHERE_COLOR,
+    transparent: true,
+    opacity: Constants.SCENE_VALIDATOR_OPACITY,
+});
 
 class ValidatorArc {
     private readonly validators: Map<string, ValidatorSummary>;

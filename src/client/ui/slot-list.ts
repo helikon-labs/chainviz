@@ -22,6 +22,10 @@ class SlotList {
         }
     }
 
+    setOpacity(opacity: number) {
+        this.ui.root.style.opacity = `${opacity}%`;
+    }
+
     private getBlockHTML(slot: Slot, block: Block): string {
         const hash = block.block.header.hash.toHex();
         let html = `<div class="block" id="block-${hash}">`;

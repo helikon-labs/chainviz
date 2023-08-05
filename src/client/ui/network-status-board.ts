@@ -43,6 +43,10 @@ class NetworkStatusBoard {
         };
     }
 
+    setOpacity(opacity: number) {
+        this.ui.root.style.opacity = `${opacity}%`;
+    }
+
     display(network: Network, status: NetworkStatus) {
         this.ui.bestBlock.innerHTML = status.bestBlockNumber.toString();
         this.ui.finalizedBlock.innerHTML = status.finalizedBlockNumber.toString();

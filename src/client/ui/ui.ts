@@ -3,7 +3,7 @@ import { Kusama, Network, Polkadot } from '../model/substrate/network';
 import { NetworkStatus } from '../model/subvt/network-status';
 import { Constants } from '../util/constants';
 import { createTween } from '../util/tween';
-import { hide, show } from '../util/ui-util';
+import { show } from '../util/ui-util';
 import { Logo, getRandomCharacterType, getRandomShapeType } from './logo';
 import { NetworkStatusBoard } from './network-status-board';
 import { SlotList } from './slot-list';
@@ -19,48 +19,54 @@ class UI {
     private readonly scene: Chainviz3DScene;
     private readonly root: HTMLElement;
     private readonly sceneContainer: HTMLDivElement;
-    private readonly sceneDiv: HTMLDivElement;
     private readonly background: HTMLDivElement;
+    private readonly content: HTMLDivElement;
     private readonly leftPanel: HTMLDivElement;
+    private readonly mainLogoCanvas: HTMLCanvasElement;
+    private readonly logo: Logo;
+    private readonly xcmMessageList: XCMMessageList;
+    private readonly centerPanel: HTMLDivElement;
     private readonly kusamaSelector: HTMLDivElement;
     private readonly polkadotSelector: HTMLDivElement;
     private readonly rightPanel: HTMLDivElement;
-    private readonly mainLogoCanvas: HTMLCanvasElement;
-    private readonly loadingContainer: HTMLDivElement;
-    private readonly loadingInfo: HTMLDivElement;
-    private readonly logo: Logo;
     private readonly networkStatusBoard: NetworkStatusBoard;
     private readonly slotList: SlotList;
-    private readonly xcmMessageList: XCMMessageList;
+    private readonly loadingContainer: HTMLDivElement;
+    private readonly loadingInfo: HTMLDivElement;
     private readonly eventBus = EventBus.getInstance();
+    private isChangingNetwork = false;
 
     constructor() {
         this.root = <HTMLElement>document.getElementById('root');
         this.sceneContainer = <HTMLDivElement>document.getElementById('scene-container');
-        this.sceneDiv = <HTMLDivElement>document.getElementById('scene');
         this.background = <HTMLDivElement>document.getElementById('background');
+        this.content = <HTMLDivElement>document.getElementById('content');
         this.leftPanel = <HTMLDivElement>document.getElementById('left-panel');
+        this.mainLogoCanvas = <HTMLCanvasElement>document.getElementById('main-logo');
+        this.logo = new Logo(getRandomShapeType(), getRandomCharacterType());
+        this.xcmMessageList = new XCMMessageList();
+        this.centerPanel = <HTMLDivElement>document.getElementById('center-panel');
         this.kusamaSelector = <HTMLDivElement>document.getElementById('kusama-selector');
         this.polkadotSelector = <HTMLDivElement>document.getElementById('polkadot-selector');
         this.rightPanel = <HTMLDivElement>document.getElementById('right-panel');
-        this.mainLogoCanvas = <HTMLCanvasElement>document.getElementById('main-logo');
-        this.loadingContainer = <HTMLDivElement>document.getElementById('loading-container');
-        this.loadingInfo = <HTMLDivElement>document.getElementById('loading-info');
-        this.logo = new Logo(getRandomShapeType(), getRandomCharacterType());
         this.networkStatusBoard = new NetworkStatusBoard();
         this.slotList = new SlotList();
-        this.xcmMessageList = new XCMMessageList();
+        this.loadingContainer = <HTMLDivElement>document.getElementById('loading-container');
+        this.loadingInfo = <HTMLDivElement>document.getElementById('loading-info');
 
-        this.scene = new Chainviz3DScene(this.sceneDiv);
-
-        this.background.style.opacity = '0%';
-
+        this.scene = new Chainviz3DScene(this.sceneContainer);
         this.kusamaSelector.addEventListener('click', (_event) => {
+            if (this.isChangingNetwork) {
+                return;
+            }
             this.kusamaSelector.classList.add('active');
             this.polkadotSelector.classList.remove('active');
             this.selectNetwork(Kusama);
         });
         this.polkadotSelector.addEventListener('click', (_event) => {
+            if (this.isChangingNetwork) {
+                return;
+            }
             this.kusamaSelector.classList.remove('active');
             this.polkadotSelector.classList.add('active');
             this.selectNetwork(Polkadot);
@@ -73,10 +79,8 @@ class UI {
     }
 
     displayLoading() {
-        hide(this.background);
-        hide(this.leftPanel);
-        hide(this.rightPanel);
-        hide(this.sceneContainer);
+        this.content.style.opacity = '0%';
+        this.background.style.opacity = '0%';
     }
 
     animate() {
@@ -144,9 +148,9 @@ class UI {
         ).start();
     }
 
-    private fadeInLeftPanel(onComplete?: () => void) {
-        this.leftPanel.style.opacity = '0%';
-        show(this.leftPanel);
+    private fadeInContent(onComplete?: () => void) {
+        this.content.style.opacity = '0%';
+        show(this.content);
         const opacity = { opacity: 0 };
         createTween(
             opacity,
@@ -155,30 +159,13 @@ class UI {
             Constants.CONTENT_FADE_ANIM_DURATION_MS,
             undefined,
             () => {
-                this.leftPanel.style.opacity = `${opacity.opacity}%`;
+                this.content.style.opacity = `${opacity.opacity}%`;
             },
             onComplete,
         ).start();
     }
 
-    private fadeInRightPanel(onComplete: () => void) {
-        this.rightPanel.style.opacity = '0%';
-        show(this.rightPanel);
-        const opacity = { opacity: 0 };
-        createTween(
-            opacity,
-            { opacity: 100 },
-            TWEEN.Easing.Exponential.InOut,
-            Constants.CONTENT_FADE_ANIM_DURATION_MS,
-            undefined,
-            () => {
-                this.rightPanel.style.opacity = `${opacity.opacity}%`;
-            },
-            onComplete,
-        ).start();
-    }
-
-    private fadeOutRightPanel(onComplete: () => void) {
+    private fadeOutForNetworkChange(onComplete?: () => void) {
         const opacity = { opacity: 100 };
         createTween(
             opacity,
@@ -187,38 +174,27 @@ class UI {
             Constants.CONTENT_FADE_ANIM_DURATION_MS,
             undefined,
             () => {
-                this.rightPanel.style.opacity = `${opacity.opacity}%`;
-            },
-            onComplete,
-        ).start();
-    }
-
-    private fadeInSceneContainer(onComplete: () => void) {
-        this.sceneContainer.style.opacity = '0%';
-        show(this.sceneContainer);
-        const opacity = { opacity: 0 };
-        createTween(
-            opacity,
-            { opacity: 100 },
-            TWEEN.Easing.Exponential.InOut,
-            Constants.CONTENT_FADE_ANIM_DURATION_MS,
-            undefined,
-            () => {
+                this.xcmMessageList.setOpacity(opacity.opacity);
+                this.networkStatusBoard.setOpacity(opacity.opacity);
+                this.slotList.setOpacity(opacity.opacity);
                 this.sceneContainer.style.opacity = `${opacity.opacity}%`;
             },
             onComplete,
         ).start();
     }
 
-    private fadeOutSceneContainer(onComplete: () => void) {
-        const opacity = { opacity: 100 };
+    private fadeInAfterNetworkChange(onComplete?: () => void) {
+        const opacity = { opacity: 0 };
         createTween(
             opacity,
-            { opacity: 0 },
+            { opacity: 100 },
             TWEEN.Easing.Exponential.InOut,
             Constants.CONTENT_FADE_ANIM_DURATION_MS,
             undefined,
             () => {
+                this.xcmMessageList.setOpacity(opacity.opacity);
+                this.networkStatusBoard.setOpacity(opacity.opacity);
+                this.slotList.setOpacity(opacity.opacity);
                 this.sceneContainer.style.opacity = `${opacity.opacity}%`;
             },
             onComplete,
@@ -232,32 +208,39 @@ class UI {
         onComplete?: () => void,
     ) {
         this.clearSlots();
+        this.clearXCMMessages();
         this.fadeOutLoadingContainer(() => {
-            this.fadeInBackground(() => {
-                this.fadeInLeftPanel();
-                this.fadeInRightPanel(() => {
+            if (this.isChangingNetwork) {
+                this.slotList.initialize(slots);
+                this.scene.start(paras, validatorMap);
+                this.fadeInAfterNetworkChange(() => {
+                    this.isChangingNetwork = false;
+                    if (onComplete) {
+                        onComplete();
+                    }
+                });
+            } else {
+                this.fadeInBackground(() => {
+                    this.slotList.initialize(slots);
                     this.scene.start(paras, validatorMap);
-                    this.fadeInSceneContainer(() => {
-                        this.slotList.initialize(slots);
+                    this.fadeInContent(() => {
                         if (onComplete) {
                             onComplete();
                         }
                     });
                 });
-            });
+            }
         });
     }
 
-    reset(onComplete?: () => void) {
-        this.clearXCMMessages();
+    prepareForNetworkChange(onComplete?: () => void) {
+        this.isChangingNetwork = true;
         this.scene.reset(() => {
-            this.fadeOutSceneContainer(() => {
-                this.fadeOutRightPanel(() => {
-                    this.fadeInLoadingContainer(() => {
-                        if (onComplete) {
-                            onComplete();
-                        }
-                    });
+            this.fadeOutForNetworkChange(() => {
+                this.fadeInLoadingContainer(() => {
+                    if (onComplete) {
+                        onComplete();
+                    }
                 });
             });
         });

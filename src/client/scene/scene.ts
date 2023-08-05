@@ -52,7 +52,7 @@ class Chainviz3DScene {
         //this.stats.domElement.style.cssText = "position:absolute; bottom:0px; right:0px;";
         // orbit controls
         this.controls = new OrbitControls(this.camera, this.renderer.domElement);
-        this.controls.enabled = false;
+        this.controls.enabled = true;
         window.addEventListener(
             'resize',
             () => {

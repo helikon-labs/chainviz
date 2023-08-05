@@ -4,6 +4,12 @@ import { Constants } from '../util/constants';
 import { createTween } from '../util/tween';
 import * as TWEEN from '@tweenjs/tween.js';
 
+const LINE_MATERIAL = new THREE.LineBasicMaterial({
+    color: Constants.PARAS_CROSSHAIR_COLOR,
+    transparent: true,
+    opacity: Constants.PARAS_CROSSHAIR_OPACITY,
+});
+
 class ParaMesh {
     private group!: THREE.Group;
 
@@ -12,24 +18,19 @@ class ParaMesh {
             scene.remove(this.group);
         }
         this.group = new THREE.Group();
-        const lineMaterial = new THREE.LineBasicMaterial({
-            color: Constants.PARAS_CROSSHAIR_COLOR,
-            transparent: true,
-            opacity: Constants.PARAS_CROSSHAIR_OPACITY,
-        });
         // horizontal line
         let linePoints = [];
         linePoints.push(new THREE.Vector3(-Constants.PARAS_CROSSHAIR_HORIZONTAL_RADIUS, 0, 0));
         linePoints.push(new THREE.Vector3(Constants.PARAS_CROSSHAIR_HORIZONTAL_RADIUS, 0, 0));
         let lineGeometry = new THREE.BufferGeometry().setFromPoints(linePoints);
-        let line = new THREE.Line(lineGeometry, lineMaterial);
+        let line = new THREE.Line(lineGeometry, LINE_MATERIAL);
         this.group.add(line);
         // vertical line
         linePoints = [];
         linePoints.push(new THREE.Vector3(0, Constants.PARAS_CROSSHAIR_VERTICAL_RADIUS, 0));
         linePoints.push(new THREE.Vector3(0, -Constants.PARAS_CROSSHAIR_VERTICAL_RADIUS, 0));
         lineGeometry = new THREE.BufferGeometry().setFromPoints(linePoints);
-        line = new THREE.Line(lineGeometry, lineMaterial);
+        line = new THREE.Line(lineGeometry, LINE_MATERIAL);
         this.group.add(line);
         // ring
         const ringMaterial = new THREE.LineBasicMaterial({
@@ -110,7 +111,8 @@ class ParaMesh {
                     const angle = (Math.PI / (this.group.children.length - 3)) * 2 * (i - 3);
                     for (const child of this.group.children[i].children) {
                         if (child instanceof THREE.Mesh) {
-                            child.material.opacity = progress.progress;
+                            child.material.opacity =
+                                progress.progress * Constants.SCENE_PARA_OPACITY;
                         }
                         child.scale.x = progress.progress;
                         child.scale.y = progress.progress;
