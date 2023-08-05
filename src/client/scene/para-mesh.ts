@@ -54,6 +54,7 @@ class ParaMesh {
             transparent: true,
             opacity: Constants.PARA_BG_OPACITY,
         });
+        backgroundMaterial.side = THREE.DoubleSide;
         for (let i = 0; i < paras.length; i++) {
             const para = paras[i];
             const paraGroup = new THREE.Group();
@@ -75,6 +76,7 @@ class ParaMesh {
                 transparent: true,
                 opacity: 1.0,
             });
+            logoMaterial.side = THREE.DoubleSide;
             const logo = new THREE.Mesh(logoGeometry, logoMaterial);
             logo.position.set(Math.sin(angle) * initialRadius, Math.cos(angle) * initialRadius, 0);
             logo.material.opacity = 0;
