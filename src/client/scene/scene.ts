@@ -50,13 +50,27 @@ class Chainviz3DScene {
         // this.renderer.outputColorSpace  = THREE.LinearSRGBColorSpace;
         container.appendChild(this.renderer.domElement);
 
+        const geometry = new THREE.SphereGeometry(Constants.PARAS_CIRCLE_RADIUS);
+        const material = new THREE.MeshBasicMaterial({
+            color: 0xffff00,
+            transparent: true,
+            opacity: 0.0,
+        });
+        material.colorWrite = false;
+        const circle = new THREE.Mesh(geometry, material);
+        circle.userData = {
+            type: 'paraRegion',
+        };
+        circle.renderOrder = Number.MAX_SAFE_INTEGER;
+        this.scene.add(circle);
+
         // stats
         this.stats = new Stats();
         //document.body.appendChild(this.stats.dom);
         //this.stats.domElement.style.cssText = "position:absolute; bottom:0px; right:0px;";
         // orbit controls
         this.controls = new OrbitControls(this.camera, this.renderer.domElement);
-        this.controls.enabled = true;
+        this.controls.enabled = false;
         window.addEventListener('click', (event) => {
             this.onClick(event);
         });
@@ -109,17 +123,18 @@ class Chainviz3DScene {
 
     private checkMouseHoverRaycast() {
         this.raycaster.setFromCamera(this.mouseHoverPoint, this.camera);
-        this.camera.getWorldPosition;
         const intersects = this.raycaster.intersectObjects(this.scene.children, true);
         this.setDefaultCursor();
+        let intersectsParaRegion = false;
         for (const intersect of intersects) {
             const type = intersect.object.userData['type'];
             if (type == 'para' || intersect.instanceId) {
                 this.setPointerCursor();
-                break;
+            } else if (type == 'paraRegion') {
+                intersectsParaRegion = true;
             }
         }
-        // this.validatorMeshIsRotating = !containsParaRegion && this.started;
+        this.validatorMeshIsRotating = !intersectsParaRegion && this.started;
         /*
         const index = intersects.length > 0 ? intersects[0].instanceId : undefined;
         const validator = index ? this.validatorMesh.hover(index) : undefined;
