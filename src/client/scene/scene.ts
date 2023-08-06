@@ -128,7 +128,7 @@ class Chainviz3DScene {
         let intersectsParaRegion = false;
         for (const intersect of intersects) {
             const type = intersect.object.userData['type'];
-            if (type == 'para' || intersect.instanceId) {
+            if (type == 'para' || intersect.instanceId != undefined) {
                 this.setPointerCursor();
             } else if (type == 'paraRegion') {
                 intersectsParaRegion = true;
