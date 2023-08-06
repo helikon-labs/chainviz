@@ -17,6 +17,7 @@ class ParaMesh {
         if (this.group) {
             scene.remove(this.group);
         }
+
         this.group = new THREE.Group();
         // horizontal line
         let linePoints = [];
@@ -80,6 +81,9 @@ class ParaMesh {
             const logo = new THREE.Mesh(logoGeometry, logoMaterial);
             logo.position.set(Math.sin(angle) * initialRadius, Math.cos(angle) * initialRadius, 0);
             logo.material.opacity = 0;
+            logo.userData = {
+                type: 'para',
+            };
             paraGroup.add(logo);
             // add to the main group
             this.group.add(paraGroup);

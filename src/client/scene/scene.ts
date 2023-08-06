@@ -13,16 +13,20 @@ class Chainviz3DScene {
     private readonly controls: OrbitControls;
     private readonly renderer: THREE.WebGLRenderer;
     private readonly stats: Stats;
-    private readonly container: HTMLDivElement;
+    private readonly container: HTMLElement;
     private readonly paraMesh: ParaMesh;
     private readonly validatorMesh: ValidatorMesh;
     private validatorMeshIsRotating = false;
+    private readonly mouseHoverPoint: THREE.Vector2 = new THREE.Vector2();
+    private readonly raycaster: THREE.Raycaster;
+    private started = false;
 
     constructor(container: HTMLDivElement) {
         this.container = container;
         this.paraMesh = new ParaMesh();
         this.validatorMesh = new ValidatorMesh();
         this.scene = new THREE.Scene();
+        this.raycaster = new THREE.Raycaster();
         this.camera = new THREE.PerspectiveCamera(
             20,
             container.clientWidth / container.clientHeight,
@@ -53,6 +57,12 @@ class Chainviz3DScene {
         // orbit controls
         this.controls = new OrbitControls(this.camera, this.renderer.domElement);
         this.controls.enabled = true;
+        window.addEventListener('click', (event) => {
+            this.onClick(event);
+        });
+        container.addEventListener('mousemove', (event) => {
+            this.onMouseMove(event);
+        });
         window.addEventListener(
             'resize',
             () => {
@@ -62,9 +72,19 @@ class Chainviz3DScene {
         );
     }
 
-    private onClick(_event: MouseEvent) {}
+    private onClick(event: MouseEvent) {
+        const x = (event.clientX / window.innerWidth) * 2 - 1;
+        const y = -(event.clientY / window.innerHeight) * 2 + 1;
+        console.log('click', x, y);
+    }
 
-    private onMouseMove(_event: MouseEvent) {}
+    private onMouseMove(event: MouseEvent) {
+        const containerRect = this.container.getBoundingClientRect();
+        const x = event.x - containerRect.left;
+        const y = event.y - containerRect.top;
+        this.mouseHoverPoint.x = (x / containerRect.width) * 2 - 1;
+        this.mouseHoverPoint.y = -((y / containerRect.height) * 2 - 1);
+    }
 
     private onWindowResize() {
         this.camera.aspect = this.container.clientWidth / this.container.clientHeight;
@@ -83,7 +103,37 @@ class Chainviz3DScene {
     }
 
     private render() {
+        this.checkMouseHoverRaycast();
         this.renderer.render(this.scene, this.camera);
+    }
+
+    private checkMouseHoverRaycast() {
+        this.raycaster.setFromCamera(this.mouseHoverPoint, this.camera);
+        this.camera.getWorldPosition;
+        const intersects = this.raycaster.intersectObjects(this.scene.children, true);
+        this.setDefaultCursor();
+        for (const intersect of intersects) {
+            const type = intersect.object.userData['type'];
+            if (type == 'para' || intersect.instanceId) {
+                this.setPointerCursor();
+                break;
+            }
+        }
+        // this.validatorMeshIsRotating = !containsParaRegion && this.started;
+        /*
+        const index = intersects.length > 0 ? intersects[0].instanceId : undefined;
+        const validator = index ? this.validatorMesh.hover(index) : undefined;
+        if (index && validator && !validator.isAuthoring()) {
+            this.setPointerCursor();
+            if (!this.validatorMesh.isSelected(index)) {
+                this.showValidatorSummaryBoard(index, validator);
+            }
+        } else {
+            this.validatorMesh.clearHover();
+            this.setDefaultCursor();
+            this.validatorSummaryBoard.close();
+        }
+        */
     }
 
     private setPointerCursor() {
@@ -114,6 +164,7 @@ class Chainviz3DScene {
         this.paraMesh.start(this.scene, paras);
         this.validatorMesh.start(this.scene, validatorMap);
         this.validatorMeshIsRotating = true;
+        this.started = true;
     }
 
     reset(onComplete?: () => void) {
