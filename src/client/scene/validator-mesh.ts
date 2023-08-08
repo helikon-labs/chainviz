@@ -3,90 +3,35 @@ import { ValidatorSummary } from '../model/subvt/validator-summary';
 import { Constants } from '../util/constants';
 import { createTween } from '../util/tween';
 import * as TWEEN from '@tweenjs/tween.js';
+import { rotateAboutPoint } from '../util/geometry';
 
-const VALIDATOR_GEOMETRY = new THREE.SphereGeometry(
-    Constants.VALIDATOR_SPHERE_MAX_RADIUS,
-    Constants.VALIDATOR_SPHERE_WIDTH_SEGMENTS,
-    Constants.VALIDATOR_SPHERE_HEIGHT_SEGMENTS,
-);
-const ARC_CURVE = new THREE.EllipseCurve(
-    0,
-    0, // aX, aY
-    Constants.VALIDATOR_ARC_RADIUS,
-    Constants.VALIDATOR_ARC_RADIUS,
-    Math.PI / 2, // start angle
-    (3 * Math.PI) / 2, // end angle
-    false, // clockwise
-    0, // rotation
-);
+const ARC_GEOMETRY = new THREE.TorusGeometry(Constants.VALIDATOR_ARC_RADIUS, 0.06, 12, 36, Math.PI);
+ARC_GEOMETRY.rotateZ(Math.PI / 2);
+
 const ARC_MATERIAL = new THREE.MeshBasicMaterial({
     color: Constants.VALIDATOR_ARC_COLOR,
     transparent: true,
     opacity: 0.6,
 });
+const VALIDATOR_GEOMETRY = new THREE.SphereGeometry(
+    Constants.VALIDATOR_SPHERE_MAX_RADIUS,
+    Constants.VALIDATOR_SPHERE_WIDTH_SEGMENTS,
+    Constants.VALIDATOR_SPHERE_HEIGHT_SEGMENTS,
+);
 const VALIDATOR_MATERIAL = new THREE.MeshBasicMaterial({
     color: Constants.VALIDATOR_SPHERE_COLOR,
     transparent: true,
     opacity: Constants.SCENE_VALIDATOR_OPACITY,
 });
 
-class ValidatorArc {
-    private readonly validators: Map<string, ValidatorSummary>;
-    private readonly mesh: THREE.InstancedMesh;
-    private readonly arc: THREE.Line;
-    private readonly group: THREE.Group;
-
-    constructor(
-        validatorMap: Map<string, ValidatorSummary>,
-        maxRewardPoints: number,
-        arcCount: number,
-        arcIndex: number,
-    ) {
-        const arcPoints = ARC_CURVE.getPoints(Constants.VALIDATOR_ARC_POINTS);
-        const arcGeometry = new THREE.BufferGeometry().setFromPoints(arcPoints);
-        this.arc = new THREE.Line(arcGeometry, ARC_MATERIAL);
-        this.validators = validatorMap;
-        this.mesh = new THREE.InstancedMesh(
-            VALIDATOR_GEOMETRY,
-            VALIDATOR_MATERIAL,
-            validatorMap.size,
-        );
-        const angleDelta = Math.PI / (validatorMap.size + 1);
-        let currentAngle = angleDelta;
-        const validatorMapKeys = Array.from(validatorMap.keys());
-        for (let j = 0; j < validatorMapKeys.length; j++) {
-            const validator = validatorMap.get(validatorMapKeys[j])!;
-            const object = new THREE.Object3D();
-            object.translateX(-Constants.VALIDATOR_ARC_RADIUS * Math.sin(currentAngle));
-            object.translateY(Constants.VALIDATOR_ARC_RADIUS * Math.cos(currentAngle));
-            const scale = Math.max(
-                validator.rewardPoints / maxRewardPoints,
-                Constants.VALIDATOR_SPHERE_MIN_RADIUS / Constants.VALIDATOR_SPHERE_MAX_RADIUS,
-            );
-            object.scale.x = scale;
-            object.scale.y = scale;
-            object.scale.z = scale;
-            object.updateMatrix();
-            this.mesh.setMatrixAt(j, object.matrix);
-            currentAngle += angleDelta;
-        }
-        const group = new THREE.Group();
-        group.add(this.mesh);
-        group.add(this.arc);
-        if (arcIndex >= arcCount / 2) {
-            group.rotation.y = Math.PI;
-        }
-        group.updateMatrix();
-        this.group = group;
-    }
-
-    addToGroup(group: THREE.Group) {
-        group.add(this.group);
-    }
-}
-
 class ValidatorMesh {
+    private arcMesh!: THREE.InstancedMesh;
+    private validatorMesh!: THREE.InstancedMesh;
     private group!: THREE.Group;
+    private validatorCount = 0;
+    private arcCount = 0;
+    private validatorsPerArc = 0;
+    private readonly validatorScales: number[] = [];
 
     start(
         scene: THREE.Scene,
@@ -97,32 +42,44 @@ class ValidatorMesh {
             scene.remove(this.group);
         }
         this.group = new THREE.Group();
+        this.validatorCount = validatorMap.size;
         let maxRewardPoints = 0;
+        let minRewardPoints = Number.MAX_SAFE_INTEGER;
         for (const validator of validatorMap.values()) {
-            if (validator.rewardPoints > maxRewardPoints) {
-                maxRewardPoints = validator.rewardPoints;
-            }
+            maxRewardPoints = Math.max(maxRewardPoints, validator.rewardPoints);
+            minRewardPoints = Math.min(minRewardPoints, validator.rewardPoints);
         }
-        let arcCount = Constants.MIN_ARC_COUNT;
-        let validatorsPerArc = Math.ceil(validatorMap.size / arcCount);
-        while (validatorsPerArc > Constants.MAX_VALIDATORS_PER_ARC) {
-            arcCount++;
-            validatorsPerArc = Math.ceil(validatorMap.size / arcCount);
+        this.arcCount = Constants.MIN_ARC_COUNT;
+        this.validatorsPerArc = Math.ceil(validatorMap.size / this.arcCount);
+        while (this.validatorsPerArc > Constants.MAX_VALIDATORS_PER_ARC) {
+            this.arcCount++;
+            this.validatorsPerArc = Math.ceil(validatorMap.size / this.arcCount);
         }
-        let index = 0;
-        while (index < validatorMap.size) {
-            const endIndex = Math.min(index + validatorsPerArc, validatorMap.size - 1);
-            const arcValidatorMap = new Map(Array.from(validatorMap).slice(index, endIndex));
-            const arc = new ValidatorArc(
-                arcValidatorMap,
-                maxRewardPoints,
-                arcCount,
-                Math.floor(index / validatorsPerArc),
-            );
-            arc.addToGroup(this.group);
-            index += validatorsPerArc;
-        }
+        this.arcMesh = new THREE.InstancedMesh(ARC_GEOMETRY, ARC_MATERIAL, this.arcCount);
+        this.arcMesh.userData = {
+            type: 'arc',
+        };
+        this.group.add(this.arcMesh);
+        this.validatorMesh = new THREE.InstancedMesh(
+            VALIDATOR_GEOMETRY,
+            VALIDATOR_MATERIAL,
+            validatorMap.size,
+        );
+        const validatorMapKeys = Array.from(validatorMap.keys());
+        this.validatorMesh.userData = {
+            type: 'validator',
+            stashAddresses: validatorMapKeys,
+        };
+        this.group.add(this.validatorMesh);
         scene.add(this.group);
+        const minScale =
+            Constants.VALIDATOR_SPHERE_MIN_RADIUS / Constants.VALIDATOR_SPHERE_MAX_RADIUS;
+        const scaleStep = (1.0 - minScale) / (maxRewardPoints - minRewardPoints);
+        for (let i = 0; i < validatorMapKeys.length; i++) {
+            const validator = validatorMap.get(validatorMapKeys[i])!;
+            const scale = minScale + scaleStep * (validator.rewardPoints - minRewardPoints);
+            this.validatorScales.push(scale);
+        }
         this.animate(false, onComplete);
     }
 
@@ -136,21 +93,48 @@ class ValidatorMesh {
             Constants.SCENE_STATE_TRANSITION_ANIM_DURATION_MS,
             undefined,
             () => {
-                for (let i = 0; i < this.group.children.length; i++) {
-                    let rotationY =
-                        i * ((2 * Math.PI) / this.group.children.length) * progress.progress;
-                    if (i >= this.group.children.length / 2) {
+                for (let i = 0; i < this.arcCount; i++) {
+                    let rotationY = i * ((2 * Math.PI) / this.arcCount) * progress.progress;
+                    if (i >= this.arcCount / 2) {
                         const target =
-                            ((i - this.group.children.length / 2) * Math.PI) /
-                            Math.ceil(this.group.children.length / 2);
+                            ((i - this.arcCount / 2) * Math.PI) / Math.ceil(this.arcCount / 2);
                         rotationY = Math.PI + target * progress.progress;
                     }
-                    this.group.children[i].rotation.y = rotationY;
-                    this.group.children[i].updateMatrix();
-                    this.group.rotation.x = Constants.VALIDATOR_MESH_ROTATE_X * progress.progress;
+                    const object = new THREE.Object3D();
+                    object.rotation.y = rotationY;
+                    object.updateMatrix();
+                    this.arcMesh.setMatrixAt(i, object.matrix);
+                    // update validators
+                    const angleDelta = Math.PI / (this.validatorsPerArc + 1);
+                    let currentAngle = angleDelta;
+                    for (let j = 0; j < this.validatorsPerArc; j++) {
+                        const k = i * this.validatorsPerArc + j;
+                        if (k >= this.validatorCount) {
+                            break;
+                        }
+                        const object = new THREE.Object3D();
+                        object.translateX(-Constants.VALIDATOR_ARC_RADIUS * Math.sin(currentAngle));
+                        object.translateY(Constants.VALIDATOR_ARC_RADIUS * Math.cos(currentAngle));
+                        rotateAboutPoint(
+                            object,
+                            new THREE.Vector3(0, object.position.y, 0),
+                            new THREE.Vector3(0, 1, 0),
+                            rotationY,
+                            false,
+                        );
+                        object.scale.x = this.validatorScales[k];
+                        object.scale.y = this.validatorScales[k];
+                        object.scale.z = this.validatorScales[k];
+                        object.updateMatrix();
+                        this.validatorMesh.setMatrixAt(k, object.matrix);
+                        currentAngle += angleDelta;
+                    }
+                    this.group.rotation.x = (Math.PI / 4) * progress.progress;
+                    this.arcMesh.instanceMatrix.needsUpdate = true;
+                    this.validatorMesh.instanceMatrix.needsUpdate = true;
+                    this.validatorMesh.computeBoundingSphere();
                     this.group.rotation.y =
                         currentRotationY * (isReverse ? progress.progress : 1 - progress.progress);
-                    this.group.updateMatrix();
                 }
             },
             onComplete,

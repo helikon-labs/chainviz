@@ -7,8 +7,14 @@ import { ValidatorSummary } from '../model/subvt/validator-summary';
 import { ValidatorMesh } from './validator-mesh';
 import { ParaMesh } from './para-mesh';
 
-class Chainviz3DScene {
+interface SceneDelegate {
+    onValidatorHover(stashAddress: string): void;
+    clearValidatorHover(): void;
+}
+
+class Scene {
     private readonly scene: THREE.Scene;
+    private readonly delegate: SceneDelegate;
     private readonly camera: THREE.PerspectiveCamera;
     private readonly controls: OrbitControls;
     private readonly renderer: THREE.WebGLRenderer;
@@ -21,8 +27,9 @@ class Chainviz3DScene {
     private readonly raycaster: THREE.Raycaster;
     private started = false;
 
-    constructor(container: HTMLDivElement) {
+    constructor(container: HTMLDivElement, delegate: SceneDelegate) {
         this.container = container;
+        this.delegate = delegate;
         this.paraMesh = new ParaMesh();
         this.validatorMesh = new ValidatorMesh();
         this.scene = new THREE.Scene();
@@ -117,7 +124,9 @@ class Chainviz3DScene {
     }
 
     private render() {
-        this.checkMouseHoverRaycast();
+        if (this.started) {
+            this.checkMouseHoverRaycast();
+        }
         this.renderer.render(this.scene, this.camera);
     }
 
@@ -128,27 +137,20 @@ class Chainviz3DScene {
         let intersectsParaRegion = false;
         for (const intersect of intersects) {
             const type = intersect.object.userData['type'];
-            if (type == 'para' || intersect.instanceId != undefined) {
+            if (type == 'para') {
                 this.setPointerCursor();
+            } else if (type == 'validator' && intersect.instanceId != undefined) {
+                this.setPointerCursor();
+                const stashAddress =
+                    intersect.object.userData['stashAddresses'][intersect.instanceId];
+                this.delegate.onValidatorHover(stashAddress);
             } else if (type == 'paraRegion') {
                 intersectsParaRegion = true;
+            } else {
+                this.delegate.clearValidatorHover();
             }
         }
         this.validatorMeshIsRotating = !intersectsParaRegion && this.started;
-        /*
-        const index = intersects.length > 0 ? intersects[0].instanceId : undefined;
-        const validator = index ? this.validatorMesh.hover(index) : undefined;
-        if (index && validator && !validator.isAuthoring()) {
-            this.setPointerCursor();
-            if (!this.validatorMesh.isSelected(index)) {
-                this.showValidatorSummaryBoard(index, validator);
-            }
-        } else {
-            this.validatorMesh.clearHover();
-            this.setDefaultCursor();
-            this.validatorSummaryBoard.close();
-        }
-        */
     }
 
     private setPointerCursor() {
@@ -177,16 +179,17 @@ class Chainviz3DScene {
             }
         }
         this.paraMesh.start(this.scene, paras);
-        this.validatorMesh.start(this.scene, validatorMap);
+        this.validatorMesh.start(this.scene, validatorMap, () => {
+            this.started = true;
+        });
         this.validatorMeshIsRotating = true;
-        this.started = true;
     }
 
     reset(onComplete?: () => void) {
         this.validatorMeshIsRotating = false;
-        this.paraMesh.reset();
+        //this.paraMesh.reset();
         this.validatorMesh.reset(onComplete);
     }
 }
 
-export { Chainviz3DScene };
+export { Scene, SceneDelegate };

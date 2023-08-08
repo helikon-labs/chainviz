@@ -35,7 +35,7 @@ export abstract class Constants {
     static readonly VALIDATOR_MESH_ROTATE_Y_DELTA = Math.PI / 2800;
     static readonly SCENE_STATE_TRANSITION_ANIM_DURATION_MS = 2000;
     static readonly SCENE_PARA_OPACITY = 0.5;
-    static readonly SCENE_VALIDATOR_OPACITY = 0.75;
+    static readonly SCENE_VALIDATOR_OPACITY = 1.0;
     // orbit control
     static readonly ORBIT_DEFAULT_DISTANCE = 380;
     // format

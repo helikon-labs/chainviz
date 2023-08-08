@@ -10,13 +10,13 @@ import { SlotList } from './slot-list';
 import * as TWEEN from '@tweenjs/tween.js';
 import { XCMMessageList } from './xcm-message-list';
 import { Para } from '../model/substrate/para';
-import { Chainviz3DScene } from '../scene/scene';
+import { Scene, SceneDelegate } from '../scene/scene';
 import { ValidatorSummary } from '../model/subvt/validator-summary';
 import { EventBus } from '../event/event-bus';
 import { ChainvizEvent } from '../event/event';
 
 class UI {
-    private readonly scene: Chainviz3DScene;
+    private readonly scene: Scene;
     private readonly root: HTMLElement;
     private readonly sceneContainer: HTMLDivElement;
     private readonly background: HTMLDivElement;
@@ -54,7 +54,14 @@ class UI {
         this.loadingContainer = <HTMLDivElement>document.getElementById('loading-container');
         this.loadingInfo = <HTMLDivElement>document.getElementById('loading-info');
 
-        this.scene = new Chainviz3DScene(this.sceneContainer);
+        this.scene = new Scene(this.sceneContainer, <SceneDelegate>{
+            onValidatorHover(stashAddress: string) {
+                console.log('hover', stashAddress);
+            },
+            clearValidatorHover() {
+                console.log('clear hover');
+            },
+        });
         this.kusamaSelector.addEventListener('click', (_event) => {
             if (this.isChangingNetwork) {
                 return;
