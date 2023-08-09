@@ -8,7 +8,7 @@ import { ValidatorMesh } from './validator-mesh';
 import { ParaMesh } from './para-mesh';
 
 interface SceneDelegate {
-    onValidatorHover(stashAddress: string): void;
+    onValidatorHover(index: number, stashAddress: string): void;
     clearValidatorHover(): void;
 }
 
@@ -26,6 +26,7 @@ class Scene {
     private readonly mouseHoverPoint: THREE.Vector2 = new THREE.Vector2();
     private readonly raycaster: THREE.Raycaster;
     private started = false;
+    private highlightedValidatorStashAddress: string | undefined = undefined;
 
     constructor(container: HTMLDivElement, delegate: SceneDelegate) {
         this.container = container;
@@ -134,23 +135,46 @@ class Scene {
         this.raycaster.setFromCamera(this.mouseHoverPoint, this.camera);
         const intersects = this.raycaster.intersectObjects(this.scene.children, true);
         this.setDefaultCursor();
+        let intersectsValidatorStashAddress: string | undefined = undefined;
+        let intersectsValidatorIndex: number | undefined = undefined;
+        let intersectsPara = false;
         let intersectsParaRegion = false;
         for (const intersect of intersects) {
             const type = intersect.object.userData['type'];
-            if (type == 'para') {
-                this.setPointerCursor();
-            } else if (type == 'validator' && intersect.instanceId != undefined) {
-                this.setPointerCursor();
-                const stashAddress =
+            if (type == 'validator' && intersect.instanceId != undefined) {
+                intersectsValidatorStashAddress =
                     intersect.object.userData['stashAddresses'][intersect.instanceId];
-                this.delegate.onValidatorHover(stashAddress);
+                intersectsValidatorIndex = intersect.instanceId;
+            } else if (type == 'para') {
+                intersectsPara = true;
             } else if (type == 'paraRegion') {
                 intersectsParaRegion = true;
-            } else {
-                this.delegate.clearValidatorHover();
             }
         }
         this.validatorMeshIsRotating = !intersectsParaRegion && this.started;
+        if (intersectsValidatorStashAddress) {
+            this.setPointerCursor();
+            if (
+                intersectsValidatorStashAddress != this.highlightedValidatorStashAddress &&
+                intersectsValidatorIndex
+            ) {
+                this.delegate.onValidatorHover(
+                    intersectsValidatorIndex,
+                    intersectsValidatorStashAddress,
+                );
+                this.highlightedValidatorStashAddress = intersectsValidatorStashAddress;
+            }
+        } else {
+            if (this.highlightedValidatorStashAddress) {
+                this.delegate.clearValidatorHover();
+                this.highlightedValidatorStashAddress = undefined;
+            }
+            if (intersectsPara) {
+                this.setPointerCursor();
+            } else {
+                this.setDefaultCursor();
+            }
+        }
     }
 
     private setPointerCursor() {
@@ -189,6 +213,18 @@ class Scene {
         this.validatorMeshIsRotating = false;
         //this.paraMesh.reset();
         this.validatorMesh.reset(onComplete);
+    }
+
+    getOnScreenPositionOfValidator(index: number): THREE.Vec2 {
+        return this.validatorMesh.getOnScreenPositionOfValidator(index, this.renderer, this.camera);
+    }
+
+    highlightValidator(index: number) {
+        this.validatorMesh.highlightValidator(index);
+    }
+
+    clearHighlight() {
+        this.validatorMesh.clearHighlight();
     }
 }
 

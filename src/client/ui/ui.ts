@@ -14,6 +14,7 @@ import { Scene, SceneDelegate } from '../scene/scene';
 import { ValidatorSummary } from '../model/subvt/validator-summary';
 import { EventBus } from '../event/event-bus';
 import { ChainvizEvent } from '../event/event';
+import { ValidatorSummaryBoard } from './validator-summary-board';
 
 class UI {
     private readonly scene: Scene;
@@ -35,8 +36,9 @@ class UI {
     private readonly loadingInfo: HTMLDivElement;
     private readonly eventBus = EventBus.getInstance();
     private isChangingNetwork = false;
+    private readonly validatorSummaryBoard: ValidatorSummaryBoard;
 
-    constructor() {
+    constructor(sceneDelegate: SceneDelegate) {
         this.root = <HTMLElement>document.getElementById('root');
         this.sceneContainer = <HTMLDivElement>document.getElementById('scene-container');
         this.background = <HTMLDivElement>document.getElementById('background');
@@ -53,15 +55,9 @@ class UI {
         this.slotList = new SlotList();
         this.loadingContainer = <HTMLDivElement>document.getElementById('loading-container');
         this.loadingInfo = <HTMLDivElement>document.getElementById('loading-info');
+        this.validatorSummaryBoard = new ValidatorSummaryBoard();
 
-        this.scene = new Scene(this.sceneContainer, <SceneDelegate>{
-            onValidatorHover(stashAddress: string) {
-                console.log('hover', stashAddress);
-            },
-            clearValidatorHover() {
-                console.log('clear hover');
-            },
-        });
+        this.scene = new Scene(this.sceneContainer, sceneDelegate);
         this.kusamaSelector.addEventListener('click', (_event) => {
             if (this.isChangingNetwork) {
                 return;
@@ -289,6 +285,27 @@ class UI {
 
     private selectNetwork(network: Network) {
         this.eventBus.dispatch<Network>(ChainvizEvent.NETWORK_SELECTED, network);
+    }
+
+    showValidatorSummaryBoard(network: Network, index: number, validatorSummary: ValidatorSummary) {
+        const position = this.scene.getOnScreenPositionOfValidator(index);
+        this.validatorSummaryBoard.show(network, validatorSummary);
+        this.validatorSummaryBoard.setPosition(
+            position.x + this.sceneContainer.getBoundingClientRect().left,
+            position.y + this.sceneContainer.getBoundingClientRect().top,
+        );
+    }
+
+    hideValidatorSummaryBoard() {
+        this.validatorSummaryBoard.hide();
+    }
+
+    highlightValidator(index: number) {
+        this.scene.highlightValidator(index);
+    }
+
+    clearHighlight() {
+        this.scene.clearHighlight();
     }
 }
 

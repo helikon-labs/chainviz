@@ -11,6 +11,8 @@ import { Slot } from './model/chainviz/slot';
 import { Block } from './model/chainviz/block';
 import { Para } from './model/substrate/para';
 import { XCMMessage } from './model/polkaholic/xcm';
+import { SceneDelegate } from './scene/scene';
+import { cloneJSONSafeObject } from './util/object';
 
 THREE.Cache.enabled = true;
 
@@ -25,9 +27,26 @@ class Chainviz {
     private slots: Slot[] = [];
     private paras: Para[] = [];
 
+    private readonly sceneDelegate = <SceneDelegate>{
+        onValidatorHover: (index: number, stashAddress: string) => {
+            const validator = this.validatorMap.get(stashAddress);
+            if (validator) {
+                this.ui.showValidatorSummaryBoard(
+                    this.network,
+                    index,
+                    cloneJSONSafeObject(validator),
+                );
+            }
+            this.ui.highlightValidator(index);
+        },
+        clearValidatorHover: () => {
+            this.ui.hideValidatorSummaryBoard();
+            this.ui.clearHighlight();
+        },
+    };
+
     constructor() {
-        const ui = new UI();
-        this.ui = ui;
+        this.ui = new UI(this.sceneDelegate);
 
         this.dataStore = new DataStore();
         // substrate api events

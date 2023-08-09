@@ -15,6 +15,15 @@ body {
     font-size: 14px;
 }
 
+hr {
+    color: #666;
+    background-color: #666;
+    height: 1px;
+    border: none;
+    max-width: 100%;
+    width: 100%;
+}
+
 .scene-container {
     height: 100%;
 }
@@ -299,4 +308,115 @@ img {
 
 .hidden {
     display: none !important;
+}
+
+/* validator summary board */
+#validator-summary-board {
+    visibility: hidden;
+    position: absolute;
+    top: 0px;
+    left: 0px;
+    width: 180px;
+    display: flex;
+    flex-flow: column nowrap;
+    justify-content: flex-start;
+    align-items: center;
+    background-color: #000000bb;
+    padding: 8px 12px 4px 12px;
+    font-size: 13px;
+    border-radius: 6px;
+    border-color: #ffffffaa;
+    border-width: 1px;
+    border-style: solid;
+    line-height: 20px;
+}
+
+#validator-summary-board div {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+#validator-summary-board div.top-margin {
+    margin-top: 4px;
+}
+
+#validator-summary-board div.left {
+    width: 100%;
+}
+
+#validator-summary-board span {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+#validator-summary-board .id-confirmation-icon {
+    width: 16px;
+    height: 16px;
+    margin-right: 6px;
+}
+
+#validator-summary-board #validator-summary-identity {
+    margin-top: 6px;
+    display: flex;
+    flex-flow: row nowrap;
+    justify-content: flex-end;
+    align-items: center;
+    max-width: 100%;
+    min-width: 0%;
+}
+
+#validator-summary-para-info {
+    width: 100%;
+    display: flex;
+    flex-flow: row nowrap;
+    justify-content: center;
+    align-items: center;
+}
+
+#validator-summary-para-info img.parachain-icon {
+    width: 14px;
+    height: 14px;
+    margin-right: 8px;
+    background-color: #fff;
+    border-radius: 12px;
+    border-style: solid;
+    border-width: 1px;
+    border-color: #ffffff22;
+}
+
+#validator-summary-board #validator-summary-era-data {
+    display: flex;
+    flex-flow: row nowrap;
+    gap: 14px;
+    align-items: center;
+    justify-content: flex-end;
+}
+
+#validator-summary-board #validator-summary-era-data em {
+    font-size: 90%;
+    margin-right: 6px;
+}
+
+#validator-summary-board .active {
+    color: #00ff00;
+}
+
+#validator-summary-board .inactive {
+    color: #ff8888;
+}
+
+#validator-summary-board .stake-data-container {
+    display: flex;
+    flex-flow: row nowrap;
+    justify-content: flex-end;
+    align-items: center;
+}
+
+#validator-summary-board .stake-data-container em {
+    font-size: 8px;
+    width: 10px;
+    margin-left: 8px;
+    opacity: 0.9;
 }

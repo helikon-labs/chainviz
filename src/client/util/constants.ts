@@ -36,6 +36,10 @@ export abstract class Constants {
     static readonly SCENE_STATE_TRANSITION_ANIM_DURATION_MS = 2000;
     static readonly SCENE_PARA_OPACITY = 0.5;
     static readonly SCENE_VALIDATOR_OPACITY = 1.0;
+    // summary board
+    // hover info board
+    static readonly VALIDATOR_SUMMARY_BOARD_X_OFFSET = 20;
+    static readonly VALIDATOR_SUMMARY_INFO_BOARD_Y_OFFSET = -20;
     // orbit control
     static readonly ORBIT_DEFAULT_DISTANCE = 380;
     // format
