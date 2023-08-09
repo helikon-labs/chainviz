@@ -144,7 +144,7 @@ class UI {
         const opacity = { opacity: 0 };
         createTween(
             opacity,
-            { opacity: 30 },
+            { opacity: 80 },
             TWEEN.Easing.Exponential.InOut,
             Constants.CONTENT_FADE_ANIM_DURATION_MS,
             undefined,
