@@ -43,8 +43,8 @@ class ValidatorMesh {
             for (let j = 0; j < this.arcs[i].length; j++) {
                 if (this.arcs[i][j]) {
                     const validator = this.arcs[i][j]!.validator;
-                    minRewardPoints = Math.min(minRewardPoints, validator.rewardPoints);
-                    maxRewardPoints = Math.max(maxRewardPoints, validator.rewardPoints);
+                    minRewardPoints = Math.min(minRewardPoints, validator.rewardPoints ?? 0);
+                    maxRewardPoints = Math.max(maxRewardPoints, validator.rewardPoints ?? 0);
                 }
             }
         }

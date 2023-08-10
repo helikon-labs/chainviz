@@ -244,7 +244,7 @@ class DataStore {
             if (isXCMMessage(data)) {
                 this.eventBus.dispatch<XCMMessage>(ChainvizEvent.NEW_XCM_MESSAGE, data);
             } else {
-                console.log(JSON.stringify(message));
+                console.log('Ignore unrecognized XCM message:', JSON.stringify(message));
             }
         });
     }
