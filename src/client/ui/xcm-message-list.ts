@@ -19,7 +19,7 @@ class XCMMessageList {
         originPara: Para | undefined,
         destinationPara: Para | undefined,
     ): string {
-        let html = '';
+        let html = '<span>XCM</span>';
         if (originPara) {
             html += `<img class="xcm-chain-logo" src="/img/paras/${originPara.ui.logo}">`;
         } else {

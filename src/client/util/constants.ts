@@ -21,7 +21,8 @@ export abstract class Constants {
     static readonly VALIDATOR_ARC_RADIUS = 48;
     static readonly VALIDATOR_SPHERE_COLOR = 0xffffff;
     static readonly VALIDATOR_ARC_COLOR = 0xffffff;
-    static readonly VALIDATOR_ARC_POINTS = 50;
+    static readonly VALIDATOR_ARC_NORMAL_OPACITY = 0.6;
+    static readonly VALIDATOR_ARC_LOW_OPACITY = 0.15;
     static readonly PARAS_CROSSHAIR_COLOR = 0xffffff;
     static readonly PARAS_CROSSHAIR_OPACITY = 0.2;
     static readonly PARAS_CROSSHAIR_HORIZONTAL_RADIUS = 65;

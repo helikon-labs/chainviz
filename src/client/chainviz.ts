@@ -28,15 +28,8 @@ class Chainviz {
     private paras: Para[] = [];
 
     private readonly sceneDelegate = <SceneDelegate>{
-        onValidatorHover: (index: number, stashAddress: string) => {
-            const validator = this.validatorMap.get(stashAddress);
-            if (validator) {
-                this.ui.showValidatorSummaryBoard(
-                    this.network,
-                    index,
-                    cloneJSONSafeObject(validator),
-                );
-            }
+        onValidatorHover: (index: number, validator: ValidatorSummary) => {
+            this.ui.showValidatorSummaryBoard(this.network, index, cloneJSONSafeObject(validator));
             this.ui.highlightValidator(index);
         },
         clearValidatorHover: () => {

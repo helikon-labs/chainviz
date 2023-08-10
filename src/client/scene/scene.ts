@@ -8,7 +8,7 @@ import { ValidatorMesh } from './validator-mesh';
 import { ParaMesh } from './para-mesh';
 
 interface SceneDelegate {
-    onValidatorHover(index: number, stashAddress: string): void;
+    onValidatorHover(index: number, validator: ValidatorSummary): void;
     clearValidatorHover(): void;
 }
 
@@ -26,7 +26,7 @@ class Scene {
     private readonly mouseHoverPoint: THREE.Vector2 = new THREE.Vector2();
     private readonly raycaster: THREE.Raycaster;
     private started = false;
-    private highlightedValidatorStashAddress: string | undefined = undefined;
+    private highlightedValidatorIndex: number | undefined = undefined;
 
     constructor(container: HTMLDivElement, delegate: SceneDelegate) {
         this.container = container;
@@ -135,16 +135,13 @@ class Scene {
         this.raycaster.setFromCamera(this.mouseHoverPoint, this.camera);
         const intersects = this.raycaster.intersectObjects(this.scene.children, true);
         this.setDefaultCursor();
-        let intersectsValidatorStashAddress: string | undefined = undefined;
-        let intersectsValidatorIndex: number | undefined = undefined;
+        let validatorIndex: number | undefined = undefined;
         let intersectsPara = false;
         let intersectsParaRegion = false;
         for (const intersect of intersects) {
             const type = intersect.object.userData['type'];
             if (type == 'validator' && intersect.instanceId != undefined) {
-                intersectsValidatorStashAddress =
-                    intersect.object.userData['stashAddresses'][intersect.instanceId];
-                intersectsValidatorIndex = intersect.instanceId;
+                validatorIndex = intersect.instanceId;
             } else if (type == 'para') {
                 intersectsPara = true;
             } else if (type == 'paraRegion') {
@@ -152,22 +149,19 @@ class Scene {
             }
         }
         this.validatorMeshIsRotating = !intersectsParaRegion && this.started;
-        if (intersectsValidatorStashAddress) {
+        if (validatorIndex) {
             this.setPointerCursor();
-            if (
-                intersectsValidatorStashAddress != this.highlightedValidatorStashAddress &&
-                intersectsValidatorIndex
-            ) {
-                this.delegate.onValidatorHover(
-                    intersectsValidatorIndex,
-                    intersectsValidatorStashAddress,
-                );
-                this.highlightedValidatorStashAddress = intersectsValidatorStashAddress;
+            if (validatorIndex != this.highlightedValidatorIndex) {
+                const slot = this.validatorMesh.getSlotAtIndex(validatorIndex);
+                if (slot) {
+                    this.delegate.onValidatorHover(validatorIndex, slot.validator);
+                }
+                this.highlightedValidatorIndex = validatorIndex;
             }
         } else {
-            if (this.highlightedValidatorStashAddress) {
+            if (this.highlightedValidatorIndex) {
                 this.delegate.clearValidatorHover();
-                this.highlightedValidatorStashAddress = undefined;
+                this.highlightedValidatorIndex = undefined;
             }
             if (intersectsPara) {
                 this.setPointerCursor();
