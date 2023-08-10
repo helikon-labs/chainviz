@@ -15,6 +15,8 @@ import { ValidatorSummary } from '../model/subvt/validator-summary';
 import { EventBus } from '../event/event-bus';
 import { ChainvizEvent } from '../event/event';
 import { ValidatorSummaryBoard } from './validator-summary-board';
+import { cloneJSONSafeObject } from '../util/object';
+import { Vec2 } from 'three';
 
 class UI {
     private readonly scene: Scene;
@@ -37,6 +39,7 @@ class UI {
     private readonly eventBus = EventBus.getInstance();
     private isChangingNetwork = false;
     private readonly validatorSummaryBoard: ValidatorSummaryBoard;
+    private readonly validatorHighlightCircle: HTMLDivElement;
 
     constructor(sceneDelegate: SceneDelegate) {
         this.root = <HTMLElement>document.getElementById('root');
@@ -56,6 +59,9 @@ class UI {
         this.loadingContainer = <HTMLDivElement>document.getElementById('loading-container');
         this.loadingInfo = <HTMLDivElement>document.getElementById('loading-info');
         this.validatorSummaryBoard = new ValidatorSummaryBoard();
+        this.validatorHighlightCircle = <HTMLDivElement>(
+            document.getElementById('validator-highlight-circle')
+        );
 
         this.scene = new Scene(this.sceneContainer, sceneDelegate);
         this.kusamaSelector.addEventListener('click', (_event) => {
@@ -287,8 +293,11 @@ class UI {
         this.eventBus.dispatch<Network>(ChainvizEvent.NETWORK_SELECTED, network);
     }
 
-    showValidatorSummaryBoard(network: Network, index: number, validatorSummary: ValidatorSummary) {
-        const position = this.scene.getOnScreenPositionOfValidator(index);
+    showValidatorSummaryBoard(
+        network: Network,
+        validatorSummary: ValidatorSummary,
+        position: Vec2,
+    ) {
         this.validatorSummaryBoard.show(network, validatorSummary);
         this.validatorSummaryBoard.setPosition(
             position.x + this.sceneContainer.getBoundingClientRect().left,
@@ -300,12 +309,29 @@ class UI {
         this.validatorSummaryBoard.hide();
     }
 
-    highlightValidator(index: number) {
-        this.scene.highlightValidator(index);
+    showValidatorHighlightCircle(position: Vec2) {
+        const x = this.sceneContainer.getBoundingClientRect().left + position.x - 10.5;
+        const y = this.sceneContainer.getBoundingClientRect().top + position.y - 10.5;
+        this.validatorHighlightCircle.style.left = `${x}px`;
+        this.validatorHighlightCircle.style.top = `${y}px`;
+        this.validatorHighlightCircle.style.display = 'block';
+    }
+
+    hideValidatorHighlightCircle() {
+        this.validatorHighlightCircle.style.display = 'none';
+    }
+
+    highlightValidator(network: Network, index: number, validator: ValidatorSummary) {
+        const position = this.scene.getValidatorOnScreenPosition(index);
+        this.scene.highlightValidator(index, validator);
+        this.showValidatorSummaryBoard(network, cloneJSONSafeObject(validator), position);
+        this.showValidatorHighlightCircle(position);
     }
 
     clearHighlight() {
         this.scene.clearHighlight();
+        this.hideValidatorSummaryBoard();
+        this.hideValidatorHighlightCircle();
     }
 }
 

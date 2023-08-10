@@ -6,6 +6,11 @@ import { Para } from '../model/substrate/para';
 import { ValidatorSummary } from '../model/subvt/validator-summary';
 import { ValidatorMesh } from './validator-mesh';
 import { ParaMesh } from './para-mesh';
+import { getOnScreenPosition } from '../util/geometry';
+
+const VALIDATOR_PARA_LINE_MATERIAL = new THREE.LineBasicMaterial({
+    color: Constants.VALIDATOR_PARA_LINE_COLOR,
+});
 
 interface SceneDelegate {
     onValidatorHover(index: number, validator: ValidatorSummary): void;
@@ -27,6 +32,7 @@ class Scene {
     private readonly raycaster: THREE.Raycaster;
     private started = false;
     private highlightedValidatorIndex: number | undefined = undefined;
+    private validatorParaLine: THREE.Line | undefined = undefined;
 
     constructor(container: HTMLDivElement, delegate: SceneDelegate) {
         this.container = container;
@@ -209,16 +215,36 @@ class Scene {
         this.validatorMesh.reset(onComplete);
     }
 
-    getOnScreenPositionOfValidator(index: number): THREE.Vec2 {
-        return this.validatorMesh.getOnScreenPositionOfValidator(index, this.renderer, this.camera);
+    getValidatorOnScreenPosition(index: number): THREE.Vec2 {
+        return getOnScreenPosition(
+            this.validatorMesh.getValidatorPosition(index),
+            this.renderer,
+            this.camera,
+        );
     }
 
-    highlightValidator(index: number) {
+    highlightValidator(index: number, validator: ValidatorSummary) {
+        const paraPosition = this.paraMesh.getParaPosition(validator.paraId ?? -1);
+        if (paraPosition) {
+            const validatorPosition = this.validatorMesh.getValidatorPosition(index);
+            const points = [];
+            points.push(validatorPosition);
+            points.push(paraPosition);
+            const geometry = new THREE.BufferGeometry().setFromPoints(points);
+            this.validatorParaLine = new THREE.Line(geometry, VALIDATOR_PARA_LINE_MATERIAL);
+            this.scene.add(this.validatorParaLine);
+            this.paraMesh.highlightPara(validator.paraId ?? -1);
+        }
         this.validatorMesh.highlightValidator(index);
     }
 
     clearHighlight() {
         this.validatorMesh.clearHighlight();
+        if (this.validatorParaLine) {
+            this.scene.remove(this.validatorParaLine);
+        }
+        this.validatorParaLine = undefined;
+        this.paraMesh.clearHighlight();
     }
 }
 

@@ -12,7 +12,6 @@ import { Block } from './model/chainviz/block';
 import { Para } from './model/substrate/para';
 import { XCMMessage } from './model/polkaholic/xcm';
 import { SceneDelegate } from './scene/scene';
-import { cloneJSONSafeObject } from './util/object';
 
 THREE.Cache.enabled = true;
 
@@ -29,11 +28,9 @@ class Chainviz {
 
     private readonly sceneDelegate = <SceneDelegate>{
         onValidatorHover: (index: number, validator: ValidatorSummary) => {
-            this.ui.showValidatorSummaryBoard(this.network, index, cloneJSONSafeObject(validator));
-            this.ui.highlightValidator(index);
+            this.ui.highlightValidator(this.network, index, validator);
         },
         clearValidatorHover: () => {
-            this.ui.hideValidatorSummaryBoard();
             this.ui.clearHighlight();
         },
     };

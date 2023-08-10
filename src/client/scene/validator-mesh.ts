@@ -3,7 +3,7 @@ import { ValidatorSummary } from '../model/subvt/validator-summary';
 import { Constants } from '../util/constants';
 import { createTween } from '../util/tween';
 import * as TWEEN from '@tweenjs/tween.js';
-import { getOnScreenPosition, rotateAboutPoint } from '../util/geometry';
+import { rotateAboutPoint } from '../util/geometry';
 
 const ARC_GEOMETRY = new THREE.TorusGeometry(Constants.VALIDATOR_ARC_RADIUS, 0.06, 12, 36, Math.PI);
 ARC_GEOMETRY.rotateZ(Math.PI / 2);
@@ -195,17 +195,13 @@ class ValidatorMesh {
         this.animate(true, onComplete);
     }
 
-    getOnScreenPositionOfValidator(
-        index: number,
-        renderer: THREE.WebGLRenderer,
-        camera: THREE.Camera,
-    ): THREE.Vec2 {
+    getValidatorPosition(index: number): THREE.Vector3 {
         const groupMatrix = new THREE.Matrix4().makeRotationFromEuler(this.group.rotation);
         const matrix = new THREE.Matrix4();
         this.validatorMesh.getMatrixAt(index, matrix);
         const position = new THREE.Vector3();
         matrix.decompose(position, new THREE.Quaternion(), new THREE.Vector3());
-        return getOnScreenPosition(position.applyMatrix4(groupMatrix), renderer, camera);
+        return position.applyMatrix4(groupMatrix);
     }
 
     highlightValidator(validatorIndex: number) {

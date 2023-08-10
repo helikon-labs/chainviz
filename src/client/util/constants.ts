@@ -37,6 +37,8 @@ export abstract class Constants {
     static readonly SCENE_STATE_TRANSITION_ANIM_DURATION_MS = 2000;
     static readonly SCENE_PARA_OPACITY = 0.5;
     static readonly SCENE_VALIDATOR_OPACITY = 1.0;
+    static readonly VALIDATOR_PARA_LINE_COLOR = 0xffffff;
+    static readonly HIGHLIGHTED_PARA_SCALE = 1.5;
     // summary board
     // hover info board
     static readonly VALIDATOR_SUMMARY_BOARD_X_OFFSET = 20;

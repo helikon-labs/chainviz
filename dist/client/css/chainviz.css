@@ -6,7 +6,7 @@
 body {
     overflow: hidden;
     margin: 0px;
-    background-color: #000000;
+    background-color: #1d1d1d;
     /* background-color: #000000; */
     /*color: #ffffffe9;*/
     color: #ffffff;
@@ -120,6 +120,7 @@ a:active {
     justify-content: space-between;
     align-items: center;
     cursor: pointer;
+    font-size: 12px;
 }
 
 .content .left-panel .xcm-message-list .xcm-message img.xcm-chain-logo {
@@ -316,33 +317,25 @@ img {
     position: absolute;
     top: 0px;
     left: 0px;
-    width: 180px;
+    width: 200px;
     display: flex;
     flex-flow: column nowrap;
     justify-content: flex-start;
     align-items: center;
-    background-color: #000000bb;
-    padding: 8px 12px 4px 12px;
+    background-color: #424242d0;
+    padding: 12px;
     font-size: 13px;
-    border-radius: 6px;
-    border-color: #ffffffaa;
+    border-radius: 10px;
+    border-color: #ffffff4c;
     border-width: 1px;
     border-style: solid;
-    line-height: 20px;
+    gap: 14px;
 }
 
 #validator-summary-board div {
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
-}
-
-#validator-summary-board div.top-margin {
-    margin-top: 4px;
-}
-
-#validator-summary-board div.left {
-    width: 100%;
 }
 
 #validator-summary-board span {
@@ -358,7 +351,6 @@ img {
 }
 
 #validator-summary-board #validator-summary-identity {
-    margin-top: 6px;
     display: flex;
     flex-flow: row nowrap;
     justify-content: flex-end;
@@ -389,14 +381,23 @@ img {
 #validator-summary-board #validator-summary-era-data {
     display: flex;
     flex-flow: row nowrap;
-    gap: 14px;
     align-items: center;
-    justify-content: flex-end;
+    justify-content: center;
+    gap: 12px;
 }
 
-#validator-summary-board #validator-summary-era-data em {
-    font-size: 90%;
-    margin-right: 6px;
+#validator-summary-board #validator-summary-era-data .era-data-section {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+}
+
+#validator-summary-board #validator-summary-era-data .era-data-section img {
+    width: 12px;
+    height: 12px;
+    margin-bottom: 2px;
 }
 
 #validator-summary-board .active {
@@ -405,6 +406,14 @@ img {
 
 #validator-summary-board .inactive {
     color: #ff8888;
+}
+
+#validator-summary-board .stake-data-outer-container {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    gap: 6px;
 }
 
 #validator-summary-board .stake-data-container {
@@ -419,4 +428,18 @@ img {
     width: 10px;
     margin-left: 8px;
     opacity: 0.9;
+}
+
+#validator-highlight-circle {
+    position: absolute;
+    top: 0px;
+    left: 0px;
+    display: none;
+    width: 20px;
+    height: 20px;
+    background-color: #ffffff22;
+    border-radius: 16px;
+    border-color: #ffffff;
+    border-width: 0.5px;
+    border-style: solid;
 }

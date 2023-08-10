@@ -117,20 +117,35 @@
             ></lottie-player>
             <div class="loading-info" id="loading-info">:: connecting to services ::</div>
         </div>
+        <!-- validator highlight circle -->
+        <div class="validator-highlight-circle" id="validator-highlight-circle"></div>
         <!-- validator summary hover board -->
         <div id="validator-summary-board" class="no-select">
             <div id="validator-summary-identity"></div>
-            <div id="validator-summary-para-info" class="top-margin"></div>
-            <hr />
-            <div id="validator-summary-era-data" class="left top-margin"></div>
-            <hr />
-            <div class="stake-data-container left active">
-                <span id="validator-summary-active-stake"></span>
-                <em class="fas fa-play"></em>
+            <div id="validator-summary-para-info"></div>
+            <div id="validator-summary-era-data">
+                <span class="era-data-section">
+                    <img src="/img/icon/block-count-icon.png" alt="Blocks in era" />
+                    <span id="validator-summary-block-count"></span>
+                </span>
+                <span class="era-data-section">
+                    <img src="/img/icon/reward-points-icon.png" alt="Reward points in era" />
+                    <span id="validator-summary-reward-points"></span>
+                </span>
+                <span class="era-data-section">
+                    <img src="/img/icon/return-rate-icon.png" alt="Staking return rate" />
+                    <span id="validator-summary-return-rate"></span>
+                </span>
             </div>
-            <div class="stake-data-container left top-margin inactive">
-                <span id="validator-summary-inactive-stake"></span>
-                <em class="fas fa-pause"></em>
+            <div class="stake-data-outer-container">
+                <div class="stake-data-container active">
+                    <span id="validator-summary-active-stake"></span>
+                    <em class="fas fa-play"></em>
+                </div>
+                <div class="stake-data-container inactive">
+                    <span id="validator-summary-inactive-stake"></span>
+                    <em class="fas fa-pause"></em>
+                </div>
             </div>
         </div>
     </body>

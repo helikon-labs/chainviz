@@ -8,7 +8,9 @@ interface UI {
     root: HTMLElement;
     identity: HTMLElement;
     paraInfo: HTMLElement;
-    eraData: HTMLElement;
+    blockCount: HTMLElement;
+    rewardPoints: HTMLElement;
+    returnRate: HTMLElement;
     activeStake: HTMLElement;
     inactiveStake: HTMLElement;
 }
@@ -22,7 +24,9 @@ class ValidatorSummaryBoard {
             root: <HTMLElement>document.getElementById('validator-summary-board'),
             identity: <HTMLElement>document.getElementById('validator-summary-identity'),
             paraInfo: <HTMLElement>document.getElementById('validator-summary-para-info'),
-            eraData: <HTMLElement>document.getElementById('validator-summary-era-data'),
+            blockCount: <HTMLElement>document.getElementById('validator-summary-block-count'),
+            rewardPoints: <HTMLElement>document.getElementById('validator-summary-reward-points'),
+            returnRate: <HTMLElement>document.getElementById('validator-summary-return-rate'),
             activeStake: <HTMLElement>document.getElementById('validator-summary-active-stake'),
             inactiveStake: <HTMLElement>document.getElementById('validator-summary-inactive-stake'),
         };
@@ -51,14 +55,15 @@ class ValidatorSummaryBoard {
         // era data
         {
             const blockCount = summary.blocksAuthored ?? 0;
-            let eraDataHTML = `<span><i class="fas fa-cube"></i>${blockCount}</span>`;
+            this.ui.blockCount.innerHTML = `${blockCount}`;
             const points = summary.rewardPoints ?? 0;
-            eraDataHTML += `<span><i class="fas fa-line-chart"></i>${points}</span>`;
+            this.ui.rewardPoints.innerHTML = `${points}`;
             if (summary.returnRatePerBillion) {
                 const returnRate = formatNumber(BigInt(summary.returnRatePerBillion), 7, 2);
-                eraDataHTML += `<span><i class="fas fa-refresh"></i>${returnRate}%</span>`;
+                this.ui.returnRate.innerHTML = `${returnRate}%`;
+            } else {
+                this.ui.returnRate.innerHTML = '-';
             }
-            this.ui.eraData.innerHTML = eraDataHTML;
         }
         // stake
         {

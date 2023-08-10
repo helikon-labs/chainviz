@@ -4,7 +4,7 @@ import { Constants } from '../util/constants';
 import { createTween } from '../util/tween';
 import * as TWEEN from '@tweenjs/tween.js';
 
-const LINE_MATERIAL = new THREE.LineBasicMaterial({
+const CROSSHAIR_LINE_MATERIAL = new THREE.LineBasicMaterial({
     color: Constants.PARAS_CROSSHAIR_COLOR,
     transparent: true,
     opacity: Constants.PARAS_CROSSHAIR_OPACITY,
@@ -17,21 +17,20 @@ class ParaMesh {
         if (this.group) {
             scene.remove(this.group);
         }
-
         this.group = new THREE.Group();
         // horizontal line
         let linePoints = [];
         linePoints.push(new THREE.Vector3(-Constants.PARAS_CROSSHAIR_HORIZONTAL_RADIUS, 0, 0));
         linePoints.push(new THREE.Vector3(Constants.PARAS_CROSSHAIR_HORIZONTAL_RADIUS, 0, 0));
         let lineGeometry = new THREE.BufferGeometry().setFromPoints(linePoints);
-        let line = new THREE.Line(lineGeometry, LINE_MATERIAL);
+        let line = new THREE.Line(lineGeometry, CROSSHAIR_LINE_MATERIAL);
         this.group.add(line);
         // vertical line
         linePoints = [];
         linePoints.push(new THREE.Vector3(0, Constants.PARAS_CROSSHAIR_VERTICAL_RADIUS, 0));
         linePoints.push(new THREE.Vector3(0, -Constants.PARAS_CROSSHAIR_VERTICAL_RADIUS, 0));
         lineGeometry = new THREE.BufferGeometry().setFromPoints(linePoints);
-        line = new THREE.Line(lineGeometry, LINE_MATERIAL);
+        line = new THREE.Line(lineGeometry, CROSSHAIR_LINE_MATERIAL);
         this.group.add(line);
         // ring
         const ringMaterial = new THREE.LineBasicMaterial({
@@ -68,6 +67,10 @@ class ParaMesh {
                 0,
             );
             background.material.opacity = 0;
+            background.userData = {
+                type: 'paraBackground',
+                paraId: para.paraId,
+            };
             paraGroup.add(background);
 
             // add logo
@@ -83,6 +86,7 @@ class ParaMesh {
             logo.material.opacity = 0;
             logo.userData = {
                 type: 'para',
+                paraId: para.paraId,
             };
             paraGroup.add(logo);
             // add to the main group
@@ -130,6 +134,47 @@ class ParaMesh {
                 }
             },
         ).start();
+    }
+
+    getParaPosition(paraId: number): THREE.Vector3 | undefined {
+        for (let i = 3; i < this.group.children.length; i++) {
+            for (const child of this.group.children[i].children) {
+                if (child.userData?.paraId == paraId) {
+                    return child.position;
+                }
+            }
+        }
+        return undefined;
+    }
+
+    highlightPara(paraId: number) {
+        for (let i = 3; i < this.group.children.length; i++) {
+            for (const child of this.group.children[i].children) {
+                if (child.userData?.paraId == paraId) {
+                    if (child instanceof THREE.Mesh) {
+                        child.material.opacity = 1.0;
+                        child.scale.x = Constants.HIGHLIGHTED_PARA_SCALE;
+                        child.scale.y = Constants.HIGHLIGHTED_PARA_SCALE;
+                        child.scale.z = Constants.HIGHLIGHTED_PARA_SCALE;
+                    }
+                }
+            }
+        }
+    }
+
+    clearHighlight() {
+        for (let i = 3; i < this.group.children.length; i++) {
+            for (const child of this.group.children[i].children) {
+                if (child.userData?.paraId != undefined) {
+                    if (child instanceof THREE.Mesh) {
+                        child.material.opacity = Constants.SCENE_PARA_OPACITY;
+                        child.scale.x = 1;
+                        child.scale.y = 1;
+                        child.scale.z = 1;
+                    }
+                }
+            }
+        }
     }
 
     reset() {
