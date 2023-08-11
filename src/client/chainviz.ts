@@ -10,7 +10,7 @@ import { ValidatorListUpdate, ValidatorSummary } from './model/subvt/validator-s
 import { Slot } from './model/chainviz/slot';
 import { Block } from './model/chainviz/block';
 import { Para } from './model/substrate/para';
-import { XCMMessage } from './model/polkaholic/xcm';
+import { XCMInfo } from './model/polkaholic/xcm';
 import { SceneDelegate } from './scene/scene';
 
 THREE.Cache.enabled = true;
@@ -25,6 +25,8 @@ class Chainviz {
     private validatorMap = new Map<string, ValidatorSummary>();
     private slots: Slot[] = [];
     private paras: Para[] = [];
+    private xcmTransfers: XCMInfo[] = [];
+    private xcmTransferGetTimeout?: NodeJS.Timeout;
 
     private readonly sceneDelegate = <SceneDelegate>{
         onValidatorMouseEnter: (index: number, validator: ValidatorSummary) => {
@@ -110,9 +112,6 @@ class Chainviz {
         });
         this.eventBus.register(ChainvizEvent.NEW_FINALIZED_BLOCK, (block: Block) => {
             this.onNewFinalizedBlock(block);
-        });
-        this.eventBus.register(ChainvizEvent.NEW_XCM_MESSAGE, (message: XCMMessage) => {
-            this.onNewXCMMessage(message);
         });
         this.eventBus.register(ChainvizEvent.NETWORK_SELECTED, (network: Network) => {
             this.onNetworkSelected(network);
@@ -255,12 +254,19 @@ class Chainviz {
     private async getInitialBlocks() {
         this.ui.setLoadingInfo('fetching blocks');
         this.slots = await this.dataStore.getInitialSlots();
-        this.subscribeToXCMInfo();
+        this.start();
     }
 
-    private subscribeToXCMInfo() {
-        this.dataStore.subscribeToXCMInfo();
-        this.start();
+    private async getXCMTransfers() {
+        try {
+            const xcmTransfers = await this.dataStore.getXCMTransfers();
+            this.processXCMTransfers(xcmTransfers);
+        } catch (error) {
+            console.error('Error while fetching XCM transfers:', error);
+        }
+        this.xcmTransferGetTimeout = setTimeout(() => {
+            this.getXCMTransfers();
+        }, Constants.XCM_TRANSFER_FETCH_PERIOD_MS);
     }
 
     private onActiveValidatorListUpdate(update: ValidatorListUpdate) {
@@ -317,26 +323,31 @@ class Chainviz {
         }
     }
 
-    onNewXCMMessage(message: XCMMessage) {
-        if (message.relayChain.relayChain != this.network.id) {
-            console.log('Ignore', message.relayChain.relayChain, 'XCM message.');
-            return;
+    processXCMTransfers(xcmTransfers: XCMInfo[]) {
+        const newXCMTransfers: XCMInfo[] = [];
+        for (const xcmTransfer of xcmTransfers) {
+            const index = this.xcmTransfers.findIndex(
+                (existingXCMTransfer) =>
+                    existingXCMTransfer.origination.extrinsicHash ==
+                    xcmTransfer.origination.extrinsicHash,
+            );
+            if (index >= 0) {
+                // message exists, skip
+                continue;
+            }
+            newXCMTransfers.push(xcmTransfer);
         }
-        const originPara = getNetworkPara(this.network, message.origination.paraID);
-        const destionationPara = getNetworkPara(this.network, message.destination.paraID);
-        this.ui.insertXCMMessage(
-            message.origination.extrinsicHash,
-            this.network,
-            originPara,
-            destionationPara,
-        );
+        this.xcmTransfers = [...newXCMTransfers, ...this.xcmTransfers];
+        this.ui.insertXCMTransfers(this.network, newXCMTransfers);
     }
 
     async onNetworkSelected(network: Network) {
+        if (this.xcmTransferGetTimeout) {
+            clearTimeout(this.xcmTransferGetTimeout);
+        }
         await this.dataStore.disconnectSubstrateClient();
         this.dataStore.disconnectNetworkStatusService();
         this.dataStore.disconnectActiveValidatorListService();
-        this.dataStore.unsubscribeXCMInfo();
         this.slots = [];
         this.validatorMap.clear();
         this.paras = [];
@@ -353,6 +364,7 @@ class Chainviz {
         this.ui.start(this.slots, this.paras, this.validatorMap, () => {
             this.dataStore.subsribeToNewBlocks();
             this.dataStore.subsribeToFinalizedBlocks();
+            this.getXCMTransfers();
         });
         this.started = true;
     }

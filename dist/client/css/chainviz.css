@@ -114,13 +114,26 @@ a:active {
 .content .left-panel .xcm-message-list .xcm-message {
     border-radius: 12px;
     border: 1px solid #ffffff55;
-    padding: 6px 8px 6px 8px;
+    padding: 6px 10px 6px 10px;
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-start;
+    gap: 14px;
+    align-items: center;
+    cursor: pointer;
+    font-size: 12px;
+}
+
+.content .left-panel .xcm-message-list .xcm-message .xcm-title {
+    margin-top: 2px;
+}
+
+.content .left-panel .xcm-message-list .xcm-message div {
+    flex-grow: 1;
     display: flex;
     flex-direction: row;
     justify-content: space-between;
     align-items: center;
-    cursor: pointer;
-    font-size: 12px;
 }
 
 .content .left-panel .xcm-message-list .xcm-message img.xcm-chain-logo {

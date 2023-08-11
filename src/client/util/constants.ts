@@ -4,8 +4,9 @@ export abstract class Constants {
     // connection
     static readonly CONNECTION_TIMEOUT_MS = 30000;
     static readonly CONNECTION_RETRY_MS = 5000;
-    static readonly POLKAHOLIC_ABLY_API_KEY =
-        'DTaENA.C13wMg:WBLRXZd-9u73gBtrFc19WPFrkeX0ACnW0dhRrYPaRuU';
+    static readonly XCM_TRANSFER_FETCH_LIMIT = 10;
+    static readonly XCM_DISPLAY_LIMIT = 5;
+    static readonly XCM_TRANSFER_FETCH_PERIOD_MS = 5000;
     // UI
     static readonly VALIDATOR_INSERT_DELAY_MS = 1000;
     static readonly CONTENT_FADE_ANIM_DURATION_MS = 500;

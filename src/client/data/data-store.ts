@@ -15,8 +15,7 @@ import { Slot } from '../model/chainviz/slot';
 import { Block } from '../model/chainviz/block';
 import { BlockHash } from '@polkadot/types/interfaces';
 import { AnyJson } from '@polkadot/types/types';
-import Ably from 'ably';
-import { XCMMessage, isXCMMessage } from '../model/polkaholic/xcm';
+import { XCMInfo, XCMInfoWrapper, isXCMInfo } from '../model/polkaholic/xcm';
 
 class DataStore {
     private network!: Network;
@@ -26,8 +25,6 @@ class DataStore {
     private readonly eventBus = EventBus.getInstance();
     private newBlockSubscription?: UnsubscribePromise;
     private finalizedHeaderSubscription?: UnsubscribePromise;
-    private readonly xcmClient = new Ably.Realtime(Constants.POLKAHOLIC_ABLY_API_KEY);
-    private readonly xcmChannel = this.xcmClient.channels.get('xcminfo');
 
     private readonly networkStatusListener: RPCSubscriptionServiceListener<NetworkStatusUpdate> = {
         onConnected: () => {
@@ -238,19 +235,30 @@ class DataStore {
         return this.getBlockByHash(hash);
     }
 
-    subscribeToXCMInfo() {
-        this.xcmChannel.subscribe((message) => {
-            const data = message.data;
-            if (isXCMMessage(data)) {
-                this.eventBus.dispatch<XCMMessage>(ChainvizEvent.NEW_XCM_MESSAGE, data);
-            } else {
-                console.log('Ignore unrecognized XCM message:', JSON.stringify(message));
+    async getXCMTransfers(): Promise<XCMInfo[]> {
+        const url = 'https://api.polkaholic.io/xcmtransfers';
+        const xcmInfoWrapperList: XCMInfoWrapper[] = await (
+            await fetch(
+                url +
+                    '?' +
+                    new URLSearchParams({
+                        limit: `${Constants.XCM_TRANSFER_FETCH_LIMIT}`,
+                    }).toString(),
+                {
+                    method: 'GET',
+                    headers: {},
+                },
+            )
+        ).json();
+        const result: XCMInfo[] = [];
+        for (const xcmInfoWrapper of xcmInfoWrapperList) {
+            if (isXCMInfo(xcmInfoWrapper.xcmInfo)) {
+                if (xcmInfoWrapper.xcmInfo.relayChain.relayChain == this.network.id) {
+                    result.push(xcmInfoWrapper.xcmInfo);
+                }
             }
-        });
-    }
-
-    unsubscribeXCMInfo() {
-        this.xcmChannel.unsubscribe();
+        }
+        return result;
     }
 
     async disconnectSubstrateClient() {

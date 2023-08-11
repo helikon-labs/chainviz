@@ -18,6 +18,7 @@ import { ValidatorSummaryBoard } from './validator-summary-board';
 import { cloneJSONSafeObject } from '../util/object';
 import { Vec2 } from 'three';
 import { ParaSummaryBoard } from './para-summary-board';
+import { XCMInfo } from '../model/polkaholic/xcm';
 
 class UI {
     private readonly scene: Scene;
@@ -278,18 +279,8 @@ class UI {
         this.xcmMessageList.clear();
     }
 
-    insertXCMMessage(
-        originExtrinsicHash: string,
-        relayChain: Network,
-        originPara: Para | undefined,
-        destinationPara: Para | undefined,
-    ) {
-        this.xcmMessageList.insertMessage(
-            originExtrinsicHash,
-            relayChain,
-            originPara,
-            destinationPara,
-        );
+    insertXCMTransfers(network: Network, xcmTransfers: XCMInfo[]) {
+        this.xcmMessageList.inserXCMTransfers(network, xcmTransfers);
     }
 
     private selectNetwork(network: Network) {

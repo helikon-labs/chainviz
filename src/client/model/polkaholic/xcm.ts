@@ -1,11 +1,14 @@
-export interface XCMMessage {
+export interface XCMInfoWrapper {
+    xcmInfo: XCMInfo;
+}
+export interface XCMInfo {
     relayChain: XCMRelayChain;
     origination: XCMOrigination;
     destination: XCMDestination;
 }
 
 // prettier-ignore
-export function isXCMMessage(object: any): object is XCMMessage { // eslint-disable-line @typescript-eslint/no-explicit-any
+export function isXCMInfo(object: any): object is XCMInfo { // eslint-disable-line @typescript-eslint/no-explicit-any
     return 'relayChain' in object && 'origination' in object && 'destination' in object;
 }
 

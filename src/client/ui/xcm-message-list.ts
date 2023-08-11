@@ -1,4 +1,5 @@
-import { Network } from '../model/substrate/network';
+import { XCMInfo } from '../model/polkaholic/xcm';
+import { Network, getNetworkPara } from '../model/substrate/network';
 import { Para } from '../model/substrate/para';
 
 interface UI {
@@ -19,7 +20,8 @@ class XCMMessageList {
         originPara: Para | undefined,
         destinationPara: Para | undefined,
     ): string {
-        let html = '<span>XCM</span>';
+        let html = '<span class="xcm-title">XCM</span>';
+        html += '<div>';
         if (originPara) {
             html += `<img class="xcm-chain-logo" src="/img/paras/${originPara.ui.logo}">`;
         } else {
@@ -31,6 +33,7 @@ class XCMMessageList {
         } else {
             html += `<img class="xcm-chain-logo" src="/img/paras/${relayChain.logo}">`;
         }
+        html += '</div>';
         return html;
     }
 
@@ -42,28 +45,34 @@ class XCMMessageList {
         this.ui.root.innerHTML = '';
     }
 
+    inserXCMTransfers(network: Network, xcmTransfers: XCMInfo[]) {
+        for (let i = xcmTransfers.length - 1; i >= 0; i--) {
+            const xcmTransfer = xcmTransfers[i];
+            const originPara = getNetworkPara(network, xcmTransfer.origination.paraID);
+            const destionationPara = getNetworkPara(network, xcmTransfer.destination.paraID);
+            this.insertMessage(
+                xcmTransfer.origination.extrinsicHash,
+                network,
+                originPara,
+                destionationPara,
+            );
+        }
+    }
+
     insertMessage(
         originExtrinsicHash: string,
         relayChain: Network,
         originPara: Para | undefined,
         destinationPara: Para | undefined,
     ) {
-        const existingMessageDiv = document.getElementById(`xcm-message-${originExtrinsicHash}`);
-        if (existingMessageDiv) {
-            // ignore duplicates
-            return;
-        }
         const messageDiv = document.createElement('div');
         messageDiv.classList.add('xcm-message');
         messageDiv.id = `xcm-message-${originExtrinsicHash}`;
         messageDiv.innerHTML = this.getMessageInnerHTML(relayChain, originPara, destinationPara);
-        if (this.ui.root.children.length == 1) {
+        if (this.ui.root.children.length == 0) {
             this.ui.root.appendChild(messageDiv);
         } else {
-            this.ui.root.insertBefore(
-                messageDiv,
-                this.ui.root.children[this.ui.root.children.length - 1],
-            );
+            this.ui.root.insertBefore(messageDiv, this.ui.root.children[0]);
         }
 
         setTimeout(() => {

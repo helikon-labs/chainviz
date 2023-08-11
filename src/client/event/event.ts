@@ -22,6 +22,5 @@ export abstract class ChainvizEvent {
     static readonly ACTIVE_VALIDATOR_LIST_UPDATE = 'event.active_validator_list_update';
     static readonly NEW_BLOCK = 'event.new_block';
     static readonly NEW_FINALIZED_BLOCK = 'event.new_finalized_block';
-    static readonly NEW_XCM_MESSAGE = 'event.new_xcm_message';
     static readonly NETWORK_SELECTED = 'event.network_selected';
 }
