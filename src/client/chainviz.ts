@@ -27,11 +27,20 @@ class Chainviz {
     private paras: Para[] = [];
 
     private readonly sceneDelegate = <SceneDelegate>{
-        onValidatorHover: (index: number, validator: ValidatorSummary) => {
+        onValidatorMouseEnter: (index: number, validator: ValidatorSummary) => {
             this.ui.highlightValidator(this.network, index, validator);
         },
-        clearValidatorHover: () => {
-            this.ui.clearHighlight();
+        onValidatorMouseLeave: () => {
+            this.ui.clearValidatorHighlight();
+        },
+        onParaMouseEnter: (paraId: number) => {
+            const para = this.paras.find((para) => para.paraId == paraId);
+            if (para != undefined) {
+                this.ui.highlightPara(para);
+            }
+        },
+        onParaMouseLeave: () => {
+            this.ui.clearParaHighlight();
         },
     };
 

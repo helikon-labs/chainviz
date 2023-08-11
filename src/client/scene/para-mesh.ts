@@ -139,8 +139,8 @@ class ParaMesh {
     getParaPosition(paraId: number): THREE.Vector3 | undefined {
         for (let i = 3; i < this.group.children.length; i++) {
             for (const child of this.group.children[i].children) {
-                if (child.userData?.paraId == paraId) {
-                    return child.position;
+                if (child.userData?.type == 'para' && child.userData?.paraId == paraId) {
+                    return child.position.clone();
                 }
             }
         }
@@ -152,7 +152,9 @@ class ParaMesh {
             for (const child of this.group.children[i].children) {
                 if (child.userData?.paraId == paraId) {
                     if (child instanceof THREE.Mesh) {
-                        child.material.opacity = 1.0;
+                        if (child.userData?.type == 'para') {
+                            child.material.opacity = 1.0;
+                        }
                         child.scale.x = Constants.HIGHLIGHTED_PARA_SCALE;
                         child.scale.y = Constants.HIGHLIGHTED_PARA_SCALE;
                         child.scale.z = Constants.HIGHLIGHTED_PARA_SCALE;
@@ -167,7 +169,9 @@ class ParaMesh {
             for (const child of this.group.children[i].children) {
                 if (child.userData?.paraId != undefined) {
                     if (child instanceof THREE.Mesh) {
-                        child.material.opacity = Constants.SCENE_PARA_OPACITY;
+                        if (child.userData?.type == 'para') {
+                            child.material.opacity = Constants.SCENE_PARA_OPACITY;
+                        }
                         child.scale.x = 1;
                         child.scale.y = 1;
                         child.scale.z = 1;

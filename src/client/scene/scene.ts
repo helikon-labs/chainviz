@@ -13,8 +13,10 @@ const VALIDATOR_PARA_LINE_MATERIAL = new THREE.LineBasicMaterial({
 });
 
 interface SceneDelegate {
-    onValidatorHover(index: number, validator: ValidatorSummary): void;
-    clearValidatorHover(): void;
+    onValidatorMouseEnter(index: number, validator: ValidatorSummary): void;
+    onValidatorMouseLeave(): void;
+    onParaMouseEnter(paraId: number): void;
+    onParaMouseLeave(): void;
 }
 
 class Scene {
@@ -33,6 +35,7 @@ class Scene {
     private started = false;
     private highlightedValidatorIndex: number | undefined = undefined;
     private validatorParaLine: THREE.Line | undefined = undefined;
+    private highlightedParaId: number | undefined = undefined;
 
     constructor(container: HTMLDivElement, delegate: SceneDelegate) {
         this.container = container;
@@ -125,7 +128,7 @@ class Scene {
         this.controls.update();
         this.stats.update();
         this.render();
-        if (this.validatorMeshIsRotating) {
+        if (this.validatorMeshIsRotating && this.highlightedParaId == undefined) {
             this.validatorMesh.rotate();
         }
     }
@@ -140,16 +143,16 @@ class Scene {
     private checkMouseHoverRaycast() {
         this.raycaster.setFromCamera(this.mouseHoverPoint, this.camera);
         const intersects = this.raycaster.intersectObjects(this.scene.children, true);
-        this.setDefaultCursor();
         let validatorIndex: number | undefined = undefined;
-        let intersectsPara = false;
+        let paraId: number | undefined = undefined;
         let intersectsParaRegion = false;
         for (const intersect of intersects) {
-            const type = intersect.object.userData['type'];
+            const userData = intersect.object.userData;
+            const type = userData['type'];
             if (type == 'validator' && intersect.instanceId != undefined) {
                 validatorIndex = intersect.instanceId;
-            } else if (type == 'para') {
-                intersectsPara = true;
+            } else if (type == 'para' && userData['paraId'] != undefined) {
+                paraId = userData['paraId'];
             } else if (type == 'paraRegion') {
                 intersectsParaRegion = true;
             }
@@ -160,19 +163,28 @@ class Scene {
             if (validatorIndex != this.highlightedValidatorIndex) {
                 const slot = this.validatorMesh.getSlotAtIndex(validatorIndex);
                 if (slot) {
-                    this.delegate.onValidatorHover(validatorIndex, slot.validator);
+                    this.delegate.onValidatorMouseEnter(validatorIndex, slot.validator);
                 }
                 this.highlightedValidatorIndex = validatorIndex;
             }
         } else {
             if (this.highlightedValidatorIndex) {
-                this.delegate.clearValidatorHover();
+                this.delegate.onValidatorMouseLeave();
                 this.highlightedValidatorIndex = undefined;
-            }
-            if (intersectsPara) {
-                this.setPointerCursor();
-            } else {
                 this.setDefaultCursor();
+            }
+            if (paraId != undefined) {
+                if (paraId != this.highlightedParaId) {
+                    this.highlightedParaId = paraId;
+                    this.setPointerCursor();
+                    this.delegate.onParaMouseEnter(paraId);
+                }
+            } else {
+                if (this.highlightedParaId != undefined) {
+                    this.highlightedParaId = undefined;
+                    this.delegate.onParaMouseLeave();
+                    this.setDefaultCursor();
+                }
             }
         }
     }
@@ -238,13 +250,29 @@ class Scene {
         this.validatorMesh.highlightValidator(index);
     }
 
-    clearHighlight() {
+    clearValidatorHighlight() {
         this.validatorMesh.clearHighlight();
         if (this.validatorParaLine) {
             this.scene.remove(this.validatorParaLine);
         }
         this.validatorParaLine = undefined;
         this.paraMesh.clearHighlight();
+    }
+
+    highlightPara(paraId: number) {
+        this.paraMesh.highlightPara(paraId);
+    }
+
+    clearParaHighlight() {
+        this.paraMesh.clearHighlight();
+    }
+
+    getParaOnScreenPosition(paraId: number): THREE.Vec2 {
+        return getOnScreenPosition(
+            this.paraMesh.getParaPosition(paraId)!,
+            this.renderer,
+            this.camera,
+        );
     }
 }
 

@@ -443,3 +443,23 @@ img {
     border-width: 0.5px;
     border-style: solid;
 }
+
+/* para summary board */
+#para-summary-board {
+    visibility: hidden;
+    position: absolute;
+    top: 0px;
+    left: 0px;
+    display: flex;
+    flex-flow: column nowrap;
+    justify-content: flex-start;
+    align-items: flex-start;
+    background-color: #424242d0;
+    padding: 12px 12px 8px 12px;
+    font-size: 12px;
+    border-radius: 10px;
+    border-color: #ffffff4c;
+    border-width: 1px;
+    border-style: solid;
+    gap: 8px;
+}

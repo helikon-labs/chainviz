@@ -17,6 +17,7 @@ import { ChainvizEvent } from '../event/event';
 import { ValidatorSummaryBoard } from './validator-summary-board';
 import { cloneJSONSafeObject } from '../util/object';
 import { Vec2 } from 'three';
+import { ParaSummaryBoard } from './para-summary-board';
 
 class UI {
     private readonly scene: Scene;
@@ -40,6 +41,7 @@ class UI {
     private isChangingNetwork = false;
     private readonly validatorSummaryBoard: ValidatorSummaryBoard;
     private readonly validatorHighlightCircle: HTMLDivElement;
+    private readonly paraSummaryBoard: ParaSummaryBoard;
 
     constructor(sceneDelegate: SceneDelegate) {
         this.root = <HTMLElement>document.getElementById('root');
@@ -62,6 +64,7 @@ class UI {
         this.validatorHighlightCircle = <HTMLDivElement>(
             document.getElementById('validator-highlight-circle')
         );
+        this.paraSummaryBoard = new ParaSummaryBoard();
 
         this.scene = new Scene(this.sceneContainer, sceneDelegate);
         this.kusamaSelector.addEventListener('click', (_event) => {
@@ -328,10 +331,33 @@ class UI {
         this.showValidatorHighlightCircle(position);
     }
 
-    clearHighlight() {
-        this.scene.clearHighlight();
+    clearValidatorHighlight() {
+        this.scene.clearValidatorHighlight();
         this.hideValidatorSummaryBoard();
         this.hideValidatorHighlightCircle();
+    }
+
+    highlightPara(para: Para) {
+        this.scene.highlightPara(para.paraId);
+        const position = this.scene.getParaOnScreenPosition(para.paraId);
+        this.showParaSummaryBoard(para, position);
+    }
+
+    clearParaHighlight() {
+        this.scene.clearParaHighlight();
+        this.hideParaSummaryBoard();
+    }
+
+    showParaSummaryBoard(para: Para, position: Vec2) {
+        this.paraSummaryBoard.show(para);
+        this.paraSummaryBoard.setPosition(
+            position.x + this.sceneContainer.getBoundingClientRect().left,
+            position.y + this.sceneContainer.getBoundingClientRect().top,
+        );
+    }
+
+    hideParaSummaryBoard() {
+        this.paraSummaryBoard.hide();
     }
 }
 

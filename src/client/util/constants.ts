@@ -39,10 +39,12 @@ export abstract class Constants {
     static readonly SCENE_VALIDATOR_OPACITY = 1.0;
     static readonly VALIDATOR_PARA_LINE_COLOR = 0xffffff;
     static readonly HIGHLIGHTED_PARA_SCALE = 1.5;
-    // summary board
-    // hover info board
+    // validator summary board
     static readonly VALIDATOR_SUMMARY_BOARD_X_OFFSET = 20;
     static readonly VALIDATOR_SUMMARY_INFO_BOARD_Y_OFFSET = -20;
+    // para summary board
+    static readonly PARA_SUMMARY_BOARD_X_OFFSET = 24;
+    static readonly PARA_SUMMARY_INFO_BOARD_Y_OFFSET = -20;
     // orbit control
     static readonly ORBIT_DEFAULT_DISTANCE = 380;
     // format
