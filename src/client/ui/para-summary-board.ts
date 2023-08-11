@@ -4,6 +4,7 @@ import { Constants } from '../util/constants';
 interface UI {
     root: HTMLElement;
     nameAndId: HTMLElement;
+    paraValidatorCount: HTMLElement;
 }
 
 class ParaSummaryBoard {
@@ -14,12 +15,16 @@ class ParaSummaryBoard {
         this.ui = {
             root: <HTMLElement>document.getElementById('para-summary-board'),
             nameAndId: <HTMLElement>document.getElementById('para-summary-name-and-id'),
+            paraValidatorCount: <HTMLElement>(
+                document.getElementById('para-summary-para-validator-count')
+            ),
         };
     }
 
-    show(para: Para) {
+    show(para: Para, paraValidatorCount: number) {
         this.para = para;
         this.ui.nameAndId.innerHTML = `${para.text} (#${para.paraId})`;
+        this.ui.paraValidatorCount.innerHTML = `${paraValidatorCount} paravalidators`;
         this.ui.root.style.visibility = 'visible';
     }
 

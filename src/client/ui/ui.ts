@@ -337,10 +337,10 @@ class UI {
         this.hideValidatorHighlightCircle();
     }
 
-    highlightPara(para: Para) {
+    highlightPara(para: Para, paraValidatorCount: number) {
         this.scene.highlightPara(para.paraId);
         const position = this.scene.getParaOnScreenPosition(para.paraId);
-        this.showParaSummaryBoard(para, position);
+        this.showParaSummaryBoard(para, paraValidatorCount, position);
     }
 
     clearParaHighlight() {
@@ -348,8 +348,8 @@ class UI {
         this.hideParaSummaryBoard();
     }
 
-    showParaSummaryBoard(para: Para, position: Vec2) {
-        this.paraSummaryBoard.show(para);
+    showParaSummaryBoard(para: Para, paraValidatorCount: number, position: Vec2) {
+        this.paraSummaryBoard.show(para, paraValidatorCount);
         this.paraSummaryBoard.setPosition(
             position.x + this.sceneContainer.getBoundingClientRect().left,
             position.y + this.sceneContainer.getBoundingClientRect().top,

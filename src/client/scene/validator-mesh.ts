@@ -258,6 +258,29 @@ class ValidatorMesh {
         const indexInArc = index % this.arcs[0].length;
         return this.arcs[arcIndex][indexInArc];
     }
+
+    highlightParaValidators(paraId: number) {
+        this.resetScales();
+        for (let i = 0; i < this.arcs.length; i++) {
+            for (let j = 0; j <= this.arcs[0].length; j++) {
+                const index = i * this.arcs[0].length + j;
+                const slot = this.arcs[i][j];
+                if (slot) {
+                    let scale = 0.0;
+                    if (slot.validator.paraId == paraId) {
+                        scale = 1;
+                    }
+                    const matrix = new THREE.Matrix4();
+                    this.validatorMesh.getMatrixAt(index, matrix);
+                    matrix.scale(new THREE.Vector3(scale, scale, scale));
+                    this.validatorMesh.setMatrixAt(index, matrix);
+                }
+            }
+        }
+        ARC_MATERIAL.opacity = Constants.VALIDATOR_ARC_LOW_OPACITY;
+        this.validatorMesh.instanceMatrix.needsUpdate = true;
+        this.validatorMesh.computeBoundingSphere();
+    }
 }
 
 export { ValidatorMesh };

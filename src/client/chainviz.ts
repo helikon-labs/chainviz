@@ -36,7 +36,13 @@ class Chainviz {
         onParaMouseEnter: (paraId: number) => {
             const para = this.paras.find((para) => para.paraId == paraId);
             if (para != undefined) {
-                this.ui.highlightPara(para);
+                let paraValidatorCount = 0;
+                for (const validator of this.validatorMap.values()) {
+                    if (validator.paraId == paraId) {
+                        paraValidatorCount++;
+                    }
+                }
+                this.ui.highlightPara(para, paraValidatorCount);
             }
         },
         onParaMouseLeave: () => {

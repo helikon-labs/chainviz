@@ -261,10 +261,12 @@ class Scene {
 
     highlightPara(paraId: number) {
         this.paraMesh.highlightPara(paraId);
+        this.validatorMesh.highlightParaValidators(paraId);
     }
 
     clearParaHighlight() {
         this.paraMesh.clearHighlight();
+        this.validatorMesh.clearHighlight();
     }
 
     getParaOnScreenPosition(paraId: number): THREE.Vec2 {
