@@ -36,13 +36,13 @@ class Chainviz {
         onParaMouseEnter: (paraId: number) => {
             const para = this.paras.find((para) => para.paraId == paraId);
             if (para != undefined) {
-                let paraValidatorCount = 0;
+                const paraValidatorStashAdresses: string[] = [];
                 for (const validator of this.validatorMap.values()) {
                     if (validator.paraId == paraId) {
-                        paraValidatorCount++;
+                        paraValidatorStashAdresses.push(validator.address);
                     }
                 }
-                this.ui.highlightPara(para, paraValidatorCount);
+                this.ui.highlightPara(para, paraValidatorStashAdresses);
             }
         },
         onParaMouseLeave: () => {

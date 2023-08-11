@@ -325,10 +325,12 @@ class UI {
     }
 
     highlightValidator(network: Network, index: number, validator: ValidatorSummary) {
-        const position = this.scene.getValidatorOnScreenPosition(index);
-        this.scene.highlightValidator(index, validator);
-        this.showValidatorSummaryBoard(network, cloneJSONSafeObject(validator), position);
-        this.showValidatorHighlightCircle(position);
+        const position = this.scene.getValidatorOnScreenPosition(validator.address);
+        if (position != undefined) {
+            this.scene.highlightValidator(index, validator);
+            this.showValidatorSummaryBoard(network, cloneJSONSafeObject(validator), position);
+            this.showValidatorHighlightCircle(position);
+        }
     }
 
     clearValidatorHighlight() {
@@ -337,10 +339,10 @@ class UI {
         this.hideValidatorHighlightCircle();
     }
 
-    highlightPara(para: Para, paraValidatorCount: number) {
-        this.scene.highlightPara(para.paraId);
+    highlightPara(para: Para, paraValidatorStashAdresses: string[]) {
+        this.scene.highlightPara(para.paraId, paraValidatorStashAdresses);
         const position = this.scene.getParaOnScreenPosition(para.paraId);
-        this.showParaSummaryBoard(para, paraValidatorCount, position);
+        this.showParaSummaryBoard(para, paraValidatorStashAdresses.length, position);
     }
 
     clearParaHighlight() {

@@ -195,7 +195,25 @@ class ValidatorMesh {
         this.animate(true, onComplete);
     }
 
-    getValidatorPosition(index: number): THREE.Vector3 {
+    private getValidatorIndex(stashAddress: string): number | undefined {
+        for (let i = 0; i < this.arcs.length; i++) {
+            for (let j = 0; j < this.arcs[i].length; j++) {
+                const slot = this.arcs[i][j];
+                if (slot) {
+                    if (slot.validator.address == stashAddress) {
+                        return i * this.arcs[0].length + j;
+                    }
+                }
+            }
+        }
+        return undefined;
+    }
+
+    getValidatorPosition(stashAddress: string): THREE.Vector3 | undefined {
+        const index = this.getValidatorIndex(stashAddress);
+        if (index == undefined) {
+            return undefined;
+        }
         const groupMatrix = new THREE.Matrix4().makeRotationFromEuler(this.group.rotation);
         const matrix = new THREE.Matrix4();
         this.validatorMesh.getMatrixAt(index, matrix);

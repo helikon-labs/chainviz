@@ -34,7 +34,7 @@ class Scene {
     private readonly raycaster: THREE.Raycaster;
     private started = false;
     private highlightedValidatorIndex: number | undefined = undefined;
-    private validatorParaLine: THREE.Line | undefined = undefined;
+    private validatorParaLines: THREE.Line[] = [];
     private highlightedParaId: number | undefined = undefined;
 
     constructor(container: HTMLDivElement, delegate: SceneDelegate) {
@@ -227,46 +227,64 @@ class Scene {
         this.validatorMesh.reset(onComplete);
     }
 
-    getValidatorOnScreenPosition(index: number): THREE.Vec2 {
-        return getOnScreenPosition(
-            this.validatorMesh.getValidatorPosition(index),
-            this.renderer,
-            this.camera,
-        );
+    getValidatorOnScreenPosition(stashAddress: string): THREE.Vec2 | undefined {
+        const position = this.validatorMesh.getValidatorPosition(stashAddress);
+        if (position == undefined) {
+            return undefined;
+        }
+        return getOnScreenPosition(position, this.renderer, this.camera);
+    }
+
+    private addParaValidatorLines(paraId: number, paraValidatorStashAddresses: string[]) {
+        const paraPosition = this.paraMesh.getParaPosition(paraId);
+        if (paraPosition) {
+            for (const paraValidatorStashAddress of paraValidatorStashAddresses) {
+                const validatorPosition =
+                    this.validatorMesh.getValidatorPosition(paraValidatorStashAddress);
+                if (validatorPosition == undefined) {
+                    continue;
+                }
+                const points = [];
+                points.push(validatorPosition);
+                points.push(paraPosition);
+                const geometry = new THREE.BufferGeometry().setFromPoints(points);
+                const validatorParaLine = new THREE.Line(geometry, VALIDATOR_PARA_LINE_MATERIAL);
+                this.validatorParaLines.push(validatorParaLine);
+                this.scene.add(validatorParaLine);
+            }
+        }
+    }
+
+    private removeParaValidatorLines() {
+        for (const validatorParaLine of this.validatorParaLines) {
+            this.scene.remove(validatorParaLine);
+        }
+        this.validatorParaLines = [];
     }
 
     highlightValidator(index: number, validator: ValidatorSummary) {
-        const paraPosition = this.paraMesh.getParaPosition(validator.paraId ?? -1);
-        if (paraPosition) {
-            const validatorPosition = this.validatorMesh.getValidatorPosition(index);
-            const points = [];
-            points.push(validatorPosition);
-            points.push(paraPosition);
-            const geometry = new THREE.BufferGeometry().setFromPoints(points);
-            this.validatorParaLine = new THREE.Line(geometry, VALIDATOR_PARA_LINE_MATERIAL);
-            this.scene.add(this.validatorParaLine);
-            this.paraMesh.highlightPara(validator.paraId ?? -1);
-        }
         this.validatorMesh.highlightValidator(index);
+        if (validator.paraId) {
+            this.addParaValidatorLines(validator.paraId, [validator.address]);
+        }
     }
 
     clearValidatorHighlight() {
         this.validatorMesh.clearHighlight();
-        if (this.validatorParaLine) {
-            this.scene.remove(this.validatorParaLine);
-        }
-        this.validatorParaLine = undefined;
         this.paraMesh.clearHighlight();
+        this.removeParaValidatorLines();
     }
 
-    highlightPara(paraId: number) {
+    highlightPara(paraId: number, paraValidatorStashAddresses: string[]) {
         this.paraMesh.highlightPara(paraId);
         this.validatorMesh.highlightParaValidators(paraId);
+        this.addParaValidatorLines(paraId, paraValidatorStashAddresses);
     }
 
     clearParaHighlight() {
         this.paraMesh.clearHighlight();
         this.validatorMesh.clearHighlight();
+        this.removeParaValidatorLines();
     }
 
     getParaOnScreenPosition(paraId: number): THREE.Vec2 {
