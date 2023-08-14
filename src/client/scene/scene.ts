@@ -30,7 +30,10 @@ class Scene {
     private readonly paraMesh: ParaMesh;
     private readonly validatorMesh: ValidatorMesh;
     private validatorMeshIsRotating = false;
-    private readonly mouseHoverPoint: THREE.Vector2 = new THREE.Vector2();
+    private readonly mouseHoverPoint: THREE.Vector2 = new THREE.Vector2(
+        Number.MAX_SAFE_INTEGER,
+        Number.MAX_SAFE_INTEGER,
+    );
     private readonly raycaster: THREE.Raycaster;
     private started = false;
     private highlightedValidatorIndex: number | undefined = undefined;
@@ -157,7 +160,7 @@ class Scene {
                 intersectsParaRegion = true;
             }
         }
-        this.validatorMeshIsRotating = !intersectsParaRegion && this.started;
+        this.validatorMeshIsRotating = !intersectsParaRegion;
         if (validatorIndex) {
             this.setPointerCursor();
             if (validatorIndex != this.highlightedValidatorIndex) {
