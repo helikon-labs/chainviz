@@ -12,6 +12,7 @@ import { Block } from './model/chainviz/block';
 import { Para } from './model/substrate/para';
 import { XCMInfo } from './model/polkaholic/xcm';
 import { SceneDelegate } from './scene/scene';
+import { getValidatorSummaryDisplay } from './util/ui-util';
 
 THREE.Cache.enabled = true;
 
@@ -292,6 +293,13 @@ class Chainviz {
     }
 
     private onNewBlock(block: Block) {
+        const authorAccountId = block.extendedHeader.author;
+        if (authorAccountId) {
+            const validator = this.validatorMap.get(authorAccountId.toString());
+            if (validator) {
+                block.setAuthorDisplay(getValidatorSummaryDisplay(validator));
+            }
+        }
         for (let i = 0; i < this.slots.length; i++) {
             if (this.slots[i].number == block.block.header.number.toNumber()) {
                 this.slots[i].insertBlock(block);
@@ -310,6 +318,13 @@ class Chainviz {
 
     private async onNewFinalizedBlock(block: Block) {
         let finalizedNumber = -1;
+        const authorAccountId = block.extendedHeader.author;
+        if (authorAccountId) {
+            const validator = this.validatorMap.get(authorAccountId.toString());
+            if (validator) {
+                block.setAuthorDisplay(getValidatorSummaryDisplay(validator));
+            }
+        }
         for (let i = 0; i < this.slots.length; i++) {
             if (this.slots[i].number == block.block.header.number.toNumber()) {
                 this.slots[i].finalize(block);

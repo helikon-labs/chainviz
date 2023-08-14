@@ -216,12 +216,14 @@ class DataStore {
     }
 
     async getBlockByHash(hash: BlockHash): Promise<Block> {
+        const extendedHeader = await this.substrateClient.derive.chain.getHeader(hash);
         const substrateBlock = (await this.substrateClient.rpc.chain.getBlock(hash)).block;
         const apiAt = await this.substrateClient.at(hash);
         const timestamp = (await apiAt.query.timestamp.now()).toJSON() as number;
         const events = (await apiAt.query.system.events()).toHuman() as AnyJson[];
         const runtimeVersion = await this.substrateClient.rpc.state.getRuntimeVersion(hash);
         const block = new Block(
+            extendedHeader,
             substrateBlock,
             timestamp,
             events,

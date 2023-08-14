@@ -1,6 +1,11 @@
 import { Block } from '../model/chainviz/block';
 import { Slot } from '../model/chainviz/slot';
-import { capitalize, getBlockTimeFormatted, getCondensedHash } from '../util/format';
+import {
+    capitalize,
+    getBlockTimeFormatted,
+    getCondensedAddress,
+    getCondensedHash,
+} from '../util/format';
 
 interface UI {
     root: HTMLElement;
@@ -42,6 +47,19 @@ class SlotList {
             html += '<span>Timestamp</span>';
             html += `<span>${getBlockTimeFormatted(block.time)}</span>`;
             html += '</div>';
+            // author
+            const authorDisplay = block.getAuthorDisplay();
+            if (authorDisplay) {
+                html += '<div class="block-content-row">';
+                html += '<span>Author</span>';
+                html += `<span>${authorDisplay}</span>`;
+                html += '</div>';
+            } else if (block.authorAccountId) {
+                html += '<div class="block-content-row">';
+                html += '<span>Author</span>';
+                html += `<span>${getCondensedAddress(block.authorAccountId.toString())}</span>`;
+                html += '</div>';
+            }
             // status
             html += '<div class="block-content-row">';
             html += '<span>Status</span>';
