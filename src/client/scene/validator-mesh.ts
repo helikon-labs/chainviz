@@ -24,7 +24,7 @@ const VALIDATOR_MATERIAL = new THREE.MeshBasicMaterial({
     opacity: Constants.SCENE_VALIDATOR_OPACITY,
 });
 
-interface Slot {
+interface ValidatorSlot {
     validator: ValidatorSummary;
     stashAddress: string;
     scale: number;
@@ -34,7 +34,7 @@ class ValidatorMesh {
     private arcMesh!: THREE.InstancedMesh;
     private validatorMesh!: THREE.InstancedMesh;
     private group!: THREE.Group;
-    private arcs: (Slot | undefined)[][] = [];
+    private arcs: (ValidatorSlot | undefined)[][] = [];
 
     private getMinMaxRewardPoints(): [number, number] {
         let minRewardPoints = Number.MAX_SAFE_INTEGER;
@@ -271,7 +271,7 @@ class ValidatorMesh {
         ARC_MATERIAL.opacity = Constants.VALIDATOR_ARC_NORMAL_OPACITY;
     }
 
-    getSlotAtIndex(index: number): Slot | undefined {
+    getSlotAtIndex(index: number): ValidatorSlot | undefined {
         const arcIndex = Math.floor(index / this.arcs[0].length);
         const indexInArc = index % this.arcs[0].length;
         return this.arcs[arcIndex][indexInArc];

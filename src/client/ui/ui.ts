@@ -1,4 +1,3 @@
-import { Slot } from '../model/chainviz/slot';
 import { Kusama, Network, Polkadot } from '../model/substrate/network';
 import { NetworkStatus } from '../model/subvt/network-status';
 import { Constants } from '../util/constants';
@@ -6,7 +5,7 @@ import { createTween } from '../util/tween';
 import { show } from '../util/ui-util';
 import { Logo, getRandomCharacterType, getRandomShapeType } from './logo';
 import { NetworkStatusBoard } from './network-status-board';
-import { SlotList } from './slot-list';
+import { BlockList } from './block-list';
 import * as TWEEN from '@tweenjs/tween.js';
 import { XCMMessageList } from './xcm-message-list';
 import { Para } from '../model/substrate/para';
@@ -19,6 +18,7 @@ import { cloneJSONSafeObject } from '../util/object';
 import { Vec2 } from 'three';
 import { ParaSummaryBoard } from './para-summary-board';
 import { XCMInfo } from '../model/polkaholic/xcm';
+import { Block } from '../model/chainviz/block';
 
 class UI {
     private readonly scene: Scene;
@@ -35,7 +35,7 @@ class UI {
     private readonly polkadotSelector: HTMLDivElement;
     private readonly rightPanel: HTMLDivElement;
     private readonly networkStatusBoard: NetworkStatusBoard;
-    private readonly slotList: SlotList;
+    private readonly blockList: BlockList;
     private readonly loadingContainer: HTMLDivElement;
     private readonly loadingInfo: HTMLDivElement;
     private readonly eventBus = EventBus.getInstance();
@@ -58,7 +58,7 @@ class UI {
         this.polkadotSelector = <HTMLDivElement>document.getElementById('polkadot-selector');
         this.rightPanel = <HTMLDivElement>document.getElementById('right-panel');
         this.networkStatusBoard = new NetworkStatusBoard();
-        this.slotList = new SlotList();
+        this.blockList = new BlockList();
         this.loadingContainer = <HTMLDivElement>document.getElementById('loading-container');
         this.loadingInfo = <HTMLDivElement>document.getElementById('loading-info');
         this.validatorSummaryBoard = new ValidatorSummaryBoard();
@@ -189,7 +189,7 @@ class UI {
             () => {
                 this.xcmMessageList.setOpacity(opacity.opacity);
                 this.networkStatusBoard.setOpacity(opacity.opacity);
-                this.slotList.setOpacity(opacity.opacity);
+                this.blockList.setOpacity(opacity.opacity);
                 this.sceneContainer.style.opacity = `${opacity.opacity}%`;
             },
             onComplete,
@@ -207,7 +207,7 @@ class UI {
             () => {
                 this.xcmMessageList.setOpacity(opacity.opacity);
                 this.networkStatusBoard.setOpacity(opacity.opacity);
-                this.slotList.setOpacity(opacity.opacity);
+                this.blockList.setOpacity(opacity.opacity);
                 this.sceneContainer.style.opacity = `${opacity.opacity}%`;
             },
             onComplete,
@@ -215,16 +215,16 @@ class UI {
     }
 
     start(
-        slots: Slot[],
+        blocks: Block[],
         paras: Para[],
         validatorMap: Map<string, ValidatorSummary>,
         onComplete?: () => void,
     ) {
-        this.clearSlots();
+        this.clearBlocks();
         this.clearXCMMessages();
         this.fadeOutLoadingContainer(() => {
             if (this.isChangingNetwork) {
-                this.slotList.initialize(slots);
+                this.blockList.initialize(blocks);
                 this.scene.start(paras, validatorMap);
                 this.fadeInAfterNetworkChange(() => {
                     this.isChangingNetwork = false;
@@ -234,7 +234,7 @@ class UI {
                 });
             } else {
                 this.fadeInBackground(() => {
-                    this.slotList.initialize(slots);
+                    this.blockList.initialize(blocks);
                     this.scene.start(paras, validatorMap);
                     this.fadeInContent(() => {
                         if (onComplete) {
@@ -263,16 +263,20 @@ class UI {
         this.networkStatusBoard.display(network, status);
     }
 
-    private clearSlots() {
-        this.slotList.initialize([]);
+    private clearBlocks() {
+        this.blockList.initialize([]);
     }
 
-    insertSlot(slot: Slot) {
-        this.slotList.insertSlot(slot, true);
+    onNewBlock(block: Block) {
+        this.blockList.onNewBlock(block);
     }
 
-    updateSlot(slot: Slot) {
-        this.slotList.updateSlot(slot);
+    onFinalizedBlock(block: Block) {
+        this.blockList.onFinalizedBlock(block);
+    }
+
+    onDiscardedBlock(block: Block) {
+        this.blockList.onDiscardedBlock(block);
     }
 
     private clearXCMMessages() {

@@ -1,21 +1,22 @@
 import { ApiPromise, WsProvider } from '@polkadot/api';
-import { Network } from '../model/substrate/network';
+import { Network, getNetworkPara } from '../model/substrate/network';
 import {
     RPCSubscriptionService,
     RPCSubscriptionServiceListener,
 } from '../service/rpc/RPCSubscriptionService';
-import { NetworkStatusUpdate } from '../model/subvt/network-status';
-import { ValidatorListUpdate } from '../model/subvt/validator-summary';
+import { NetworkStatus, NetworkStatusUpdate } from '../model/subvt/network-status';
+import { ValidatorListUpdate, ValidatorSummary } from '../model/subvt/validator-summary';
 import { setAsyncTimeout } from '../util/async-util';
 import { EventBus } from '../event/event-bus';
 import { Constants } from '../util/constants';
 import { ChainvizEvent } from '../event/event';
 import { UnsubscribePromise } from '@polkadot/api/types';
-import { Slot } from '../model/chainviz/slot';
 import { Block } from '../model/chainviz/block';
-import { BlockHash } from '@polkadot/types/interfaces';
+import { BlockHash, Header } from '@polkadot/types/interfaces';
 import { AnyJson } from '@polkadot/types/types';
 import { XCMInfo, XCMInfoWrapper, isXCMInfo } from '../model/polkaholic/xcm';
+import { Para } from '../model/substrate/para';
+import { getValidatorIdentityIconHTML, getValidatorSummaryDisplay } from '../util/ui-util';
 
 class DataStore {
     private network!: Network;
@@ -25,6 +26,13 @@ class DataStore {
     private readonly eventBus = EventBus.getInstance();
     private newBlockSubscription?: UnsubscribePromise;
     private finalizedHeaderSubscription?: UnsubscribePromise;
+    private xcmTransferGetTimeout?: NodeJS.Timeout;
+
+    private networkStatus!: NetworkStatus;
+    validatorMap = new Map<string, ValidatorSummary>();
+    blocks: Block[] = [];
+    paras: Para[] = [];
+    xcmTransfers: XCMInfo[] = [];
 
     private readonly networkStatusListener: RPCSubscriptionServiceListener<NetworkStatusUpdate> = {
         onConnected: () => {
@@ -44,6 +52,7 @@ class DataStore {
         },
         onError: (code: number, message: string) => {
             console.log(`Network status service error (${code}: ${message}).`);
+            this.disconnectNetworkStatusService();
             this.eventBus.dispatch<string>(ChainvizEvent.NETWORK_STATUS_SERVICE_ERROR);
         },
     };
@@ -75,12 +84,23 @@ class DataStore {
             },
             onError: (code: number, message: string) => {
                 console.log(`Validator list service error (${code}: ${message}).`);
+                this.disconnectActiveValidatorListService();
                 this.eventBus.dispatch<string>(ChainvizEvent.ACTIVE_VALIDATOR_LIST_SERVICE_ERROR);
             },
         };
 
-    setNetwork(network: Network) {
+    async setNetwork(network: Network) {
         this.network = network;
+        await this.disconnectSubstrateClient();
+        this.disconnectNetworkStatusService();
+        this.disconnectActiveValidatorListService();
+        if (this.xcmTransferGetTimeout) {
+            clearTimeout(this.xcmTransferGetTimeout);
+        }
+        this.blocks = [];
+        this.validatorMap.clear();
+        this.paras = [];
+        this.xcmTransfers = [];
     }
 
     async connectSubstrateRPC() {
@@ -108,8 +128,8 @@ class DataStore {
         this.networkStatusClient.connect();
     }
 
-    disconnectNetworkStatusService() {
-        this.networkStatusClient.disconnect();
+    private disconnectNetworkStatusService() {
+        this.networkStatusClient?.disconnect();
     }
 
     subscribeToNetworkStatus() {
@@ -126,93 +146,195 @@ class DataStore {
         this.activeValidatorListClient.connect();
     }
 
-    disconnectActiveValidatorListService() {
-        this.activeValidatorListClient.disconnect();
+    private disconnectActiveValidatorListService() {
+        this.activeValidatorListClient?.disconnect();
     }
 
     subscribeToActiveValidatorList() {
         this.activeValidatorListClient.subscribe();
     }
 
-    processNetworkStatusUpdate(update: NetworkStatusUpdate) {
-        this.eventBus.dispatch<NetworkStatusUpdate>(ChainvizEvent.NETWORK_STATUS_UPDATE, update);
-    }
-
-    processActiveValidatorListUpdate(update: ValidatorListUpdate) {
-        this.eventBus.dispatch<ValidatorListUpdate>(
-            ChainvizEvent.ACTIVE_VALIDATOR_LIST_UPDATE,
-            update,
+    private processNetworkStatusUpdate(update: NetworkStatusUpdate) {
+        if (update.status) {
+            this.networkStatus = update.status;
+        } else if (update.diff) {
+            Object.assign(this.networkStatus, update.diff);
+        }
+        this.eventBus.dispatch<NetworkStatus>(
+            ChainvizEvent.NETWORK_STATUS_UPDATE,
+            this.networkStatus,
         );
     }
 
-    async getInitialSlots(): Promise<Slot[]> {
-        const finalizedSlots: Slot[] = [];
+    private processActiveValidatorListUpdate(update: ValidatorListUpdate) {
+        if (this.validatorMap.size == 0) {
+            this.eventBus.dispatch(ChainvizEvent.ACTIVE_VALIDATOR_LIST_INITIALIZED);
+        }
+        for (const validator of update.insert) {
+            this.validatorMap.set(validator.address, validator);
+        }
+        for (const diff of update.update) {
+            const validator = this.validatorMap.get(diff.accountId);
+            if (validator) {
+                Object.assign(validator, diff);
+                this.validatorMap.set(validator.accountId, validator);
+                continue;
+            }
+        }
+        for (const removeAccountId of update.removeIds) {
+            this.validatorMap.delete(removeAccountId);
+        }
+    }
+
+    getParaById(paraId: number): Para | undefined {
+        return this.paras.find((para) => para.paraId == paraId);
+    }
+
+    getParavalidatorStashAddresses(para: Para): string[] {
+        const addresses: string[] = [];
+        for (const validator of this.validatorMap.values()) {
+            if (validator.paraId == para.paraId) {
+                addresses.push(validator.address);
+            }
+        }
+        return addresses;
+    }
+
+    async getInitialBlocks() {
+        const finalizedBlocks: Block[] = [];
         // get finalized blocks
         const finalizedBlockHash = await this.substrateClient.rpc.chain.getFinalizedHead();
-        const lastFinalizedBlock = await this.getBlockByHash(finalizedBlockHash);
-        finalizedSlots.push(
-            new Slot(lastFinalizedBlock.block.header.number.toNumber(), true, [lastFinalizedBlock]),
-        );
-        let finalizedBlock = lastFinalizedBlock;
-        for (let i = Constants.INITIAL_SLOT_COUNT - 1; i > 0; i--) {
+        let finalizedBlock = await this.getBlockByHash(finalizedBlockHash);
+        finalizedBlock.isFinalized = true;
+        finalizedBlocks.push(finalizedBlock);
+        for (let i = 0; i < Constants.INITIAL_BLOCK_COUNT; i++) {
             finalizedBlock = await this.getBlockByHash(finalizedBlock.block.header.parentHash);
-            finalizedSlots.push(
-                new Slot(finalizedBlock.block.header.number.toNumber(), true, [finalizedBlock]),
-            );
+            finalizedBlock.isFinalized = true;
+            finalizedBlocks.push(finalizedBlock);
         }
         // get non-finalized blocks
-        const nonFinalizedSlots: Slot[] = [];
-        const lastHeader = await this.substrateClient.rpc.chain.getHeader();
-        let nonFinalizedSubstrateBlock = (
-            await this.substrateClient.rpc.chain.getBlock(lastHeader.hash)
-        ).block;
+        const nonFinalizedBlocks: Block[] = [];
+        let nonFinalizedHeader = await this.substrateClient.rpc.chain.getHeader();
         while (
-            nonFinalizedSubstrateBlock.header.hash.toHex() !=
-            lastFinalizedBlock.block.header.hash.toHex()
+            nonFinalizedHeader.number.toNumber() !=
+            finalizedBlocks[0].block.header.number.toNumber()
         ) {
-            const nonFinalizedBlock = await this.getBlockByHash(
-                nonFinalizedSubstrateBlock.header.hash,
+            const nonFinalizedBlock = await this.getBlockByHash(nonFinalizedHeader.hash);
+            nonFinalizedBlocks.push(nonFinalizedBlock);
+            nonFinalizedHeader = await this.substrateClient.rpc.chain.getHeader(
+                nonFinalizedHeader.parentHash,
             );
-            nonFinalizedSlots.push(
-                new Slot(nonFinalizedBlock.block.header.number.toNumber(), false, [
-                    nonFinalizedBlock,
-                ]),
-            );
-            nonFinalizedSubstrateBlock = (
-                await this.substrateClient.rpc.chain.getBlock(
-                    nonFinalizedBlock.block.header.parentHash,
-                )
-            ).block;
         }
-        return [...nonFinalizedSlots, ...finalizedSlots];
+        this.blocks = [...nonFinalizedBlocks, ...finalizedBlocks];
     }
 
-    async getParaIds(): Promise<number[]> {
+    private async getParaIds(): Promise<number[]> {
         return (await this.substrateClient.query.paras.parachains()).toJSON() as number[];
     }
 
-    subsribeToNewBlocks() {
+    async getParas() {
+        this.paras = [];
+        const paraIds = await this.getParaIds();
+        for (const paraId of paraIds) {
+            const para = getNetworkPara(this.network, paraId);
+            if (para) {
+                this.paras.push(para);
+            }
+        }
+    }
+
+    subscribeToNewBlocks() {
         if (this.newBlockSubscription) {
             return;
         }
         this.newBlockSubscription = this.substrateClient.rpc.chain.subscribeNewHeads(
             async (header) => {
-                const block = await this.getBlockByHash(header.hash);
-                this.eventBus.dispatch<Block>(ChainvizEvent.NEW_BLOCK, block);
+                this.onNewBlock(header);
             },
         );
     }
 
-    subsribeToFinalizedBlocks() {
+    subscribeToFinalizedBlocks() {
         if (this.finalizedHeaderSubscription) {
             return;
         }
         this.finalizedHeaderSubscription = this.substrateClient.rpc.chain.subscribeFinalizedHeads(
             async (header) => {
-                const block = await this.getBlockByHash(header.hash);
-                this.eventBus.dispatch<Block>(ChainvizEvent.NEW_FINALIZED_BLOCK, block);
+                this.onFinalizedBlock(header);
             },
         );
+    }
+
+    private insertBlock(block: Block) {
+        let insertIndex = 0;
+        for (let i = 0; i < this.blocks.length; i++) {
+            insertIndex = i;
+            if (
+                block.block.header.number.toNumber() >=
+                this.blocks[i].block.header.number.toNumber()
+            ) {
+                break;
+            }
+        }
+        this.blocks = [
+            ...this.blocks.slice(0, insertIndex),
+            block,
+            ...this.blocks.slice(insertIndex),
+        ];
+    }
+
+    private async onNewBlock(header: Header) {
+        if (
+            this.blocks.findIndex((block) => block.block.header.toHex() == header.hash.toHex()) >= 0
+        ) {
+            return;
+        }
+        const block = await this.getBlockByHash(header.hash);
+        this.insertBlock(block);
+        this.eventBus.dispatch<Block>(ChainvizEvent.NEW_BLOCK, block);
+    }
+
+    private async onFinalizedBlock(header: Header) {
+        // find unfinalized slots before this one & discard & finalize
+        const removeIndices: number[] = [];
+        for (let i = 0; i < this.blocks.length; i++) {
+            if (
+                header.number.toNumber() >= this.blocks[i].block.header.number.toNumber() &&
+                header.hash != this.blocks[i].block.hash &&
+                !this.blocks[i].isFinalized
+            ) {
+                removeIndices.push(i);
+            }
+        }
+        for (const removeIndex of removeIndices.reverse()) {
+            const removed = this.blocks.splice(removeIndex, 1);
+            this.eventBus.dispatch<Block>(ChainvizEvent.DISCARDED_BLOCK, removed[0]);
+        }
+
+        let number = header.number.toNumber() - 1;
+        while (
+            this.blocks.findIndex((block) => block.block.header.number.toNumber() == number) < 0
+        ) {
+            const block = await this.getBlockByNumber(number);
+            block.isFinalized = true;
+            this.insertBlock(block);
+            this.eventBus.dispatch<Block>(ChainvizEvent.FINALIZED_BLOCK, block);
+            console.log('missing insert', block.block.header.number.toNumber());
+            number--;
+        }
+
+        const index = this.blocks.findIndex(
+            (block) => block.block.header.hash.toHex() == header.hash.toHex(),
+        );
+        if (index >= 0) {
+            this.blocks[index].isFinalized = true;
+            this.eventBus.dispatch<Block>(ChainvizEvent.FINALIZED_BLOCK, this.blocks[index]);
+        } else {
+            const block = await this.getBlockByHash(header.hash);
+            block.isFinalized = true;
+            this.insertBlock(block);
+            this.eventBus.dispatch<Block>(ChainvizEvent.FINALIZED_BLOCK, block);
+        }
     }
 
     async getBlockByHash(hash: BlockHash): Promise<Block> {
@@ -229,6 +351,14 @@ class DataStore {
             events,
             runtimeVersion.specVersion.toNumber(),
         );
+        const authorAccountId = block.extendedHeader.author;
+        if (authorAccountId) {
+            const validator = this.validatorMap.get(authorAccountId.toString());
+            if (validator) {
+                block.setAuthorDisplay(getValidatorSummaryDisplay(validator));
+                block.setAuthorIdentityIconHTML(getValidatorIdentityIconHTML(validator));
+            }
+        }
         return block;
     }
 
@@ -237,30 +367,54 @@ class DataStore {
         return this.getBlockByHash(hash);
     }
 
-    async getXCMTransfers(): Promise<XCMInfo[]> {
+    async getXCMTransfers() {
         const url = 'https://api.polkaholic.io/xcmtransfers';
-        const xcmInfoWrapperList: XCMInfoWrapper[] = await (
-            await fetch(
-                url +
-                    '?' +
-                    new URLSearchParams({
-                        limit: `${Constants.XCM_TRANSFER_FETCH_LIMIT}`,
-                    }).toString(),
-                {
-                    method: 'GET',
-                    headers: {},
-                },
-            )
-        ).json();
-        const result: XCMInfo[] = [];
+        let xcmInfoWrapperList: XCMInfoWrapper[] = [];
+        try {
+            xcmInfoWrapperList = await (
+                await fetch(
+                    url +
+                        '?' +
+                        new URLSearchParams({
+                            limit: `${Constants.XCM_TRANSFER_FETCH_LIMIT}`,
+                        }).toString(),
+                    {
+                        method: 'GET',
+                        headers: {},
+                    },
+                )
+            ).json();
+        } catch (error) {
+            console.error('Error while fetching XCM transfers:', error);
+        }
+        const fetchedXCMTransfers: XCMInfo[] = [];
         for (const xcmInfoWrapper of xcmInfoWrapperList) {
             if (isXCMInfo(xcmInfoWrapper.xcmInfo)) {
                 if (xcmInfoWrapper.xcmInfo.relayChain.relayChain == this.network.id) {
-                    result.push(xcmInfoWrapper.xcmInfo);
+                    fetchedXCMTransfers.push(xcmInfoWrapper.xcmInfo);
                 }
             }
         }
-        return result;
+        const newXCMTransfers: XCMInfo[] = [];
+        for (const fetchedXCMTransfer of fetchedXCMTransfers) {
+            const index = this.xcmTransfers.findIndex(
+                (existingXCMTransfer) =>
+                    existingXCMTransfer.origination.extrinsicHash ==
+                    fetchedXCMTransfer.origination.extrinsicHash,
+            );
+            if (index >= 0) {
+                // message exists, skip
+                continue;
+            }
+            newXCMTransfers.push(fetchedXCMTransfer);
+        }
+        for (const xcmTransfer of newXCMTransfers.reverse()) {
+            this.eventBus.dispatch<XCMInfo>(ChainvizEvent.NEW_XCM_TRANSFER, xcmTransfer);
+        }
+        this.xcmTransfers = [...newXCMTransfers, ...this.xcmTransfers];
+        this.xcmTransferGetTimeout = setTimeout(() => {
+            this.getXCMTransfers();
+        }, Constants.XCM_TRANSFER_FETCH_PERIOD_MS);
     }
 
     async disconnectSubstrateClient() {
@@ -272,7 +426,9 @@ class DataStore {
             (await this.finalizedHeaderSubscription)();
             this.finalizedHeaderSubscription = undefined;
         }
-        await this.substrateClient.disconnect();
+        if (this.substrateClient) {
+            await this.substrateClient.disconnect();
+        }
     }
 }
 

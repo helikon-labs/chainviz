@@ -1,5 +1,4 @@
 import { Block } from '../model/chainviz/block';
-import { Slot } from '../model/chainviz/slot';
 import {
     capitalize,
     getBlockTimeFormatted,
@@ -11,19 +10,20 @@ interface UI {
     root: HTMLElement;
 }
 
-class SlotList {
+class BlockList {
     private readonly ui: UI;
+    private expandedBlockHashes: string[] = [];
 
     constructor() {
         this.ui = {
-            root: <HTMLElement>document.getElementById('slot-list'),
+            root: <HTMLElement>document.getElementById('block-list'),
         };
     }
 
-    initialize(slots: Slot[]) {
+    initialize(blocks: Block[]) {
         this.ui.root.innerHTML = '';
-        for (const slot of slots) {
-            this.insertSlot(slot, false);
+        for (const block of blocks) {
+            this.insertBlock(block);
         }
     }
 
@@ -31,16 +31,18 @@ class SlotList {
         this.ui.root.style.opacity = `${opacity}%`;
     }
 
-    private getBlockHTML(slot: Slot, block: Block): string {
+    private getBlockHTML(block: Block): string {
         const hash = block.block.header.hash.toHex();
-        let html = `<div class="block" id="block-${hash}">`;
-        html += '<div class="block-header">';
+        let html = '<div class="block-header">';
         html += `<span>${block.block.header.number.toNumber()}</span>`;
         html += '<span>|</span>';
         html += `<span class="hash">${getCondensedHash(hash, 11)}</span>`;
         html += '</div>';
 
-        if (slot.blockIsExpanded(hash)) {
+        if (
+            this.expandedBlockHashes.findIndex((expandedBlockHash) => expandedBlockHash == hash) >=
+            0
+        ) {
             html += '<div class="block-content-separator"></div>';
             // block time
             html += '<div class="block-content-row">';
@@ -52,7 +54,7 @@ class SlotList {
             if (authorDisplay) {
                 html += '<div class="block-content-row">';
                 html += '<span>Author</span>';
-                html += `<span>${authorDisplay}</span>`;
+                html += `<span>${block.getAuthorIdentityIconHTML()}${authorDisplay}</span>`;
                 html += '</div>';
             } else if (block.authorAccountId) {
                 html += '<div class="block-content-row">';
@@ -63,7 +65,7 @@ class SlotList {
             // status
             html += '<div class="block-content-row">';
             html += '<span>Status</span>';
-            html += `<span>${slot.getIsFinalized() ? 'Finalized' : 'Unfinalized'}</span>`;
+            html += `<span>${block.isFinalized ? 'Finalized' : 'Unfinalized'}</span>`;
             html += '</div>';
             // parent hash
             html += '<div class="block-content-row">';
@@ -122,80 +124,105 @@ class SlotList {
                 html += '</div>';
             }
         }
-
-        html += '</div>';
         return html;
     }
 
-    private getSlotHTML(slot: Slot): string {
-        let html = `<div class="slot ${
-            slot.getIsFinalized() ? 'finalized' : 'non-finalized'
-        }" id="slot-${slot.number}">`;
-        for (const block of slot.getBlocks()) {
-            html += this.getBlockHTML(slot, block);
-        }
-        html += '</div>';
-        return html;
-    }
-
-    private setBlockOnClick(slot: Slot, block: Block) {
+    private setBlockOnClick(block: Block) {
         setTimeout(() => {
             const hash = block.block.header.hash.toHex();
             const blockDiv = document.getElementById(`block-${hash}`);
             blockDiv?.addEventListener('click', (_event) => {
-                slot.toggleBlockExpand(hash);
-                this.updateSlot(slot);
+                this.toggleBlockExpand(hash);
+                this.updateBlockDiv(block);
             });
         }, 500);
     }
 
-    insertSlot(slot: Slot, prepend: boolean) {
-        const slotDiv = document.createElement('div');
-        slotDiv.classList.add('slot');
-        if (slot.getIsFinalized()) {
-            slotDiv.classList.add('finalized');
+    private toggleBlockExpand(hash: string) {
+        const index = this.expandedBlockHashes.indexOf(hash);
+        if (index >= 0) {
+            this.expandedBlockHashes.splice(index, 1);
         } else {
-            slotDiv.classList.add('non-finalized');
-        }
-        slotDiv.id = `slot-${slot.number}`;
-        let html = '';
-        for (const block of slot.getBlocks()) {
-            html += this.getBlockHTML(slot, block);
-            this.setBlockOnClick(slot, block);
-        }
-        slotDiv.innerHTML = html;
-        if (prepend && this.ui.root.firstChild) {
-            this.ui.root.insertBefore(slotDiv, this.ui.root.firstChild);
-        } else {
-            this.ui.root.appendChild(slotDiv);
+            this.expandedBlockHashes.push(hash);
         }
     }
 
-    updateSlot(slot: Slot) {
-        const slotDiv = <HTMLDivElement>document.getElementById(`slot-${slot.number}`);
-        if (!slotDiv) {
+    private updateBlockDiv(block: Block) {
+        const blockDiv = <HTMLDivElement>(
+            document.getElementById(`block-${block.block.header.hash.toHex()}`)
+        );
+        if (!blockDiv) {
             return;
         }
-        slotDiv.classList.remove('non-finalized');
-        slotDiv.classList.remove('finalized');
-        if (slot.getIsFinalized()) {
-            slotDiv.classList.add('finalized');
+        blockDiv.classList.remove('non-finalized');
+        blockDiv.classList.remove('finalized');
+        if (block.isFinalized) {
+            blockDiv.classList.add('finalized');
         } else {
-            slotDiv.classList.add('non-finalized');
+            blockDiv.classList.add('non-finalized');
         }
-        let html = '';
-        for (const block of slot.getBlocks()) {
-            const blockDiv = <HTMLDivElement>(
-                document.getElementById(`block-${block.block.header.hash.toHex()}`)
-            );
-            if (blockDiv) {
-                blockDiv.parentNode!.removeChild(blockDiv);
+        // this.setBlockOnClick(block);
+        blockDiv.innerHTML = this.getBlockHTML(block);
+    }
+
+    private insertBlock(block: Block) {
+        const newBlockNumber = block.block.header.number.toNumber();
+        let nextBlockDiv: Element | undefined = undefined;
+        for (const blockDiv of this.ui.root.children) {
+            const blockNumber = Number(blockDiv.getAttribute('block-number')!);
+            if (newBlockNumber >= blockNumber) {
+                nextBlockDiv = blockDiv;
+                break;
             }
-            html += this.getBlockHTML(slot, block);
-            this.setBlockOnClick(slot, block);
         }
-        slotDiv.innerHTML = html;
+        const newBlockDiv = document.createElement('div');
+        const hash = block.block.header.hash.toHex();
+        newBlockDiv.id = `block-${hash}`;
+        newBlockDiv.setAttribute('block-number', block.block.header.number.toNumber().toString());
+        newBlockDiv.classList.add('block');
+        if (block.isFinalized) {
+            newBlockDiv.classList.add('finalized');
+        } else {
+            newBlockDiv.classList.add('non-finalized');
+        }
+        newBlockDiv.innerHTML = this.getBlockHTML(block);
+        if (nextBlockDiv == undefined) {
+            this.ui.root.appendChild(newBlockDiv);
+        } else {
+            this.ui.root.insertBefore(newBlockDiv, nextBlockDiv);
+        }
+        this.setBlockOnClick(block);
+    }
+
+    onNewBlock(block: Block) {
+        this.insertBlock(block);
+    }
+
+    onFinalizedBlock(block: Block) {
+        const blockDiv = <HTMLDivElement>(
+            document.getElementById(`block-${block.block.header.hash.toHex()}`)
+        );
+        if (blockDiv) {
+            this.updateBlockDiv(block);
+        } else {
+            this.insertBlock(block);
+        }
+    }
+
+    onDiscardedBlock(block: Block) {
+        const hash = block.block.header.hash.toHex();
+        const blockDiv = <HTMLDivElement>document.getElementById(`block-${hash}`);
+        if (blockDiv) {
+            blockDiv.remove();
+        }
+        this.expandedBlockHashes = this.expandedBlockHashes.filter(
+            (expandedBlockHash) => expandedBlockHash != hash,
+        );
+        const explandedBlockHashesIndex = this.expandedBlockHashes.indexOf(hash);
+        if (explandedBlockHashesIndex >= 0) {
+            this.expandedBlockHashes.splice(explandedBlockHashesIndex, 1);
+        }
     }
 }
 
-export { SlotList };
+export { BlockList };

@@ -210,13 +210,6 @@ class Scene {
     }
 
     start(paras: Para[], validatorMap: Map<string, ValidatorSummary>) {
-        const relayChainValidatorMap = new Map<string, ValidatorSummary>();
-        for (const key of validatorMap.keys()) {
-            const validator = validatorMap.get(key)!;
-            if (!validator.isParaValidator) {
-                relayChainValidatorMap.set(key, validator);
-            }
-        }
         this.paraMesh.start(this.scene, paras);
         this.validatorMesh.start(this.scene, validatorMap, () => {
             this.started = true;

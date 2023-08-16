@@ -19,8 +19,11 @@ export abstract class ChainvizEvent {
         'event.active_validator_list_service_disconnected';
     static readonly ACTIVE_VALIDATOR_LIST_SERVICE_ERROR =
         'event.active_validator_list_service_error';
-    static readonly ACTIVE_VALIDATOR_LIST_UPDATE = 'event.active_validator_list_update';
+    static readonly ACTIVE_VALIDATOR_LIST_INITIALIZED = 'event.active_validator_list_initialized';
     static readonly NEW_BLOCK = 'event.new_block';
-    static readonly NEW_FINALIZED_BLOCK = 'event.new_finalized_block';
+    static readonly FINALIZED_BLOCK = 'event.finalized_block';
+    static readonly DISCARDED_BLOCK = 'event.discarded_block';
     static readonly NETWORK_SELECTED = 'event.network_selected';
+    static readonly NEW_XCM_TRANSFER = 'event.new_xcm_transfer';
+    static readonly XCM_TRANSFER_DISCARDED = 'event.xcm_transfer_discarded';
 }

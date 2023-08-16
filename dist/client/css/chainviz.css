@@ -249,7 +249,7 @@ img {
     font-size: 12px;
 }
 
-.content .right-panel .slot-list {
+.content .right-panel .block-list {
     margin-right: 26px;
     flex-grow: 1;
     gap: 4px;
@@ -258,15 +258,16 @@ img {
     overflow-y: scroll;
 }
 
-.content .right-panel .slot-list .slot {
+.content .right-panel .block-list .block {
     border-radius: 12px;
     padding: 10px 10px 8px 10px;
     display: flex;
     flex-direction: column;
     gap: 8px;
+    cursor: pointer;
 }
 
-.content .right-panel .slot-list .non-finalized {
+.content .right-panel .block-list .non-finalized {
     border: 1px solid #ffffff55;
     animation: non-finalized-border 1s infinite;
 }
@@ -277,15 +278,8 @@ img {
     }
 }
 
-.content .right-panel .slot-list .finalized {
+.content .right-panel .block-list .finalized {
     border: 1px solid #ffffff55;
-}
-
-.content .right-panel .slot-list .slot .block {
-    cursor: pointer;
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
 }
 
 .block .block-content-separator {
@@ -314,7 +308,21 @@ img {
     font-size: 12px;
 }
 
-.content .right-panel .slot-list .slot .block .hash {
+.block-content-row span {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 4px;
+    text-overflow: ellipsis;
+}
+
+.block-content-row span img {
+    width: 12px;
+    height: 12px;
+    margin-bottom: 2px;
+}
+
+.content .right-panel .block-list .block .hash {
     font-family: 'Fira Mono';
     opacity: 0.8;
     font-size: 10.2px;
@@ -384,6 +392,7 @@ img {
     width: 14px;
     height: 14px;
     margin-right: 8px;
+    margin-bottom: 2px;
     background-color: #fff;
     border-radius: 12px;
     border-style: solid;

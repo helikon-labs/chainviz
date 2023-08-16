@@ -7,9 +7,11 @@ class Block {
     readonly block: SubstrateBlock;
     readonly authorAccountId?: AccountId;
     private authorDisplay?: string;
+    private authorIdentityIconHTML?: string;
     readonly time: Date;
     readonly events: AnyJson[];
     readonly runtimeVersion: number;
+    isFinalized: boolean = false;
 
     constructor(
         extendedHeader: HeaderExtended,
@@ -26,12 +28,20 @@ class Block {
         this.runtimeVersion = runtimeVersion;
     }
 
-    setAuthorDisplay(display?: string) {
+    setAuthorDisplay(display: string) {
         this.authorDisplay = display;
     }
 
     getAuthorDisplay(): string | undefined {
         return this.authorDisplay;
+    }
+
+    setAuthorIdentityIconHTML(html: string) {
+        this.authorIdentityIconHTML = html;
+    }
+
+    getAuthorIdentityIconHTML(): string | undefined {
+        return this.authorIdentityIconHTML;
     }
 }
 
