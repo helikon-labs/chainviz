@@ -25,5 +25,5 @@ export abstract class ChainvizEvent {
     static readonly DISCARDED_BLOCK = 'event.discarded_block';
     static readonly NETWORK_SELECTED = 'event.network_selected';
     static readonly NEW_XCM_TRANSFER = 'event.new_xcm_transfer';
-    static readonly XCM_TRANSFER_DISCARDED = 'event.xcm_transfer_discarded';
+    static readonly XCM_TRANSFERS_DISCARDED = 'event.xcm_transfers_discarded';
 }

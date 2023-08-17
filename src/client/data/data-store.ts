@@ -17,6 +17,7 @@ import { AnyJson } from '@polkadot/types/types';
 import { XCMInfo, XCMInfoWrapper, isXCMInfo } from '../model/polkaholic/xcm';
 import { Para } from '../model/substrate/para';
 import { getValidatorIdentityIconHTML, getValidatorSummaryDisplay } from '../util/ui-util';
+import AsyncLock from 'async-lock';
 
 class DataStore {
     private network!: Network;
@@ -27,6 +28,8 @@ class DataStore {
     private newBlockSubscription?: UnsubscribePromise;
     private finalizedHeaderSubscription?: UnsubscribePromise;
     private xcmTransferGetTimeout?: NodeJS.Timeout;
+    private readonly lock = new AsyncLock();
+    private readonly blockProcessLockKey = 'block_process';
 
     private networkStatus!: NetworkStatus;
     validatorMap = new Map<string, ValidatorSummary>();
@@ -284,6 +287,21 @@ class DataStore {
     }
 
     private async onNewBlock(header: Header) {
+        this.lock.acquire(
+            this.blockProcessLockKey,
+            (done) => {
+                this.processNewBlock(header, done);
+            },
+            (error, _) => {
+                if (error) {
+                    console.log('Error while processing new block:', error);
+                }
+                // lock released
+            },
+        );
+    }
+
+    private async processNewBlock(header: Header, done: AsyncLock.AsyncLockDoneCallback<unknown>) {
         if (
             this.blocks.findIndex((block) => block.block.header.toHex() == header.hash.toHex()) >= 0
         ) {
@@ -292,9 +310,28 @@ class DataStore {
         const block = await this.getBlockByHash(header.hash);
         this.insertBlock(block);
         this.eventBus.dispatch<Block>(ChainvizEvent.NEW_BLOCK, block);
+        done();
     }
 
     private async onFinalizedBlock(header: Header) {
+        this.lock.acquire(
+            this.blockProcessLockKey,
+            (done) => {
+                this.processFinalizedBlock(header, done);
+            },
+            (error, _) => {
+                if (error) {
+                    console.log('Error while processing finalized block:', error);
+                }
+                // lock released
+            },
+        );
+    }
+
+    private async processFinalizedBlock(
+        header: Header,
+        done: AsyncLock.AsyncLockDoneCallback<unknown>,
+    ) {
         // find unfinalized slots before this one & discard & finalize
         const removeIndices: number[] = [];
         for (let i = 0; i < this.blocks.length; i++) {
@@ -319,7 +356,6 @@ class DataStore {
             block.isFinalized = true;
             this.insertBlock(block);
             this.eventBus.dispatch<Block>(ChainvizEvent.FINALIZED_BLOCK, block);
-            console.log('missing insert', block.block.header.number.toNumber());
             number--;
         }
 
@@ -335,6 +371,7 @@ class DataStore {
             this.insertBlock(block);
             this.eventBus.dispatch<Block>(ChainvizEvent.FINALIZED_BLOCK, block);
         }
+        done();
     }
 
     async getBlockByHash(hash: BlockHash): Promise<Block> {
@@ -395,6 +432,7 @@ class DataStore {
                 }
             }
         }
+        fetchedXCMTransfers.sort((a, b) => b.origination.ts - a.origination.ts);
         const newXCMTransfers: XCMInfo[] = [];
         for (const fetchedXCMTransfer of fetchedXCMTransfers) {
             const index = this.xcmTransfers.findIndex(
@@ -408,10 +446,19 @@ class DataStore {
             }
             newXCMTransfers.push(fetchedXCMTransfer);
         }
-        for (const xcmTransfer of newXCMTransfers.reverse()) {
+        this.xcmTransfers = [...newXCMTransfers, ...this.xcmTransfers];
+        const excessCount = this.xcmTransfers.length - Constants.XCM_DISPLAY_LIMIT;
+        if (excessCount > 0) {
+            const discarded = this.xcmTransfers.splice(
+                this.xcmTransfers.length - excessCount,
+                excessCount,
+            );
+            this.eventBus.dispatch<XCMInfo[]>(ChainvizEvent.XCM_TRANSFERS_DISCARDED, discarded);
+        }
+        for (const xcmTransfer of this.xcmTransfers.reverse()) {
             this.eventBus.dispatch<XCMInfo>(ChainvizEvent.NEW_XCM_TRANSFER, xcmTransfer);
         }
-        this.xcmTransfers = [...newXCMTransfers, ...this.xcmTransfers];
+
         this.xcmTransferGetTimeout = setTimeout(() => {
             this.getXCMTransfers();
         }, Constants.XCM_TRANSFER_FETCH_PERIOD_MS);

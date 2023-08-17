@@ -7,6 +7,7 @@ import { ValidatorSummary } from '../model/subvt/validator-summary';
 import { ValidatorMesh } from './validator-mesh';
 import { ParaMesh } from './para-mesh';
 import { getOnScreenPosition } from '../util/geometry';
+import { Block } from '../model/chainviz/block';
 
 const VALIDATOR_PARA_LINE_MATERIAL = new THREE.LineBasicMaterial({
     color: Constants.VALIDATOR_PARA_LINE_COLOR,
@@ -209,10 +210,13 @@ class Scene {
         );
     }
 
-    start(paras: Para[], validatorMap: Map<string, ValidatorSummary>) {
+    start(paras: Para[], validatorMap: Map<string, ValidatorSummary>, onComplete?: () => void) {
         this.paraMesh.start(this.scene, paras);
         this.validatorMesh.start(this.scene, validatorMap, () => {
             this.started = true;
+            if (onComplete) {
+                onComplete();
+            }
         });
         this.validatorMeshIsRotating = true;
     }
@@ -289,6 +293,38 @@ class Scene {
             this.renderer,
             this.camera,
         );
+    }
+
+    private visibleHeight() {
+        // compensate for cameras not positioned at z=0
+        const cameraOffset = this.camera.position.z;
+        // vertical fov in radians
+        const vFOV = (this.camera.fov * Math.PI) / 180;
+
+        // Math.abs to ensure the result is always positive
+        return 2 * Math.tan(vFOV / 2) * Math.abs(cameraOffset);
+    }
+
+    private visibleWidth() {
+        const height = this.visibleHeight();
+        return height * this.camera.aspect;
+    }
+
+    onNewBlock(_block: Block) {
+        /*
+        this.validatorMesh.onNewBlock(block);
+        const authorStashAddress = block.authorAccountId?.toString();
+        const validatorPosition = this.validatorMesh.getValidatorPosition(authorStashAddress ?? '');
+        if (validatorPosition == undefined) {
+            return;
+        }
+        const points = [];
+        points.push(validatorPosition);
+        points.push(new THREE.Vector3(this.visibleWidth() / 2, 0, -10));
+        const geometry = new THREE.BufferGeometry().setFromPoints(points);
+        const validatorParaLine = new THREE.Line(geometry, VALIDATOR_PARA_LINE_MATERIAL);
+        this.scene.add(validatorParaLine);
+        */
     }
 }
 

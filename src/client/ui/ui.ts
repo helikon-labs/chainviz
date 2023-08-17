@@ -7,7 +7,7 @@ import { Logo, getRandomCharacterType, getRandomShapeType } from './logo';
 import { NetworkStatusBoard } from './network-status-board';
 import { BlockList } from './block-list';
 import * as TWEEN from '@tweenjs/tween.js';
-import { XCMMessageList } from './xcm-message-list';
+import { XCMTransferList } from './xcm-transfer-list';
 import { Para } from '../model/substrate/para';
 import { Scene, SceneDelegate } from '../scene/scene';
 import { ValidatorSummary } from '../model/subvt/validator-summary';
@@ -29,7 +29,7 @@ class UI {
     private readonly leftPanel: HTMLDivElement;
     private readonly mainLogoCanvas: HTMLCanvasElement;
     private readonly logo: Logo;
-    private readonly xcmMessageList: XCMMessageList;
+    private readonly xcmTransferList: XCMTransferList;
     private readonly centerPanel: HTMLDivElement;
     private readonly kusamaSelector: HTMLDivElement;
     private readonly polkadotSelector: HTMLDivElement;
@@ -52,7 +52,7 @@ class UI {
         this.leftPanel = <HTMLDivElement>document.getElementById('left-panel');
         this.mainLogoCanvas = <HTMLCanvasElement>document.getElementById('main-logo');
         this.logo = new Logo(getRandomShapeType(), getRandomCharacterType());
-        this.xcmMessageList = new XCMMessageList();
+        this.xcmTransferList = new XCMTransferList();
         this.centerPanel = <HTMLDivElement>document.getElementById('center-panel');
         this.kusamaSelector = <HTMLDivElement>document.getElementById('kusama-selector');
         this.polkadotSelector = <HTMLDivElement>document.getElementById('polkadot-selector');
@@ -187,7 +187,7 @@ class UI {
             Constants.CONTENT_FADE_ANIM_DURATION_MS,
             undefined,
             () => {
-                this.xcmMessageList.setOpacity(opacity.opacity);
+                this.xcmTransferList.setOpacity(opacity.opacity);
                 this.networkStatusBoard.setOpacity(opacity.opacity);
                 this.blockList.setOpacity(opacity.opacity);
                 this.sceneContainer.style.opacity = `${opacity.opacity}%`;
@@ -205,7 +205,7 @@ class UI {
             Constants.CONTENT_FADE_ANIM_DURATION_MS,
             undefined,
             () => {
-                this.xcmMessageList.setOpacity(opacity.opacity);
+                this.xcmTransferList.setOpacity(opacity.opacity);
                 this.networkStatusBoard.setOpacity(opacity.opacity);
                 this.blockList.setOpacity(opacity.opacity);
                 this.sceneContainer.style.opacity = `${opacity.opacity}%`;
@@ -221,7 +221,7 @@ class UI {
         onComplete?: () => void,
     ) {
         this.clearBlocks();
-        this.clearXCMMessages();
+        this.clearXCMTransfers();
         this.fadeOutLoadingContainer(() => {
             if (this.isChangingNetwork) {
                 this.blockList.initialize(blocks);
@@ -235,8 +235,8 @@ class UI {
             } else {
                 this.fadeInBackground(() => {
                     this.blockList.initialize(blocks);
-                    this.scene.start(paras, validatorMap);
-                    this.fadeInContent(() => {
+                    this.fadeInContent();
+                    this.scene.start(paras, validatorMap, () => {
                         if (onComplete) {
                             onComplete();
                         }
@@ -269,6 +269,7 @@ class UI {
 
     onNewBlock(block: Block) {
         this.blockList.onNewBlock(block);
+        this.scene.onNewBlock(block);
     }
 
     onFinalizedBlock(block: Block) {
@@ -279,12 +280,16 @@ class UI {
         this.blockList.onDiscardedBlock(block);
     }
 
-    private clearXCMMessages() {
-        this.xcmMessageList.clear();
+    private clearXCMTransfers() {
+        this.xcmTransferList.clear();
     }
 
     insertXCMTransfers(network: Network, xcmTransfers: XCMInfo[]) {
-        this.xcmMessageList.inserXCMTransfers(network, xcmTransfers);
+        this.xcmTransferList.insertXCMTransfers(network, xcmTransfers);
+    }
+
+    removeXCMTransfers(xcmTransfers: XCMInfo[]) {
+        this.xcmTransferList.removeXCMTransfers(xcmTransfers);
     }
 
     private selectNetwork(network: Network) {

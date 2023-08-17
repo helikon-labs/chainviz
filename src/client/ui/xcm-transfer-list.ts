@@ -6,16 +6,16 @@ interface UI {
     root: HTMLDivElement;
 }
 
-class XCMMessageList {
+class XCMTransferList {
     private readonly ui: UI;
 
     constructor() {
         this.ui = {
-            root: <HTMLDivElement>document.getElementById('xcm-message-list'),
+            root: <HTMLDivElement>document.getElementById('xcm-transfer-list'),
         };
     }
 
-    private getMessageInnerHTML(
+    private getXCMTransferInnerHTML(
         relayChain: Network,
         originPara: Para | undefined,
         destinationPara: Para | undefined,
@@ -45,12 +45,18 @@ class XCMMessageList {
         this.ui.root.innerHTML = '';
     }
 
-    inserXCMTransfers(network: Network, xcmTransfers: XCMInfo[]) {
+    insertXCMTransfers(network: Network, xcmTransfers: XCMInfo[]) {
         for (let i = xcmTransfers.length - 1; i >= 0; i--) {
             const xcmTransfer = xcmTransfers[i];
+            const transferDiv = document.getElementById(
+                `xcm-transfer-${xcmTransfer.origination.extrinsicHash}`,
+            );
+            if (transferDiv) {
+                continue;
+            }
             const originPara = getNetworkPara(network, xcmTransfer.origination.paraID);
             const destionationPara = getNetworkPara(network, xcmTransfer.destination.paraID);
-            this.insertMessage(
+            this.insertXCMTransfer(
                 xcmTransfer.origination.extrinsicHash,
                 network,
                 originPara,
@@ -59,16 +65,29 @@ class XCMMessageList {
         }
     }
 
-    insertMessage(
+    removeXCMTransfers(xcmTransfers: XCMInfo[]) {
+        for (const xcmTransfer of xcmTransfers) {
+            const transferDiv = document.getElementById(
+                `xcm-transfer-${xcmTransfer.origination.extrinsicHash}`,
+            );
+            transferDiv?.remove();
+        }
+    }
+
+    insertXCMTransfer(
         originExtrinsicHash: string,
         relayChain: Network,
         originPara: Para | undefined,
         destinationPara: Para | undefined,
     ) {
         const messageDiv = document.createElement('div');
-        messageDiv.classList.add('xcm-message');
-        messageDiv.id = `xcm-message-${originExtrinsicHash}`;
-        messageDiv.innerHTML = this.getMessageInnerHTML(relayChain, originPara, destinationPara);
+        messageDiv.classList.add('xcm-transfer');
+        messageDiv.id = `xcm-transfer-${originExtrinsicHash}`;
+        messageDiv.innerHTML = this.getXCMTransferInnerHTML(
+            relayChain,
+            originPara,
+            destinationPara,
+        );
         if (this.ui.root.children.length == 0) {
             this.ui.root.appendChild(messageDiv);
         } else {
@@ -76,7 +95,7 @@ class XCMMessageList {
         }
 
         setTimeout(() => {
-            const messageDiv = document.getElementById(`xcm-message-${originExtrinsicHash}`);
+            const messageDiv = document.getElementById(`xcm-transfer-${originExtrinsicHash}`);
             const url = `https://polkaholic.io/tx/${originExtrinsicHash}`;
             messageDiv?.addEventListener('click', (_event) => {
                 window.open(url);
@@ -85,4 +104,4 @@ class XCMMessageList {
     }
 }
 
-export { XCMMessageList };
+export { XCMTransferList };

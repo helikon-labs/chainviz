@@ -4,6 +4,7 @@ import { Constants } from '../util/constants';
 import { createTween } from '../util/tween';
 import * as TWEEN from '@tweenjs/tween.js';
 import { rotateAboutPoint } from '../util/geometry';
+import { Block } from '../model/chainviz/block';
 
 const ARC_GEOMETRY = new THREE.TorusGeometry(Constants.VALIDATOR_ARC_RADIUS, 0.06, 12, 36, Math.PI);
 ARC_GEOMETRY.rotateZ(Math.PI / 2);
@@ -209,17 +210,25 @@ class ValidatorMesh {
         return undefined;
     }
 
-    getValidatorPosition(stashAddress: string): THREE.Vector3 | undefined {
+    private getInnerValidatorPosition(stashAddress: string): THREE.Vector3 | undefined {
         const index = this.getValidatorIndex(stashAddress);
         if (index == undefined) {
             return undefined;
         }
-        const groupMatrix = new THREE.Matrix4().makeRotationFromEuler(this.group.rotation);
         const matrix = new THREE.Matrix4();
         this.validatorMesh.getMatrixAt(index, matrix);
         const position = new THREE.Vector3();
         matrix.decompose(position, new THREE.Quaternion(), new THREE.Vector3());
-        return position.applyMatrix4(groupMatrix);
+        return position;
+    }
+
+    getValidatorPosition(stashAddress: string): THREE.Vector3 | undefined {
+        const innerPosition = this.getInnerValidatorPosition(stashAddress);
+        if (innerPosition == undefined) {
+            return undefined;
+        }
+        const groupMatrix = new THREE.Matrix4().makeRotationFromEuler(this.group.rotation);
+        return innerPosition.applyMatrix4(groupMatrix);
     }
 
     highlightValidator(validatorIndex: number) {
@@ -298,6 +307,10 @@ class ValidatorMesh {
         ARC_MATERIAL.opacity = Constants.VALIDATOR_ARC_LOW_OPACITY;
         this.validatorMesh.instanceMatrix.needsUpdate = true;
         this.validatorMesh.computeBoundingSphere();
+    }
+
+    onNewBlock(_block: Block) {
+        // no-op
     }
 }
 

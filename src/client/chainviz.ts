@@ -104,6 +104,9 @@ class Chainviz {
         this.eventBus.register(ChainvizEvent.NEW_XCM_TRANSFER, (xcmTransfer: XCMInfo) => {
             this.ui.insertXCMTransfers(this.network, [xcmTransfer]);
         });
+        this.eventBus.register(ChainvizEvent.XCM_TRANSFERS_DISCARDED, (xcmTransfers: XCMInfo[]) => {
+            this.ui.removeXCMTransfers(xcmTransfers);
+        });
     }
 
     async init() {
@@ -113,7 +116,7 @@ class Chainviz {
 
     async connect() {
         this.ui.displayLoading();
-        this.dataStore.setNetwork(this.network);
+        await this.dataStore.setNetwork(this.network);
         this.ui.setLoadingInfo('connecting to blockchain');
         this.dataStore.connectSubstrateRPC();
     }
@@ -241,7 +244,9 @@ class Chainviz {
     }
 
     private onNewBlock(block: Block) {
-        this.ui.onNewBlock(block);
+        if (this.started) {
+            this.ui.onNewBlock(block);
+        }
     }
 
     private async onFinalizedBlock(block: Block) {
@@ -271,9 +276,9 @@ class Chainviz {
                 this.dataStore.subscribeToNewBlocks();
                 this.dataStore.subscribeToFinalizedBlocks();
                 this.dataStore.getXCMTransfers();
+                this.started = true;
             },
         );
-        this.started = true;
     }
 }
 
