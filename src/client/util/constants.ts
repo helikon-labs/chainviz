@@ -1,6 +1,11 @@
 import * as THREE from 'three';
 
 export abstract class Constants {
+    // RPC
+    //static readonly KUSAMA_RPC_URL = 'wss://rpc.ibp.network/kusama';
+    static readonly KUSAMA_RPC_URL = 'wss://kusama-rpc.polkadot.io';
+    //static readonly POLKADOT_RPC_URL = 'wss://rpc.ibp.network/polkadot';
+    static readonly POLKADOT_RPC_URL = 'wss://rpc.polkadot.io';
     // connection
     static readonly CONNECTION_TIMEOUT_MS = 30000;
     static readonly CONNECTION_RETRY_MS = 5000;

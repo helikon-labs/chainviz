@@ -1,5 +1,6 @@
 import { KUSAMA_PARAS } from '../../data/kusama-paras';
 import { POLKADOT_PARAS } from '../../data/polkadot-paras';
+import { Constants } from '../../util/constants';
 import { Para } from './para';
 
 interface Network {
@@ -23,7 +24,7 @@ const Kusama = {
     ss58Prefix: 2,
     logo: 'kusama.svg',
     paras: KUSAMA_PARAS,
-    rpcURL: 'wss://rpc.ibp.network/kusama',
+    rpcURL: Constants.KUSAMA_RPC_URL,
     //rpcURL: 'wss://kusama-rpc.polkadot.io',
     networkStatusServiceURL: 'wss://rpc.kusama.subvt.io:17888',
     activeValidatorListServiceURL: 'wss://rpc.kusama.subvt.io:17889',
@@ -37,7 +38,7 @@ const Polkadot = {
     ss58Prefix: 0,
     logo: 'polkadot-circle.svg',
     paras: POLKADOT_PARAS,
-    rpcURL: 'wss://rpc.ibp.network/polkadot',
+    rpcURL: Constants.POLKADOT_RPC_URL,
     //rpcURL: 'wss://rpc.polkadot.io',
     networkStatusServiceURL: 'wss://rpc.polkadot.subvt.io:18888',
     activeValidatorListServiceURL: 'wss://rpc.polkadot.subvt.io:18889',
