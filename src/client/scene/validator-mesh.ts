@@ -84,7 +84,10 @@ class ValidatorMesh {
         const minScale =
             Constants.VALIDATOR_SPHERE_MIN_RADIUS / Constants.VALIDATOR_SPHERE_MAX_RADIUS;
         const [minRewardPoints, maxRewardPoints] = this.getMinMaxRewardPoints();
-        const scaleStep = (1.0 - minScale) / (maxRewardPoints - minRewardPoints);
+        let scaleStep = 0;
+        if (maxRewardPoints != 0) {
+            scaleStep = (1.0 - minScale) / (maxRewardPoints - minRewardPoints);
+        }
         for (let i = 0; i < this.arcs.length; i++) {
             for (let j = 0; j < this.arcs[i].length; j++) {
                 if (this.arcs[i][j]) {
