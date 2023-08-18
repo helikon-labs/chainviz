@@ -39,7 +39,10 @@ export abstract class Constants {
     static readonly SCENE_PARA_OPACITY = 0.5;
     static readonly SCENE_VALIDATOR_OPACITY = 1.0;
     static readonly VALIDATOR_PARA_LINE_COLOR = 0xffffff;
+    static readonly BLOCK_LINE_COLOR = 0xffffff;
     static readonly HIGHLIGHTED_PARA_SCALE = 1.5;
+    static readonly NEW_BLOCK_APPEAR_ANIM_DURATION_MS = 125;
+    static readonly NEW_BLOCK_BEAM_ANIM_DURATION_MS = 1500;
     // validator summary board
     static readonly VALIDATOR_SUMMARY_BOARD_X_OFFSET = 20;
     static readonly VALIDATOR_SUMMARY_INFO_BOARD_Y_OFFSET = -20;

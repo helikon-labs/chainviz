@@ -1,10 +1,13 @@
 import { Block } from '../model/chainviz/block';
+import { Constants } from '../util/constants';
 import {
     capitalize,
     getBlockTimeFormatted,
     getCondensedAddress,
     getCondensedHash,
 } from '../util/format';
+import { createTween } from '../util/tween';
+import * as TWEEN from '@tweenjs/tween.js';
 
 interface UI {
     root: HTMLElement;
@@ -12,12 +15,14 @@ interface UI {
 
 class BlockList {
     private readonly ui: UI;
+    private readonly isCandidateBlockList: boolean;
     private expandedBlockHashes: string[] = [];
 
-    constructor() {
+    constructor(divId: string, isCandidateBlockList: boolean) {
         this.ui = {
-            root: <HTMLElement>document.getElementById('block-list'),
+            root: <HTMLElement>document.getElementById(divId),
         };
+        this.isCandidateBlockList = isCandidateBlockList;
     }
 
     initialize(blocks: Block[]) {
@@ -148,9 +153,7 @@ class BlockList {
     }
 
     private updateBlockDiv(block: Block) {
-        const blockDiv = <HTMLDivElement>(
-            document.getElementById(`block-${block.block.header.hash.toHex()}`)
-        );
+        const blockDiv = this.getBlockDiv(block);
         if (!blockDiv) {
             return;
         }
@@ -177,31 +180,53 @@ class BlockList {
         }
         const newBlockDiv = document.createElement('div');
         const hash = block.block.header.hash.toHex();
-        newBlockDiv.id = `block-${hash}`;
+        newBlockDiv.id = `${this.isCandidateBlockList ? 'candidate-' : ''}block-${hash}`;
         newBlockDiv.setAttribute('block-number', block.block.header.number.toNumber().toString());
         newBlockDiv.classList.add('block');
-        if (block.isFinalized) {
+        if (this.isCandidateBlockList) {
+            newBlockDiv.classList.add('candidate');
+            newBlockDiv.classList.add('transparent');
+        } else if (block.isFinalized) {
             newBlockDiv.classList.add('finalized');
         } else {
             newBlockDiv.classList.add('non-finalized');
         }
         newBlockDiv.innerHTML = this.getBlockHTML(block);
-        if (nextBlockDiv == undefined) {
+        if (nextBlockDiv == undefined || this.isCandidateBlockList) {
             this.ui.root.appendChild(newBlockDiv);
         } else {
             this.ui.root.insertBefore(newBlockDiv, nextBlockDiv);
         }
-        this.setBlockOnClick(block);
+        if (!this.isCandidateBlockList) {
+            this.setBlockOnClick(block);
+        }
     }
 
     onNewBlock(block: Block) {
         this.insertBlock(block);
     }
 
+    showBlock(block: Block) {
+        const blockDiv = this.getBlockDiv(block);
+        if (blockDiv) {
+            blockDiv.classList.remove('transparent');
+            blockDiv.style.opacity = '0%';
+            const progress = { progress: 0 };
+            createTween(
+                progress,
+                { progress: 100 },
+                TWEEN.Easing.Quadratic.InOut,
+                Constants.NEW_BLOCK_APPEAR_ANIM_DURATION_MS,
+                undefined,
+                () => {
+                    blockDiv.style.opacity = `${progress.progress}%`;
+                },
+            ).start();
+        }
+    }
+
     onFinalizedBlock(block: Block) {
-        const blockDiv = <HTMLDivElement>(
-            document.getElementById(`block-${block.block.header.hash.toHex()}`)
-        );
+        const blockDiv = this.getBlockDiv(block);
         if (blockDiv) {
             this.updateBlockDiv(block);
         } else {
@@ -211,7 +236,7 @@ class BlockList {
 
     onDiscardedBlock(block: Block) {
         const hash = block.block.header.hash.toHex();
-        const blockDiv = <HTMLDivElement>document.getElementById(`block-${hash}`);
+        const blockDiv = this.getBlockDiv(block);
         if (blockDiv) {
             blockDiv.remove();
         }
@@ -222,6 +247,13 @@ class BlockList {
         if (explandedBlockHashesIndex >= 0) {
             this.expandedBlockHashes.splice(explandedBlockHashesIndex, 1);
         }
+    }
+
+    private getBlockDiv(block: Block): HTMLDivElement {
+        const hash = block.block.header.hash.toHex();
+        return <HTMLDivElement>(
+            document.getElementById(`${this.isCandidateBlockList ? 'candidate-' : ''}block-${hash}`)
+        );
     }
 }
 

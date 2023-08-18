@@ -36,6 +36,7 @@ class UI {
     private readonly rightPanel: HTMLDivElement;
     private readonly networkStatusBoard: NetworkStatusBoard;
     private readonly blockList: BlockList;
+    private readonly newBlockList: BlockList;
     private readonly loadingContainer: HTMLDivElement;
     private readonly loadingInfo: HTMLDivElement;
     private readonly eventBus = EventBus.getInstance();
@@ -58,7 +59,8 @@ class UI {
         this.polkadotSelector = <HTMLDivElement>document.getElementById('polkadot-selector');
         this.rightPanel = <HTMLDivElement>document.getElementById('right-panel');
         this.networkStatusBoard = new NetworkStatusBoard();
-        this.blockList = new BlockList();
+        this.blockList = new BlockList('block-list', false);
+        this.newBlockList = new BlockList('new-block-list', true);
         this.loadingContainer = <HTMLDivElement>document.getElementById('loading-container');
         this.loadingInfo = <HTMLDivElement>document.getElementById('loading-info');
         this.validatorSummaryBoard = new ValidatorSummaryBoard();
@@ -268,8 +270,17 @@ class UI {
     }
 
     onNewBlock(block: Block) {
-        this.blockList.onNewBlock(block);
-        this.scene.onNewBlock(block);
+        this.newBlockList.onNewBlock(block);
+        this.scene.onNewBlock(
+            block,
+            () => {
+                this.newBlockList.showBlock(block);
+            },
+            () => {
+                this.newBlockList.onDiscardedBlock(block);
+                this.blockList.onNewBlock(block);
+            },
+        );
     }
 
     onFinalizedBlock(block: Block) {

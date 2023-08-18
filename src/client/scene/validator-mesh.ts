@@ -4,7 +4,6 @@ import { Constants } from '../util/constants';
 import { createTween } from '../util/tween';
 import * as TWEEN from '@tweenjs/tween.js';
 import { rotateAboutPoint } from '../util/geometry';
-import { Block } from '../model/chainviz/block';
 
 const ARC_GEOMETRY = new THREE.TorusGeometry(Constants.VALIDATOR_ARC_RADIUS, 0.06, 12, 36, Math.PI);
 ARC_GEOMETRY.rotateZ(Math.PI / 2);
@@ -146,8 +145,7 @@ class ValidatorMesh {
                     let rotationY = i * ((2 * Math.PI) / this.arcs.length) * progress.progress;
                     if (i >= this.arcs.length / 2) {
                         const target =
-                            ((i - this.arcs.length / 2) * Math.PI) /
-                            Math.ceil(this.arcs.length / 2);
+                            ((i - this.arcs.length / 2) * Math.PI) / (this.arcs.length / 2.0);
                         rotationY = Math.PI + target * progress.progress;
                     }
                     const object = new THREE.Object3D();
@@ -174,6 +172,10 @@ class ValidatorMesh {
                         object.scale.z = scale;
                         object.updateMatrix();
                         this.validatorMesh.setMatrixAt(i * this.arcs[0].length + j, object.matrix);
+                        this.validatorMesh.setColorAt(
+                            i * this.arcs[0].length + j,
+                            new THREE.Color(1, 1, 1),
+                        );
                         currentAngle += angleDelta;
                     }
                     this.group.rotation.x = (Math.PI / 4) * progress.progress;
@@ -307,10 +309,6 @@ class ValidatorMesh {
         ARC_MATERIAL.opacity = Constants.VALIDATOR_ARC_LOW_OPACITY;
         this.validatorMesh.instanceMatrix.needsUpdate = true;
         this.validatorMesh.computeBoundingSphere();
-    }
-
-    onNewBlock(_block: Block) {
-        // no-op
     }
 }
 

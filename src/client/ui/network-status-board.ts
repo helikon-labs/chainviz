@@ -92,6 +92,10 @@ class NetworkStatusBoard {
             );
         }
     }
+
+    getBoundingClientRect(): DOMRect {
+        return this.ui.root.getBoundingClientRect();
+    }
 }
 
 export { NetworkStatusBoard };

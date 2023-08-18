@@ -23,8 +23,8 @@ const Kusama = {
     ss58Prefix: 2,
     logo: 'kusama.svg',
     paras: KUSAMA_PARAS,
-    //rpcURL: 'wss://rpc.ibp.network/kusama',
-    rpcURL: 'wss://kusama-rpc.polkadot.io',
+    rpcURL: 'wss://rpc.ibp.network/kusama',
+    //rpcURL: 'wss://kusama-rpc.polkadot.io',
     networkStatusServiceURL: 'wss://rpc.kusama.subvt.io:17888',
     activeValidatorListServiceURL: 'wss://rpc.kusama.subvt.io:17889',
 } as Network;
@@ -37,8 +37,8 @@ const Polkadot = {
     ss58Prefix: 0,
     logo: 'polkadot-circle.svg',
     paras: POLKADOT_PARAS,
-    //rpcURL: 'wss://rpc.ibp.network/polkadot',
-    rpcURL: 'wss://rpc.polkadot.io',
+    rpcURL: 'wss://rpc.ibp.network/polkadot',
+    //rpcURL: 'wss://rpc.polkadot.io',
     networkStatusServiceURL: 'wss://rpc.polkadot.subvt.io:18888',
     activeValidatorListServiceURL: 'wss://rpc.polkadot.subvt.io:18889',
 } as Network;

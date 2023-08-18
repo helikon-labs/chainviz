@@ -24,6 +24,10 @@ hr {
     width: 100%;
 }
 
+.transparent {
+    opacity: 0;
+}
+
 .scene-container {
     height: 100%;
 }
@@ -233,6 +237,7 @@ img {
     flex-direction: column;
     gap: 12px;
     flex-shrink: 0;
+    position: relative;
 }
 
 .content .right-panel .network-status {
@@ -253,16 +258,33 @@ img {
     font-size: 12px;
 }
 
-.content .right-panel .block-list {
-    margin-right: 26px;
-    flex-grow: 1;
-    gap: 4px;
+.content .right-panel .block-list-container {
+    position: relative;
     display: flex;
-    flex-direction: column;
+    flex-grow: 1;
     overflow-y: scroll;
+    margin-right: 26px;
 }
 
-.content .right-panel .block-list .block {
+.content .right-panel .new-block-list {
+    position: absolute;
+    top: 12px;
+    left: 0px;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.content .right-panel .block-list {
+    flex-grow: 1;
+    overflow-y: scroll;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.content .right-panel .block-list-container .block {
     border-radius: 12px;
     border: 1px solid #ffffff55;
     padding: 10px 10px 8px 10px;
@@ -272,7 +294,12 @@ img {
     cursor: pointer;
 }
 
-.content .right-panel .block-list .non-finalized {
+.content .right-panel .block-list-container .candidate {
+    background-color: #424242;
+    cursor: default !important;
+}
+
+.content .right-panel .block-list-container .non-finalized {
     border-style: dashed;
     opacity: 50%;
 }
@@ -317,7 +344,7 @@ img {
     margin-bottom: 2px;
 }
 
-.content .right-panel .block-list .block .hash {
+.content .right-panel .block .hash {
     font-family: 'Fira Mono';
     opacity: 0.8;
     font-size: 10.2px;

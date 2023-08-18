@@ -8,9 +8,14 @@ import { ValidatorMesh } from './validator-mesh';
 import { ParaMesh } from './para-mesh';
 import { getOnScreenPosition } from '../util/geometry';
 import { Block } from '../model/chainviz/block';
+import { createTween } from '../util/tween';
+import * as TWEEN from '@tweenjs/tween.js';
 
 const VALIDATOR_PARA_LINE_MATERIAL = new THREE.LineBasicMaterial({
     color: Constants.VALIDATOR_PARA_LINE_COLOR,
+});
+const BlOCK_LINE_MATERIAL = new THREE.LineBasicMaterial({
+    color: Constants.BLOCK_LINE_COLOR,
 });
 
 interface SceneDelegate {
@@ -295,36 +300,129 @@ class Scene {
         );
     }
 
-    private visibleHeight() {
-        // compensate for cameras not positioned at z=0
+    private getVisibleHeight(): number {
+        // compensate for cameras not positioned at z = 0
         const cameraOffset = this.camera.position.z;
         // vertical fov in radians
         const vFOV = (this.camera.fov * Math.PI) / 180;
-
         // Math.abs to ensure the result is always positive
         return 2 * Math.tan(vFOV / 2) * Math.abs(cameraOffset);
     }
 
-    private visibleWidth() {
-        const height = this.visibleHeight();
+    private getVisibleWidth(): number {
+        const height = this.getVisibleHeight();
         return height * this.camera.aspect;
     }
 
-    onNewBlock(_block: Block) {
-        /*
-        this.validatorMesh.onNewBlock(block);
-        const authorStashAddress = block.authorAccountId?.toString();
-        const validatorPosition = this.validatorMesh.getValidatorPosition(authorStashAddress ?? '');
-        if (validatorPosition == undefined) {
+    getCandidateBlockBeamTargetPosition(hash: string): THREE.Vector3 | undefined {
+        const candidateBlock = document.getElementById(`candidate-block-${hash}`);
+        if (!candidateBlock) {
+            return undefined;
+        }
+        const sceneContainer = document.getElementById('scene-container');
+        if (!sceneContainer) {
+            return undefined;
+        }
+        const candidateBlockBoundingRect = candidateBlock.getBoundingClientRect();
+        const sceneContainerBoundingRect = sceneContainer.getBoundingClientRect();
+
+        const height = this.getVisibleHeight();
+        const delta =
+            candidateBlockBoundingRect.bottom -
+            (candidateBlockBoundingRect.height - 2) / 2 -
+            sceneContainerBoundingRect.top;
+        const ratio = delta / sceneContainerBoundingRect.height;
+        const targetY = height / 2 - height * ratio;
+        const width = this.getVisibleWidth();
+        return new THREE.Vector3(width / 2 - 1, targetY, 0);
+    }
+
+    onNewBlock(block: Block, onHalfTime: () => void, onComplete: () => void) {
+        if (this.highlightedValidatorIndex != undefined || this.highlightedParaId != undefined) {
+            onComplete();
             return;
         }
-        const points = [];
-        points.push(validatorPosition);
-        points.push(new THREE.Vector3(this.visibleWidth() / 2, 0, -10));
-        const geometry = new THREE.BufferGeometry().setFromPoints(points);
-        const validatorParaLine = new THREE.Line(geometry, VALIDATOR_PARA_LINE_MATERIAL);
-        this.scene.add(validatorParaLine);
-        */
+        const authorStashAddress = block.authorAccountId?.toString();
+        if (authorStashAddress == undefined) {
+            return;
+        }
+        // beam
+        const positionCount = 100;
+        const beamGeometry = new THREE.BufferGeometry();
+        const beamPositions = new Float32Array(positionCount * 3);
+        beamGeometry.setAttribute('position', new THREE.BufferAttribute(beamPositions, 3));
+        const beam = new THREE.Line(beamGeometry, BlOCK_LINE_MATERIAL);
+        this.scene.add(beam);
+        // block line
+        const blockLineGeometry = new THREE.BufferGeometry();
+        const blockLinePositions = new Float32Array(2 * 3);
+        blockLineGeometry.setAttribute(
+            'position',
+            new THREE.BufferAttribute(blockLinePositions, 3),
+        );
+        const blockLine = new THREE.Line(blockLineGeometry, BlOCK_LINE_MATERIAL);
+        this.scene.add(blockLine);
+
+        const hash = block.block.header.hash.toHex();
+        const progress = { progress: 0 };
+        let crossedHalfTime = false;
+        createTween(
+            progress,
+            { progress: positionCount * 2 },
+            TWEEN.Easing.Quadratic.InOut,
+            Constants.NEW_BLOCK_BEAM_ANIM_DURATION_MS,
+            undefined,
+            () => {
+                const flProgress = Math.floor(progress.progress);
+                const beamTargetPosition = this.getCandidateBlockBeamTargetPosition(hash);
+                if (beamTargetPosition == undefined) {
+                    return;
+                }
+                const beamPositionAttribute = beam.geometry.getAttribute('position');
+                const validatorPosition = this.validatorMesh.getValidatorPosition(
+                    authorStashAddress ?? '',
+                );
+                if (validatorPosition == undefined) {
+                    return;
+                }
+                for (let i = 0; i < positionCount; i++) {
+                    const position = validatorPosition
+                        .clone()
+                        .lerp(beamTargetPosition, i / (positionCount - 1.0));
+                    beamPositionAttribute.setXYZ(i, position.x, position.y, position.z);
+                }
+                beamPositionAttribute.needsUpdate = true;
+                if (progress.progress <= positionCount) {
+                    beam.geometry.setDrawRange(0, flProgress);
+                } else {
+                    if (!crossedHalfTime) {
+                        crossedHalfTime = true;
+                        onHalfTime();
+                    }
+                    const index = flProgress - positionCount;
+                    beam.geometry.setDrawRange(index, positionCount - index);
+                    const blockLinePositionAttribute = blockLine.geometry.getAttribute('position');
+                    blockLinePositionAttribute.setXYZ(
+                        0,
+                        beamTargetPosition.x,
+                        beamTargetPosition.y - 1.2,
+                        beamTargetPosition.z,
+                    );
+                    blockLinePositionAttribute.setXYZ(
+                        1,
+                        beamTargetPosition.x,
+                        beamTargetPosition.y + 1.2,
+                        beamTargetPosition.z,
+                    );
+                    blockLinePositionAttribute.needsUpdate = true;
+                }
+            },
+            () => {
+                this.scene.remove(beam);
+                this.scene.remove(blockLine);
+                onComplete();
+            },
+        ).start();
     }
 }
 
