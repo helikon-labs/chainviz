@@ -228,7 +228,7 @@ class Scene {
 
     reset(onComplete?: () => void) {
         this.validatorMeshIsRotating = false;
-        //this.paraMesh.reset();
+        this.paraMesh.reset();
         this.validatorMesh.reset(onComplete);
     }
 

@@ -47,7 +47,7 @@ class ParaMesh {
         this.group.add(ring);
 
         const initialRadius = Constants.VALIDATOR_ARC_RADIUS;
-        const backgroundGeometry = new THREE.CircleGeometry(Constants.PARA_BG_RADIUS);
+        const _backgroundGeometry = new THREE.CircleGeometry(Constants.PARA_BG_RADIUS);
         const logoGeometry = new THREE.CircleGeometry(Constants.PARA_LOGO_RADIUS);
         const backgroundMaterial = new THREE.MeshBasicMaterial({
             color: Constants.PARA_BG_COLOR,
@@ -60,6 +60,7 @@ class ParaMesh {
             const paraGroup = new THREE.Group();
             const angle = (Math.PI / paras.length) * 2 * i;
             // add background circle
+            /*
             const background = new THREE.Mesh(backgroundGeometry, backgroundMaterial);
             background.position.set(
                 Math.sin(angle) * initialRadius,
@@ -72,6 +73,7 @@ class ParaMesh {
                 paraId: para.paraId,
             };
             paraGroup.add(background);
+            */
 
             // add logo
             const logoTexture = new THREE.TextureLoader().load('/img/paras/' + para.ui.logo);

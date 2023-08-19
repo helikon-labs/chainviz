@@ -477,7 +477,11 @@ class DataStore {
             this.finalizedHeaderSubscription = undefined;
         }
         if (this.substrateClient) {
-            await this.substrateClient.disconnect();
+            try {
+                await this.substrateClient.disconnect();
+            } catch (error) {
+                console.error('Error while disconnecting Substrate client:', error);
+            }
         }
     }
 }
