@@ -246,6 +246,7 @@ img {
     width: 256px;
     height: 284px;
     backdrop-filter: blur(7px);
+    -webkit-backdrop-filter: blur(7px);
     border-radius: 12px;
     border: 1px solid #ffffff55;
     padding: 10px 10px 8px 10px;
@@ -329,6 +330,10 @@ img {
     width: 12px;
     height: 12px;
     margin-bottom: 2px;
+}
+
+.content .center-panel .block-details-board .block-details-row em {
+    font-size: 9px;
 }
 
 .content .right-panel {

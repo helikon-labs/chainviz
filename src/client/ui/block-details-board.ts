@@ -33,6 +33,7 @@ class BlockDetailsBoard {
     private readonly ui: UI;
     private extrinsicsAreVisible: boolean = false;
     private eventsAreVisible: boolean = false;
+    private hash: string = '';
 
     constructor() {
         this.ui = {
@@ -108,11 +109,14 @@ class BlockDetailsBoard {
     }
 
     display(block: Block) {
+        this.hash = block.block.header.hash.toHex();
         this.hideExtrinsics();
         this.hideEvents();
         this.ui.number.innerHTML = block.block.header.number.toNumber().toString();
         this.ui.timestamp.innerHTML = getBlockTimeFormatted(block.time);
-        this.ui.status.innerHTML = block.isFinalized ? 'Finalized' : 'Non-finalized';
+        this.ui.status.innerHTML = block.isFinalized
+            ? '<em class="fas fa-check-circle"></em>Finalized'
+            : '<em class="fas fa-clock-o"></em>Non-finalized';
         this.ui.hash.innerHTML = getCondensedHash(block.block.header.hash.toHex(), HASH_TRIM_SIZE);
         this.ui.parentHash.innerHTML = getCondensedHash(
             block.block.header.parentHash.toHex(),
@@ -162,6 +166,12 @@ class BlockDetailsBoard {
         eventListHTML += '<div class="block-details-row"></div>';
         this.ui.eventContainer.innerHTML = eventListHTML;
         show(this.ui.root);
+    }
+
+    onFinalizedBlock(block: Block) {
+        if (this.hash == block.block.header.hash.toHex()) {
+            this.ui.status.innerHTML = '<em class="fas fa-check-circle"></em>Finalized';
+        }
     }
 }
 

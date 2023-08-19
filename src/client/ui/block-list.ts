@@ -129,6 +129,7 @@ class BlockList {
     }
 
     onFinalizedBlock(block: Block) {
+        this.blockDetailsBoard?.onFinalizedBlock(block);
         const blockDiv = this.getBlockDiv(block);
         if (blockDiv) {
             this.updateBlockDiv(block);
