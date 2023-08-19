@@ -3,7 +3,7 @@
     <head>
         <title>ChainViz by Helikon</title>
         <meta charset="utf-8" />
-        <link rel="icon" type="image/x-icon" href="./img/icon/favicon.ico" />
+        <link rel="icon" type="image/png" href="./img/icon/favicon.png" />
         <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Fira%20Mono" />
         <link
             rel="stylesheet"
@@ -65,6 +65,74 @@
                     </div>
                 </div>
                 <div class="scene-container" id="scene-container"></div>
+                <div class="block-details-board hidden" id="block-details-board">
+                    <div class="block-details-header" id="block-details-header">
+                        <em class="fas fa-cube"></em>
+                        <span class="block-details-number" id="block-details-number">13452463</span>
+                        <span class="flex-spacer"></span>
+                        <em class="fas fa-close block-details-close" id="block-details-close"></em>
+                    </div>
+                    <div class="block-details-separator"></div>
+                    <div class="block-details-content">
+                        <div class="block-details-content-inner">
+                            <div class="block-details-row">
+                                <span>Timestamp</span>
+                                <span id="block-details-timestamp"></span>
+                            </div>
+                            <div class="block-details-row">
+                                <span>Status</span>
+                                <span id="block-details-status"></span>
+                            </div>
+                            <div class="block-details-row">
+                                <span>Hash</span>
+                                <span class="hash" id="block-details-hash"></span>
+                            </div>
+                            <div class="block-details-row">
+                                <span>Parent Hash</span>
+                                <span class="hash" id="block-details-parent-hash"></span>
+                            </div>
+                            <div class="block-details-row">
+                                <span>State Root</span>
+                                <span class="hash" id="block-details-state-root"></span>
+                            </div>
+                            <div class="block-details-row">
+                                <span>Extrinsics Root</span>
+                                <span class="hash" id="block-details-extrinsics-root"></span>
+                            </div>
+                            <div class="block-details-row">
+                                <span>Author</span>
+                                <span id="block-details-author"></span>
+                            </div>
+                            <div class="block-details-row">
+                                <span>Runtime</span>
+                                <span id="block-details-runtime"></span>
+                            </div>
+                            <!-- spacer -->
+                            <div class="block-details-row"></div>
+                            <div class="block-details-separator"></div>
+                            <div class="block-details-section-header">
+                                <span id="block-details-extrinsic-count"></span>
+                                <span class="flex-spacer"></span>
+                                <em
+                                    id="block-details-extrinsics-chevron"
+                                    class="fas fa-chevron-right"
+                                ></em>
+                            </div>
+                            <div class="block-details-separator"></div>
+                            <div id="block-details-extrinsic-container"></div>
+                            <div class="block-details-section-header">
+                                <span id="block-details-event-count"></span>
+                                <span class="flex-spacer"></span>
+                                <em
+                                    id="block-details-events-chevron"
+                                    class="fas fa-chevron-right"
+                                ></em>
+                            </div>
+                            <div class="block-details-separator"></div>
+                            <div id="block-details-event-container"></div>
+                        </div>
+                    </div>
+                </div>
             </div>
             <div class="right-panel" id="right-panel">
                 <div class="network-status" id="network-status">

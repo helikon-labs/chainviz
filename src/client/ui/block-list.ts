@@ -1,13 +1,9 @@
 import { Block } from '../model/chainviz/block';
 import { Constants } from '../util/constants';
-import {
-    capitalize,
-    getBlockTimeFormatted,
-    getCondensedAddress,
-    getCondensedHash,
-} from '../util/format';
+import { getCondensedHash } from '../util/format';
 import { createTween } from '../util/tween';
 import * as TWEEN from '@tweenjs/tween.js';
+import { BlockDetailsBoard } from './block-details-board';
 
 interface UI {
     root: HTMLElement;
@@ -16,13 +12,16 @@ interface UI {
 class BlockList {
     private readonly ui: UI;
     private readonly isCandidateBlockList: boolean;
-    private expandedBlockHashes: string[] = [];
+    private readonly blockDetailsBoard?: BlockDetailsBoard;
 
     constructor(divId: string, isCandidateBlockList: boolean) {
         this.ui = {
             root: <HTMLElement>document.getElementById(divId),
         };
         this.isCandidateBlockList = isCandidateBlockList;
+        if (!isCandidateBlockList) {
+            this.blockDetailsBoard = new BlockDetailsBoard();
+        }
     }
 
     initialize(blocks: Block[]) {
@@ -43,92 +42,6 @@ class BlockList {
         html += '<span>|</span>';
         html += `<span class="hash">${getCondensedHash(hash, 11)}</span>`;
         html += '</div>';
-
-        if (
-            this.expandedBlockHashes.findIndex((expandedBlockHash) => expandedBlockHash == hash) >=
-            0
-        ) {
-            html += '<div class="block-content-separator"></div>';
-            // block time
-            html += '<div class="block-content-row">';
-            html += '<span>Timestamp</span>';
-            html += `<span>${getBlockTimeFormatted(block.time)}</span>`;
-            html += '</div>';
-            // author
-            const authorDisplay = block.getAuthorDisplay();
-            if (authorDisplay) {
-                html += '<div class="block-content-row">';
-                html += '<span>Author</span>';
-                html += `<span>${block.getAuthorIdentityIconHTML()}${authorDisplay}</span>`;
-                html += '</div>';
-            } else if (block.authorAccountId) {
-                html += '<div class="block-content-row">';
-                html += '<span>Author</span>';
-                html += `<span>${getCondensedAddress(block.authorAccountId.toString())}</span>`;
-                html += '</div>';
-            }
-            // status
-            html += '<div class="block-content-row">';
-            html += '<span>Status</span>';
-            html += `<span>${block.isFinalized ? 'Finalized' : 'Unfinalized'}</span>`;
-            html += '</div>';
-            // parent hash
-            html += '<div class="block-content-row">';
-            html += '<span>Parent Hash</span>';
-            html += `<span class="hash">${getCondensedHash(
-                block.block.header.parentHash.toHex(),
-                9,
-            )}</span>`;
-            html += '</div>';
-            // state root
-            html += '<div class="block-content-row">';
-            html += '<span>State Root</span>';
-            html += `<span class="hash">${getCondensedHash(
-                block.block.header.stateRoot.toHex(),
-                9,
-            )}</span>`;
-            html += '</div>';
-            // extrinsics root
-            html += '<div class="block-content-row">';
-            html += '<span>Extrinsics Root</span>';
-            html += `<span class="hash">${getCondensedHash(
-                block.block.header.extrinsicsRoot.toHex(),
-                9,
-            )}</span>`;
-            html += '</div>';
-            // runtime
-            html += '<div class="block-content-row">';
-            html += '<span>Runtime</span>';
-            html += `<span>${block.runtimeVersion}</span>`;
-            html += '</div>';
-
-            // extrinsics
-            html += '<div class="block-content-separator"></div>';
-            html += '<div class="block-content-row">';
-            html += `<span class="header">${block.block.extrinsics.length} Extrinsics</span>`;
-            html += '</div>';
-            for (const extrinsic of block.block.extrinsics) {
-                html += '<div class="block-content-row">';
-                html += `<span>${capitalize(extrinsic.method.section)}.${capitalize(
-                    extrinsic.method.method,
-                )}</span>`;
-                html += '</div>';
-            }
-
-            // events
-            html += '<div class="block-content-separator"></div>';
-            html += '<div class="block-content-row">';
-            html += `<span class="header">${block.events.length} Events</span>`;
-            html += '</div>';
-            for (const blockEvent of block.events) {
-                /* eslint-disable @typescript-eslint/ban-ts-comment */
-                // @ts-ignore
-                const { _phase, event, _topics } = blockEvent;
-                html += '<div class="block-content-row">';
-                html += `<span>${capitalize(event.section)}.${event.method}</span>`;
-                html += '</div>';
-            }
-        }
         return html;
     }
 
@@ -137,19 +50,9 @@ class BlockList {
             const hash = block.block.header.hash.toHex();
             const blockDiv = document.getElementById(`block-${hash}`);
             blockDiv?.addEventListener('click', (_event) => {
-                this.toggleBlockExpand(hash);
-                this.updateBlockDiv(block);
+                this.blockDetailsBoard?.display(block);
             });
         }, 500);
-    }
-
-    private toggleBlockExpand(hash: string) {
-        const index = this.expandedBlockHashes.indexOf(hash);
-        if (index >= 0) {
-            this.expandedBlockHashes.splice(index, 1);
-        } else {
-            this.expandedBlockHashes.push(hash);
-        }
     }
 
     private updateBlockDiv(block: Block) {
@@ -235,17 +138,9 @@ class BlockList {
     }
 
     onDiscardedBlock(block: Block) {
-        const hash = block.block.header.hash.toHex();
         const blockDiv = this.getBlockDiv(block);
         if (blockDiv) {
             blockDiv.remove();
-        }
-        this.expandedBlockHashes = this.expandedBlockHashes.filter(
-            (expandedBlockHash) => expandedBlockHash != hash,
-        );
-        const explandedBlockHashesIndex = this.expandedBlockHashes.indexOf(hash);
-        if (explandedBlockHashesIndex >= 0) {
-            this.expandedBlockHashes.splice(explandedBlockHashesIndex, 1);
         }
     }
 

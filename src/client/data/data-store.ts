@@ -310,6 +310,9 @@ class DataStore {
         const block = await this.getBlockByHash(header.hash);
         this.insertBlock(block);
         this.eventBus.dispatch<Block>(ChainvizEvent.NEW_BLOCK, block);
+        while (this.blocks.length > Constants.MAX_BLOCK_COUNT) {
+            this.eventBus.dispatch<Block>(ChainvizEvent.DISCARDED_BLOCK, this.blocks.pop());
+        }
         done();
     }
 

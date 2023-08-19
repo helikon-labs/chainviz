@@ -2,10 +2,10 @@ import * as THREE from 'three';
 
 export abstract class Constants {
     // RPC
-    //static readonly KUSAMA_RPC_URL = 'wss://rpc.ibp.network/kusama';
-    static readonly KUSAMA_RPC_URL = 'wss://kusama-rpc.polkadot.io';
-    //static readonly POLKADOT_RPC_URL = 'wss://rpc.ibp.network/polkadot';
-    static readonly POLKADOT_RPC_URL = 'wss://rpc.polkadot.io';
+    static readonly KUSAMA_RPC_URL = 'wss://rpc.ibp.network/kusama';
+    //static readonly KUSAMA_RPC_URL = 'wss://kusama-rpc.polkadot.io';
+    static readonly POLKADOT_RPC_URL = 'wss://rpc.ibp.network/polkadot';
+    //static readonly POLKADOT_RPC_URL = 'wss://rpc.polkadot.io';
     // connection
     static readonly CONNECTION_TIMEOUT_MS = 30000;
     static readonly CONNECTION_RETRY_MS = 5000;
@@ -16,8 +16,8 @@ export abstract class Constants {
     static readonly VALIDATOR_INSERT_DELAY_MS = 1000;
     static readonly CONTENT_FADE_ANIM_DURATION_MS = 500;
     static readonly UI_STATE_CHANGE_DELAY_MS = 300;
-    static readonly INITIAL_BLOCK_COUNT = 7;
-    static readonly MAX_BLOCK_COUNT = 50;
+    static readonly INITIAL_BLOCK_COUNT = 3;
+    static readonly MAX_BLOCK_COUNT = 15;
     static readonly MAX_VALIDATORS_PER_ARC = 30;
     static readonly MIN_ARC_COUNT = 10;
     static readonly VALIDATOR_SPHERE_MIN_RADIUS = 0.3;

@@ -24,6 +24,10 @@ hr {
     width: 100%;
 }
 
+.flex-spacer {
+    flex-grow: 1;
+}
+
 .transparent {
     opacity: 0;
 }
@@ -129,6 +133,10 @@ a:active {
     font-size: 12px;
 }
 
+.content .left-panel .xcm-transfer-list .xcm-transfer:hover {
+    background-color: #ffffff11 !important;
+}
+
 .content .left-panel .xcm-transfer-list .xcm-transfer .xcm-title {
     margin-top: 2px;
 }
@@ -184,6 +192,7 @@ img {
     flex-shrink: 1;
     display: flex;
     flex-direction: column;
+    position: relative;
 }
 
 .content .center-panel .network-selector {
@@ -230,6 +239,98 @@ img {
     margin-top: 1.5px;
 }
 
+.content .center-panel .block-details-board {
+    position: absolute;
+    bottom: 26px;
+    right: 4px;
+    width: 256px;
+    height: 284px;
+    backdrop-filter: blur(7px);
+    border-radius: 12px;
+    border: 1px solid #ffffff55;
+    padding: 10px 10px 8px 10px;
+    display: flex;
+    flex-direction: column;
+    padding: 10px 10px 8px 10px;
+    font-size: 12px;
+}
+
+.content .center-panel .block-details-board .block-details-header {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    margin-bottom: 8px;
+}
+
+.content .center-panel .block-details-board .block-details-content {
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    overflow-y: scroll;
+}
+
+.content .center-panel .block-details-board .block-details-number {
+    margin-left: 6px;
+    margin-top: 2px;
+}
+
+.content .center-panel .block-details-board .block-details-close {
+    cursor: pointer;
+}
+
+.content .center-panel .block-details-board .block-details-separator {
+    border-bottom: 1px dotted #ffffff;
+    height: 0px;
+    width: 100%;
+    opacity: 30%;
+}
+
+.content .center-panel .block-details-board .hash {
+    font-family: 'Fira Mono';
+}
+
+.content .center-panel .block-details-board .block-details-row {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    overflow-x: hidden;
+    align-items: center;
+    font-size: 11px;
+    margin-top: 8px;
+}
+
+.content .center-panel .block-details-board .block-details-section-header {
+    font-size: 12px;
+    cursor: pointer;
+    padding: 8px 4px 8px 0px;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+}
+
+.content .center-panel .block-details-board .block-details-section-header:hover {
+    cursor: pointer;
+    background-color: #ffffff11;
+}
+
+.content .center-panel .block-details-board .block-details-row .header {
+    font-size: 12px;
+}
+
+.content .center-panel .block-details-board .block-details-row span {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 4px;
+    text-overflow: ellipsis;
+}
+
+.content .center-panel .block-details-board .block-details-row span img {
+    width: 12px;
+    height: 12px;
+    margin-bottom: 2px;
+}
+
 .content .right-panel {
     height: 100%;
     width: 280px;
@@ -268,7 +369,7 @@ img {
 
 .content .right-panel .new-block-list {
     position: absolute;
-    top: 12px;
+    top: 0px;
     left: 0px;
     width: 100%;
     display: flex;
@@ -282,16 +383,21 @@ img {
     display: flex;
     flex-direction: column;
     gap: 4px;
+    padding-bottom: 26px;
 }
 
 .content .right-panel .block-list-container .block {
     border-radius: 12px;
     border: 1px solid #ffffff55;
-    padding: 10px 10px 8px 10px;
     display: flex;
     flex-direction: column;
     gap: 8px;
     cursor: pointer;
+    padding: 10px 10px 8px 10px;
+}
+
+.content .right-panel .block-list-container .block:hover {
+    background-color: #ffffff11 !important;
 }
 
 .content .right-panel .block-list-container .candidate {
@@ -304,44 +410,11 @@ img {
     opacity: 50%;
 }
 
-.block .block-content-separator {
-    border-top: 1px dotted #ffffff;
-    height: 1px;
-    width: 100%;
-    opacity: 30%;
-}
-
-.block-header {
+.content .right-panel .block-header {
     display: flex;
     flex-direction: row;
     font-size: 12px;
     justify-content: space-between;
-}
-
-.block-content-row {
-    display: flex;
-    flex-direction: row;
-    font-size: 10px;
-    justify-content: space-between;
-    overflow-x: hidden;
-}
-
-.block-content-row .header {
-    font-size: 12px;
-}
-
-.block-content-row span {
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-    gap: 4px;
-    text-overflow: ellipsis;
-}
-
-.block-content-row span img {
-    width: 12px;
-    height: 12px;
-    margin-bottom: 2px;
 }
 
 .content .right-panel .block .hash {
