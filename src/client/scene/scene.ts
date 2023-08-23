@@ -23,6 +23,7 @@ interface SceneDelegate {
     onValidatorMouseLeave(): void;
     onParaMouseEnter(paraId: number): void;
     onParaMouseLeave(): void;
+    onValidatorClick(index: number, validator: ValidatorSummary): void;
 }
 
 class Scene {
@@ -100,7 +101,7 @@ class Scene {
         window.addEventListener('click', (event) => {
             this.onClick(event);
         });
-        container.addEventListener('mousemove', (event) => {
+        window.addEventListener('mousemove', (event) => {
             this.onMouseMove(event);
         });
         window.addEventListener(
@@ -112,10 +113,17 @@ class Scene {
         );
     }
 
-    private onClick(event: MouseEvent) {
-        const x = (event.clientX / window.innerWidth) * 2 - 1;
-        const y = -(event.clientY / window.innerHeight) * 2 + 1;
-        console.log('click', x, y);
+    private onClick(_event: MouseEvent) {
+        //const x = (event.clientX / window.innerWidth) * 2 - 1;
+        //const y = -(event.clientY / window.innerHeight) * 2 + 1;
+        if (this.highlightedValidatorIndex != undefined) {
+            const slot = this.validatorMesh.getSlotAtIndex(this.highlightedValidatorIndex);
+            if (slot) {
+                this.delegate.onValidatorClick(this.highlightedValidatorIndex, slot.validator);
+            }
+        } else if (this.highlightedParaId != undefined) {
+            console.log('para details', this.highlightedParaId);
+        }
     }
 
     private onMouseMove(event: MouseEvent) {
@@ -204,15 +212,6 @@ class Scene {
 
     private setDefaultCursor() {
         document.getElementsByTagName('html')[0].style.cursor = 'default';
-    }
-
-    private bezierCurve(p0: number, p1: number, p2: number, p3: number, t: number) {
-        return (
-            Math.pow(1 - t, 3) * p0 +
-            3 * Math.pow(1 - t, 2) * t * p1 +
-            3 * (1 - t) * Math.pow(t, 2) * p2 +
-            Math.pow(t, 3) * p3
-        );
     }
 
     start(paras: Para[], validatorMap: Map<string, ValidatorSummary>, onComplete?: () => void) {

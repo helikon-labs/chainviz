@@ -151,6 +151,10 @@ class BlockList {
             document.getElementById(`${this.isCandidateBlockList ? 'candidate-' : ''}block-${hash}`)
         );
     }
+
+    closeBlockDetailsBoard() {
+        this.blockDetailsBoard?.close();
+    }
 }
 
 export { BlockList };

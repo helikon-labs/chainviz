@@ -38,6 +38,9 @@ class Chainviz {
         onParaMouseLeave: () => {
             this.ui.clearParaHighlight();
         },
+        onValidatorClick: (index: number, validator: ValidatorSummary) => {
+            this.ui.showValidatorDetails(this.network, index, validator);
+        },
     };
 
     constructor() {

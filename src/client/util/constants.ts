@@ -2,10 +2,10 @@ import * as THREE from 'three';
 
 export abstract class Constants {
     // RPC
-    //static readonly KUSAMA_RPC_URL = 'wss://rpc.ibp.network/kusama';
-    static readonly KUSAMA_RPC_URL = 'wss://kusama-rpc.polkadot.io';
-    //static readonly POLKADOT_RPC_URL = 'wss://rpc.ibp.network/polkadot';
-    static readonly POLKADOT_RPC_URL = 'wss://rpc.polkadot.io';
+    static readonly KUSAMA_RPC_URL = 'wss://rpc.ibp.network/kusama';
+    //static readonly KUSAMA_RPC_URL = 'wss://kusama-rpc.polkadot.io';
+    static readonly POLKADOT_RPC_URL = 'wss://rpc.ibp.network/polkadot';
+    //static readonly POLKADOT_RPC_URL = 'wss://rpc.polkadot.io';
     // connection
     static readonly CONNECTION_TIMEOUT_MS = 30000;
     static readonly CONNECTION_RETRY_MS = 5000;
@@ -48,6 +48,7 @@ export abstract class Constants {
     static readonly HIGHLIGHTED_PARA_SCALE = 1.5;
     static readonly NEW_BLOCK_APPEAR_ANIM_DURATION_MS = 125;
     static readonly NEW_BLOCK_BEAM_ANIM_DURATION_MS = 1500;
+    static readonly VALIDATOR_DETAILS_BOARD_IDENTICON_SIZE = 24;
     // validator summary board
     static readonly VALIDATOR_SUMMARY_BOARD_X_OFFSET = 20;
     static readonly VALIDATOR_SUMMARY_INFO_BOARD_Y_OFFSET = -20;

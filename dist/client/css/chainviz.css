@@ -94,6 +94,14 @@ a:active {
     display: flex;
 }
 
+.active-stake {
+    color: #00ff00;
+}
+
+.inactive-stake {
+    color: #ff8888;
+}
+
 .content .left-panel {
     width: 200px;
     display: flex;
@@ -239,6 +247,102 @@ img {
     margin-top: 1.5px;
 }
 
+/* validator details board */
+.content .center-panel .validator-details-board {
+    position: absolute;
+    top: 66px;
+    left: 4px;
+    width: 248px;
+    backdrop-filter: blur(7px);
+    -webkit-backdrop-filter: blur(7px);
+    font-size: 12px;
+    border-radius: 12px;
+    border: 1px solid #ffffff55;
+    padding: 10px 10px 8px 10px;
+    font-size: 12px;
+    display: flex;
+    flex-direction: column;
+}
+
+.content .center-panel .validator-details-board .validator-details-header {
+    height: 22px;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 8px;
+}
+
+.content .center-panel .validator-details-board .validator-details-identity {
+    margin-top: 2px;
+    font-size: 13px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: flex;
+    flex-direction: row;
+    gap: 4px;
+}
+
+.content .center-panel .validator-details-board .validator-details-identity img {
+    width: 14px;
+    height: 14px;
+}
+
+.content .center-panel .validator-details-board .validator-details-identity .identity {
+    margin-top: 0px;
+}
+
+.content .center-panel .validator-details-board .validator-details-close {
+    width: 18px;
+    height: 18px;
+    cursor: pointer;
+}
+
+.content .center-panel .validator-details-board .validator-details-row {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 8px;
+    gap: 8px;
+}
+
+.content .center-panel .validator-details-board #validator-details-para-info span {
+    margin-top: 2px;
+}
+
+.content .center-panel .validator-details-board .validator-details-separator {
+    border-bottom: 1px dotted #ffffff;
+    height: 0px;
+    width: 100%;
+    opacity: 30%;
+    margin-top: 8px;
+}
+
+.content .center-panel .validator-details-board .validator-details-status-icon-container {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 8px;
+    justify-content: center;
+    margin-top: 8px;
+}
+
+.content
+    .center-panel
+    .validator-details-board
+    .validator-details-status-icon-container
+    .validator-details-identicon-container {
+    width: 24px;
+    height: 24px;
+}
+
+.content .center-panel .validator-details-board .validator-details-status-icon-container img {
+    width: 24px;
+    height: 24px;
+}
+
+/* block details board */
 .content .center-panel .block-details-board {
     position: absolute;
     bottom: 26px;
@@ -250,10 +354,9 @@ img {
     border-radius: 12px;
     border: 1px solid #ffffff55;
     padding: 10px 10px 8px 10px;
+    font-size: 12px;
     display: flex;
     flex-direction: column;
-    padding: 10px 10px 8px 10px;
-    font-size: 12px;
 }
 
 .content .center-panel .block-details-board .block-details-header {
@@ -443,7 +546,8 @@ img {
     flex-flow: column nowrap;
     justify-content: flex-start;
     align-items: center;
-    background-color: #424242d0;
+    backdrop-filter: blur(7px);
+    -webkit-backdrop-filter: blur(7px);
     padding: 12px;
     font-size: 13px;
     border-radius: 10px;
@@ -520,14 +624,6 @@ img {
     width: 12px;
     height: 12px;
     margin-bottom: 2px;
-}
-
-#validator-summary-board .active {
-    color: #00ff00;
-}
-
-#validator-summary-board .inactive {
-    color: #ff8888;
 }
 
 #validator-summary-board .stake-data-outer-container {

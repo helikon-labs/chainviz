@@ -61,7 +61,7 @@ class BlockDetailsBoard {
         };
         setTimeout(() => {
             this.ui.close.addEventListener('click', (_event) => {
-                hide(this.ui.root);
+                this.close();
             });
             this.ui.extrinsicCount.parentElement!.addEventListener('click', (_event) => {
                 if (this.extrinsicsAreVisible) {
@@ -166,6 +166,10 @@ class BlockDetailsBoard {
         eventListHTML += '<div class="block-details-row"></div>';
         this.ui.eventContainer.innerHTML = eventListHTML;
         show(this.ui.root);
+    }
+
+    close() {
+        hide(this.ui.root);
     }
 
     onFinalizedBlock(block: Block) {
