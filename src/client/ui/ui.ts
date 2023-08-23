@@ -329,7 +329,7 @@ class UI {
     }
 
     showValidatorHighlightCircle(position: Vec2) {
-        const x = this.sceneContainer.getBoundingClientRect().left + position.x - 10.5;
+        const x = position.x - 10.5;
         const y = this.sceneContainer.getBoundingClientRect().top + position.y - 10.5;
         this.validatorHighlightCircle.style.left = `${x}px`;
         this.validatorHighlightCircle.style.top = `${y}px`;
