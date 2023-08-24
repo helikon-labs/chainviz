@@ -11,6 +11,10 @@ import {
     show,
 } from '../util/ui-util';
 
+interface ValidatorDetailsBoardDelegate {
+    onClose(): void;
+}
+
 interface UI {
     root: HTMLElement;
     close: HTMLElement;
@@ -40,8 +44,10 @@ interface UI {
 
 class ValidatorDetailsBoard {
     private readonly ui: UI;
+    private readonly delegate: ValidatorDetailsBoardDelegate;
 
-    constructor() {
+    constructor(delegate: ValidatorDetailsBoardDelegate) {
+        this.delegate = delegate;
         this.ui = {
             root: <HTMLElement>document.getElementById('validator-details-board'),
             close: <HTMLElement>document.getElementById('validator-details-close'),
@@ -239,7 +245,8 @@ class ValidatorDetailsBoard {
 
     close() {
         hide(this.ui.root);
+        this.delegate.onClose();
     }
 }
 
-export { ValidatorDetailsBoard };
+export { ValidatorDetailsBoard, ValidatorDetailsBoardDelegate };

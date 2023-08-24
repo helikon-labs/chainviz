@@ -39,7 +39,7 @@ class Chainviz {
             this.ui.clearParaHighlight();
         },
         onValidatorClick: (index: number, validator: ValidatorSummary) => {
-            this.ui.showValidatorDetails(this.network, index, validator);
+            this.ui.selectValidator(this.network, index, validator);
         },
     };
 

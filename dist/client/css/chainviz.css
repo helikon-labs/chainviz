@@ -309,6 +309,9 @@ img {
 
 .content .center-panel .validator-details-board #validator-details-para-info span {
     margin-top: 2px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .content .center-panel .validator-details-board .validator-details-separator {

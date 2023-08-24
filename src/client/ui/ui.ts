@@ -19,7 +19,7 @@ import { Vec2 } from 'three';
 import { ParaSummaryBoard } from './para-summary-board';
 import { XCMInfo } from '../model/polkaholic/xcm';
 import { Block } from '../model/chainviz/block';
-import { ValidatorDetailsBoard } from './validator-details-board';
+import { ValidatorDetailsBoard, ValidatorDetailsBoardDelegate } from './validator-details-board';
 
 class UI {
     private readonly scene: Scene;
@@ -70,7 +70,11 @@ class UI {
             document.getElementById('validator-highlight-circle')
         );
         this.paraSummaryBoard = new ParaSummaryBoard();
-        this.validatorDetailsBoard = new ValidatorDetailsBoard();
+        this.validatorDetailsBoard = new ValidatorDetailsBoard(<ValidatorDetailsBoardDelegate>{
+            onClose: () => {
+                this.scene.clearValidatorSelection();
+            },
+        });
 
         this.scene = new Scene(this.sceneContainer, sceneDelegate);
         this.kusamaSelector.addEventListener('click', (_event) => {
@@ -355,8 +359,9 @@ class UI {
         this.hideValidatorHighlightCircle();
     }
 
-    showValidatorDetails(network: Network, index: number, validator: ValidatorSummary) {
+    selectValidator(network: Network, index: number, validator: ValidatorSummary) {
         this.validatorDetailsBoard.display(network, validator);
+        this.scene.selectValidator(index);
     }
 
     highlightPara(para: Para, paraValidatorStashAdresses: string[]) {

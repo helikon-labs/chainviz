@@ -423,6 +423,14 @@ class Scene {
             },
         ).start();
     }
+
+    selectValidator(index: number) {
+        this.validatorMesh.selectValidator(index);
+    }
+
+    clearValidatorSelection() {
+        this.validatorMesh.clearSelection();
+    }
 }
 
 export { Scene, SceneDelegate };

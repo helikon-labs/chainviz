@@ -23,6 +23,16 @@ const VALIDATOR_MATERIAL = new THREE.MeshBasicMaterial({
     transparent: true,
     opacity: Constants.SCENE_VALIDATOR_OPACITY,
 });
+const VALIDATOR_SELECTOR_GEOMETRY = new THREE.SphereGeometry(
+    Constants.VALIDATOR_SELECTOR_SPHERE_RADIUS,
+    Constants.VALIDATOR_SPHERE_WIDTH_SEGMENTS,
+    Constants.VALIDATOR_SPHERE_HEIGHT_SEGMENTS,
+);
+const VALIDATOR_SELECTOR_MATERIAL = new THREE.MeshBasicMaterial({
+    color: Constants.VALIDATOR_SELECTOR_SPHERE_COLOR,
+    transparent: true,
+    opacity: Constants.VALIDATOR_SELECTOR_SPHERE_OPACITY,
+});
 
 interface ValidatorSlot {
     validator: ValidatorSummary;
@@ -33,6 +43,7 @@ interface ValidatorSlot {
 class ValidatorMesh {
     private arcMesh!: THREE.InstancedMesh;
     private validatorMesh!: THREE.InstancedMesh;
+    private validatorSelectorMesh!: THREE.Mesh;
     private group!: THREE.Group;
     private arcs: (ValidatorSlot | undefined)[][] = [];
 
@@ -130,6 +141,12 @@ class ValidatorMesh {
         this.group.add(this.validatorMesh);
         // add to scene
         scene.add(this.group);
+        // init selector
+        this.validatorSelectorMesh = new THREE.InstancedMesh(
+            VALIDATOR_SELECTOR_GEOMETRY,
+            VALIDATOR_SELECTOR_MATERIAL,
+            this.arcs.length * this.arcs[0].length,
+        );
         // initial animation
         this.animate(false, onComplete);
     }
@@ -215,11 +232,7 @@ class ValidatorMesh {
         return undefined;
     }
 
-    private getInnerValidatorPosition(stashAddress: string): THREE.Vector3 | undefined {
-        const index = this.getValidatorIndex(stashAddress);
-        if (index == undefined) {
-            return undefined;
-        }
+    private getInnerValidatorPosition(index: number): THREE.Vector3 {
         const matrix = new THREE.Matrix4();
         this.validatorMesh.getMatrixAt(index, matrix);
         const position = new THREE.Vector3();
@@ -228,15 +241,16 @@ class ValidatorMesh {
     }
 
     getValidatorPosition(stashAddress: string): THREE.Vector3 | undefined {
-        const innerPosition = this.getInnerValidatorPosition(stashAddress);
-        if (innerPosition == undefined) {
+        const index = this.getValidatorIndex(stashAddress);
+        if (index == undefined) {
             return undefined;
         }
+        const innerPosition = this.getInnerValidatorPosition(index);
         const groupMatrix = new THREE.Matrix4().makeRotationFromEuler(this.group.rotation);
         return innerPosition.applyMatrix4(groupMatrix);
     }
 
-    highlightValidator(validatorIndex: number) {
+    highlightValidator(index: number) {
         this.resetScales();
         for (let i = 0; i < this.arcs.length; i++) {
             const arcFirstIndex = i * this.arcs[0].length;
@@ -245,9 +259,9 @@ class ValidatorMesh {
                 const matrix = new THREE.Matrix4();
                 this.validatorMesh.getMatrixAt(j, matrix);
                 let scale = 0.0;
-                if (j == validatorIndex) {
+                if (j == index) {
                     scale = 2;
-                } else if (validatorIndex >= arcFirstIndex && validatorIndex <= arcLastIndex) {
+                } else if (index >= arcFirstIndex && index <= arcLastIndex) {
                     scale = 1;
                 }
                 matrix.scale(new THREE.Vector3(scale, scale, scale));
@@ -312,6 +326,18 @@ class ValidatorMesh {
         ARC_MATERIAL.opacity = Constants.VALIDATOR_ARC_LOW_OPACITY;
         this.validatorMesh.instanceMatrix.needsUpdate = true;
         this.validatorMesh.computeBoundingSphere();
+    }
+
+    selectValidator(index: number) {
+        const position = this.getInnerValidatorPosition(index);
+        this.group.add(this.validatorSelectorMesh);
+        this.validatorSelectorMesh.position.x = position.x;
+        this.validatorSelectorMesh.position.y = position.y;
+        this.validatorSelectorMesh.position.z = position.z;
+    }
+
+    clearSelection() {
+        this.validatorSelectorMesh.removeFromParent();
     }
 }
 
