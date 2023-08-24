@@ -22,13 +22,13 @@ export abstract class Constants {
     static readonly MIN_ARC_COUNT = 10;
     static readonly VALIDATOR_SPHERE_MIN_RADIUS = 0.3;
     static readonly VALIDATOR_SPHERE_MAX_RADIUS = 0.5;
-    static readonly VALIDATOR_SELECTOR_SPHERE_RADIUS = 1.0;
     static readonly VALIDATOR_SPHERE_WIDTH_SEGMENTS = 32;
     static readonly VALIDATOR_SPHERE_HEIGHT_SEGMENTS = 16;
     static readonly VALIDATOR_ARC_RADIUS = 48;
     static readonly VALIDATOR_SPHERE_COLOR = 0xffffff;
+    static readonly VALIDATOR_SELECTOR_SPHERE_RADIUS = 1.2;
     static readonly VALIDATOR_SELECTOR_SPHERE_COLOR = 0xffff00;
-    static readonly VALIDATOR_SELECTOR_SPHERE_OPACITY = 0.1;
+    static readonly VALIDATOR_SELECTOR_SPHERE_OPACITY = 0.005;
     static readonly VALIDATOR_ARC_COLOR = 0xffffff;
     static readonly VALIDATOR_ARC_NORMAL_OPACITY = 0.6;
     static readonly VALIDATOR_ARC_LOW_OPACITY = 0.15;

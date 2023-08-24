@@ -208,12 +208,20 @@ class DataStore {
         // get finalized blocks
         const finalizedBlockHash = await this.substrateClient.rpc.chain.getFinalizedHead();
         let finalizedBlock = await this.getBlockByHash(finalizedBlockHash);
-        finalizedBlock.isFinalized = true;
-        finalizedBlocks.push(finalizedBlock);
-        for (let i = 0; i < Constants.INITIAL_BLOCK_COUNT; i++) {
-            finalizedBlock = await this.getBlockByHash(finalizedBlock.block.header.parentHash);
+        if (finalizedBlock) {
             finalizedBlock.isFinalized = true;
             finalizedBlocks.push(finalizedBlock);
+            for (let i = 0; i < Constants.INITIAL_BLOCK_COUNT; i++) {
+                finalizedBlock = await this.getBlockByHash(finalizedBlock!.block.header.parentHash);
+                if (finalizedBlock) {
+                    finalizedBlock.isFinalized = true;
+                    finalizedBlocks.push(finalizedBlock);
+                } else {
+                    return;
+                }
+            }
+        } else {
+            return;
         }
         // get non-finalized blocks
         const nonFinalizedBlocks: Block[] = [];
@@ -223,10 +231,14 @@ class DataStore {
             finalizedBlocks[0].block.header.number.toNumber()
         ) {
             const nonFinalizedBlock = await this.getBlockByHash(nonFinalizedHeader.hash);
-            nonFinalizedBlocks.push(nonFinalizedBlock);
-            nonFinalizedHeader = await this.substrateClient.rpc.chain.getHeader(
-                nonFinalizedHeader.parentHash,
-            );
+            if (nonFinalizedBlock) {
+                nonFinalizedBlocks.push(nonFinalizedBlock);
+                nonFinalizedHeader = await this.substrateClient.rpc.chain.getHeader(
+                    nonFinalizedHeader.parentHash,
+                );
+            } else {
+                break;
+            }
         }
         this.blocks = [...nonFinalizedBlocks, ...finalizedBlocks];
     }
@@ -308,8 +320,10 @@ class DataStore {
             return;
         }
         const block = await this.getBlockByHash(header.hash);
-        this.insertBlock(block);
-        this.eventBus.dispatch<Block>(ChainvizEvent.NEW_BLOCK, block);
+        if (block) {
+            this.insertBlock(block);
+            this.eventBus.dispatch<Block>(ChainvizEvent.NEW_BLOCK, block);
+        }
         while (this.blocks.length > Constants.MAX_BLOCK_COUNT) {
             this.eventBus.dispatch<Block>(ChainvizEvent.DISCARDED_BLOCK, this.blocks.pop());
         }
@@ -356,10 +370,14 @@ class DataStore {
             this.blocks.findIndex((block) => block.block.header.number.toNumber() == number) < 0
         ) {
             const block = await this.getBlockByNumber(number);
-            block.isFinalized = true;
-            this.insertBlock(block);
-            this.eventBus.dispatch<Block>(ChainvizEvent.FINALIZED_BLOCK, block);
-            number--;
+            if (block) {
+                block.isFinalized = true;
+                this.insertBlock(block);
+                this.eventBus.dispatch<Block>(ChainvizEvent.FINALIZED_BLOCK, block);
+                number--;
+            } else {
+                break;
+            }
         }
 
         const index = this.blocks.findIndex(
@@ -370,39 +388,45 @@ class DataStore {
             this.eventBus.dispatch<Block>(ChainvizEvent.FINALIZED_BLOCK, this.blocks[index]);
         } else {
             const block = await this.getBlockByHash(header.hash);
-            block.isFinalized = true;
-            this.insertBlock(block);
-            this.eventBus.dispatch<Block>(ChainvizEvent.FINALIZED_BLOCK, block);
+            if (block) {
+                block.isFinalized = true;
+                this.insertBlock(block);
+                this.eventBus.dispatch<Block>(ChainvizEvent.FINALIZED_BLOCK, block);
+            }
         }
         done();
     }
 
-    async getBlockByHash(hash: BlockHash): Promise<Block> {
-        const extendedHeader = await this.substrateClient.derive.chain.getHeader(hash);
-        const substrateBlock = (await this.substrateClient.rpc.chain.getBlock(hash)).block;
-        const apiAt = await this.substrateClient.at(hash);
-        const timestamp = (await apiAt.query.timestamp.now()).toJSON() as number;
-        const events = (await apiAt.query.system.events()).toHuman() as AnyJson[];
-        const runtimeVersion = await this.substrateClient.rpc.state.getRuntimeVersion(hash);
-        const block = new Block(
-            extendedHeader,
-            substrateBlock,
-            timestamp,
-            events,
-            runtimeVersion.specVersion.toNumber(),
-        );
-        const authorAccountId = block.extendedHeader.author;
-        if (authorAccountId) {
-            const validator = this.validatorMap.get(authorAccountId.toString());
-            if (validator) {
-                block.setAuthorDisplay(getValidatorSummaryDisplay(validator));
-                block.setAuthorIdentityIconHTML(getValidatorIdentityIconHTML(validator));
+    async getBlockByHash(hash: BlockHash): Promise<Block | undefined> {
+        try {
+            const extendedHeader = await this.substrateClient.derive.chain.getHeader(hash);
+            const substrateBlock = (await this.substrateClient.rpc.chain.getBlock(hash)).block;
+            const apiAt = await this.substrateClient.at(hash);
+            const timestamp = (await apiAt.query.timestamp.now()).toJSON() as number;
+            const events = (await apiAt.query.system.events()).toHuman() as AnyJson[];
+            const runtimeVersion = await this.substrateClient.rpc.state.getRuntimeVersion(hash);
+            const block = new Block(
+                extendedHeader,
+                substrateBlock,
+                timestamp,
+                events,
+                runtimeVersion.specVersion.toNumber(),
+            );
+            const authorAccountId = block.extendedHeader.author;
+            if (authorAccountId) {
+                const validator = this.validatorMap.get(authorAccountId.toString());
+                if (validator) {
+                    block.setAuthorDisplay(getValidatorSummaryDisplay(validator));
+                    block.setAuthorIdentityIconHTML(getValidatorIdentityIconHTML(validator));
+                }
             }
+            return block;
+        } catch (_error) {
+            return undefined;
         }
-        return block;
     }
 
-    async getBlockByNumber(number: number): Promise<Block> {
+    async getBlockByNumber(number: number): Promise<Block | undefined> {
         const hash = await this.substrateClient.rpc.chain.getBlockHash(number);
         return this.getBlockByHash(hash);
     }
