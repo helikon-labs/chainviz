@@ -6,13 +6,21 @@ interface UI {
     root: HTMLDivElement;
 }
 
+interface XCMTransferListDelegate {
+    onClick(originExtrinsicHash: string): void;
+    onMouseEnter(originExtrinsicHash: string): void;
+    onMouseLeave(originExtrinsicHash: string): void;
+}
+
 class XCMTransferList {
     private readonly ui: UI;
+    private readonly delegate: XCMTransferListDelegate;
 
-    constructor() {
+    constructor(delegate: XCMTransferListDelegate) {
         this.ui = {
             root: <HTMLDivElement>document.getElementById('xcm-transfer-list'),
         };
+        this.delegate = delegate;
     }
 
     private getXCMTransferInnerHTML(
@@ -96,12 +104,18 @@ class XCMTransferList {
 
         setTimeout(() => {
             const messageDiv = document.getElementById(`xcm-transfer-${originExtrinsicHash}`);
-            const url = `https://polkaholic.io/tx/${originExtrinsicHash}`;
             messageDiv?.addEventListener('click', (_event) => {
-                window.open(url);
+                this.delegate.onClick(originExtrinsicHash);
+            });
+            // mouse over :: call delegate
+            messageDiv?.addEventListener('mouseenter', (_event) => {
+                this.delegate.onMouseEnter(originExtrinsicHash);
+            });
+            messageDiv?.addEventListener('mouseleave', (_event) => {
+                this.delegate.onMouseLeave(originExtrinsicHash);
             });
         }, 500);
     }
 }
 
-export { XCMTransferList };
+export { XCMTransferList, XCMTransferListDelegate };

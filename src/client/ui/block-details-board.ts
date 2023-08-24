@@ -1,4 +1,5 @@
 import { Block } from '../model/chainviz/block';
+import { Constants } from '../util/constants';
 import {
     capitalize,
     getBlockTimeFormatted,
@@ -6,8 +7,6 @@ import {
     getCondensedHash,
 } from '../util/format';
 import { hide, show } from '../util/ui-util';
-
-const HASH_TRIM_SIZE = 7;
 
 interface UI {
     root: HTMLElement;
@@ -117,18 +116,21 @@ class BlockDetailsBoard {
         this.ui.status.innerHTML = block.isFinalized
             ? '<em class="fas fa-check-circle"></em>Finalized'
             : '<em class="fas fa-clock-o"></em>Non-finalized';
-        this.ui.hash.innerHTML = getCondensedHash(block.block.header.hash.toHex(), HASH_TRIM_SIZE);
+        this.ui.hash.innerHTML = getCondensedHash(
+            block.block.header.hash.toHex(),
+            Constants.HASH_TRIM_SIZE,
+        );
         this.ui.parentHash.innerHTML = getCondensedHash(
             block.block.header.parentHash.toHex(),
-            HASH_TRIM_SIZE,
+            Constants.HASH_TRIM_SIZE,
         );
         this.ui.stateRoot.innerHTML = getCondensedHash(
             block.block.header.stateRoot.toHex(),
-            HASH_TRIM_SIZE,
+            Constants.HASH_TRIM_SIZE,
         );
         this.ui.extrinsicsRoot.innerHTML = getCondensedHash(
             block.block.header.extrinsicsRoot.toHex(),
-            HASH_TRIM_SIZE,
+            Constants.HASH_TRIM_SIZE,
         );
         const authorDisplay = block.getAuthorDisplay();
         if (authorDisplay) {

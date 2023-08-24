@@ -10,6 +10,7 @@ import { ValidatorSummary } from './model/subvt/validator-summary';
 import { Block } from './model/chainviz/block';
 import { XCMInfo } from './model/polkaholic/xcm';
 import { SceneDelegate } from './scene/scene';
+import { XCMTransferListDelegate } from './ui/xcm-transfer-list';
 
 THREE.Cache.enabled = true;
 
@@ -43,8 +44,35 @@ class Chainviz {
         },
     };
 
+    private readonly xcmTransferListDelegate = <XCMTransferListDelegate>{
+        onClick: (originExtrinsicHash: string) => {
+            const transfer =
+                this.dataStore.getXCMTransferByOriginExtrinsicHash(originExtrinsicHash);
+            if (transfer) {
+                this.ui.showXCMTransferDetailsBoard(transfer);
+            }
+        },
+        onMouseEnter: (originExtrinsicHash: string) => {
+            const transfer =
+                this.dataStore.getXCMTransferByOriginExtrinsicHash(originExtrinsicHash);
+            if (transfer) {
+                const paraIds: number[] = [];
+                if (transfer.origination.paraID > 0) {
+                    paraIds.push(transfer.origination.paraID);
+                }
+                if (transfer.destination.paraID) {
+                    paraIds.push(transfer.destination.paraID);
+                }
+                this.ui.highlightParas(paraIds);
+            }
+        },
+        onMouseLeave: (_originExtrinsicHash: string) => {
+            this.ui.clearParaHighlight();
+        },
+    };
+
     constructor() {
-        this.ui = new UI(this.sceneDelegate);
+        this.ui = new UI(this.sceneDelegate, this.xcmTransferListDelegate);
 
         this.dataStore = new DataStore();
         // substrate api events

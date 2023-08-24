@@ -7,7 +7,7 @@ import { Logo, getRandomCharacterType, getRandomShapeType } from './logo';
 import { NetworkStatusBoard } from './network-status-board';
 import { BlockList } from './block-list';
 import * as TWEEN from '@tweenjs/tween.js';
-import { XCMTransferList } from './xcm-transfer-list';
+import { XCMTransferList, XCMTransferListDelegate } from './xcm-transfer-list';
 import { Para } from '../model/substrate/para';
 import { Scene, SceneDelegate } from '../scene/scene';
 import { ValidatorSummary } from '../model/subvt/validator-summary';
@@ -20,6 +20,7 @@ import { ParaSummaryBoard } from './para-summary-board';
 import { XCMInfo } from '../model/polkaholic/xcm';
 import { Block } from '../model/chainviz/block';
 import { ValidatorDetailsBoard, ValidatorDetailsBoardDelegate } from './validator-details-board';
+import { XCMTransferDetailsBoard } from './xcm-transfer-details-board';
 
 class UI {
     private readonly scene: Scene;
@@ -46,8 +47,9 @@ class UI {
     private readonly validatorHighlightCircle: HTMLDivElement;
     private readonly paraSummaryBoard: ParaSummaryBoard;
     private readonly validatorDetailsBoard: ValidatorDetailsBoard;
+    private readonly xcmTransferDetailsBoard: XCMTransferDetailsBoard;
 
-    constructor(sceneDelegate: SceneDelegate) {
+    constructor(sceneDelegate: SceneDelegate, xcmTransferListDelegate: XCMTransferListDelegate) {
         this.root = <HTMLElement>document.getElementById('root');
         this.sceneContainer = <HTMLDivElement>document.getElementById('scene-container');
         this.background = <HTMLDivElement>document.getElementById('background');
@@ -55,7 +57,7 @@ class UI {
         this.leftPanel = <HTMLDivElement>document.getElementById('left-panel');
         this.mainLogoCanvas = <HTMLCanvasElement>document.getElementById('main-logo');
         this.logo = new Logo(getRandomShapeType(), getRandomCharacterType());
-        this.xcmTransferList = new XCMTransferList();
+        this.xcmTransferList = new XCMTransferList(xcmTransferListDelegate);
         this.centerPanel = <HTMLDivElement>document.getElementById('center-panel');
         this.kusamaSelector = <HTMLDivElement>document.getElementById('kusama-selector');
         this.polkadotSelector = <HTMLDivElement>document.getElementById('polkadot-selector');
@@ -75,6 +77,7 @@ class UI {
                 this.scene.clearValidatorSelection();
             },
         });
+        this.xcmTransferDetailsBoard = new XCMTransferDetailsBoard();
 
         this.scene = new Scene(this.sceneContainer, sceneDelegate);
         this.kusamaSelector.addEventListener('click', (_event) => {
@@ -259,6 +262,7 @@ class UI {
         this.isChangingNetwork = true;
         this.blockList.closeBlockDetailsBoard();
         this.validatorDetailsBoard.close();
+        this.xcmTransferDetailsBoard.close();
         this.scene.reset(() => {
             this.fadeOutForNetworkChange(() => {
                 this.fadeInLoadingContainer(() => {
@@ -364,6 +368,10 @@ class UI {
         this.scene.selectValidator(index);
     }
 
+    highlightParas(paraIds: number[]) {
+        this.scene.highlightParas(paraIds);
+    }
+
     highlightPara(para: Para, paraValidatorStashAdresses: string[]) {
         this.scene.highlightPara(para.paraId, paraValidatorStashAdresses);
         const position = this.scene.getParaOnScreenPosition(para.paraId);
@@ -385,6 +393,10 @@ class UI {
 
     hideParaSummaryBoard() {
         this.paraSummaryBoard.hide();
+    }
+
+    showXCMTransferDetailsBoard(transfer: XCMInfo) {
+        this.xcmTransferDetailsBoard.display(transfer);
     }
 }
 

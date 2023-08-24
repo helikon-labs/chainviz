@@ -471,6 +471,11 @@ class DataStore {
                 // message exists, skip
                 continue;
             }
+            console.log(
+                fetchedXCMTransfer.origination.extrinsicHash,
+                fetchedXCMTransfer.origination.amountSent,
+                fetchedXCMTransfer.symbol ?? fetchedXCMTransfer.origination.txFeeSymbol,
+            );
             newXCMTransfers.push(fetchedXCMTransfer);
         }
         this.xcmTransfers = [...newXCMTransfers, ...this.xcmTransfers];
@@ -507,6 +512,12 @@ class DataStore {
                 console.error('Error while disconnecting Substrate client:', error);
             }
         }
+    }
+
+    getXCMTransferByOriginExtrinsicHash(hash: string): XCMInfo | undefined {
+        return this.xcmTransfers.find(
+            (xcmTransfer) => xcmTransfer.origination.extrinsicHash == hash,
+        );
     }
 }
 

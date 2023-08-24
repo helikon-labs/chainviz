@@ -2,6 +2,7 @@ export interface XCMInfoWrapper {
     xcmInfo: XCMInfo;
 }
 export interface XCMInfo {
+    symbol?: string;
     relayChain: XCMRelayChain;
     origination: XCMOrigination;
     destination: XCMDestination;
@@ -25,7 +26,7 @@ export interface XCMOrigination {
     sender: string;
     amountSent: number;
     amountSentUSD: number;
-    xcmtransferHash: string;
+    xcmTransferHash: string;
     initiateTS: number;
     txFee: number;
     txFeeUSD: number;

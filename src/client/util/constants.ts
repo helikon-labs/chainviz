@@ -13,6 +13,7 @@ export abstract class Constants {
     static readonly XCM_DISPLAY_LIMIT = 5;
     static readonly XCM_TRANSFER_FETCH_PERIOD_MS = 12000;
     // UI
+    static readonly HASH_TRIM_SIZE = 7;
     static readonly VALIDATOR_INSERT_DELAY_MS = 1000;
     static readonly CONTENT_FADE_ANIM_DURATION_MS = 500;
     static readonly UI_STATE_CHANGE_DELAY_MS = 300;

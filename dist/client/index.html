@@ -50,7 +50,7 @@
                     </a>
                 </div>
             </div>
-            <div class="left-panel-spacer"></div>
+            <!--div class="left-panel-spacer"></div-->
             <div class="center-panel" id="center-panel">
                 <div style="display: flex; align-items: center; justify-content: center">
                     <div class="network-selector">
@@ -67,6 +67,54 @@
                 <div class="scene-container" id="scene-container"></div>
                 <!-- validator highlight circle -->
                 <div class="validator-highlight-circle" id="validator-highlight-circle"></div>
+                <!-- xcm details -->
+                <div class="xcm-details-board hidden" id="xcm-details-board">
+                    <div class="xcm-details-header">
+                        <span> XCM </span>
+                        <span class="flex-spacer"></span>
+                        <img
+                            class="xcm-details-close"
+                            id="xcm-details-close"
+                            src="/img/icon/close-icon.png"
+                        />
+                    </div>
+                    <div class="xcm-details-separator"></div>
+                    <div class="xcm-details-row">
+                        <span>Hash</span>
+                        <span class="flex-spacer"></span>
+                        <span id="xcm-details-hash"></span>
+                    </div>
+                    <div class="xcm-details-row">
+                        <span>From</span>
+                        <span class="flex-spacer"></span>
+                        <span id="xcm-details-from-para"></span>
+                    </div>
+                    <div class="xcm-details-row">
+                        <span>Sender</span>
+                        <span class="flex-spacer"></span>
+                        <span id="xcm-details-sender"></span>
+                    </div>
+                    <div class="xcm-details-row">
+                        <span>To</span>
+                        <span class="flex-spacer"></span>
+                        <span id="xcm-details-to-para"></span>
+                    </div>
+                    <div class="xcm-details-row">
+                        <span>Recipient</span>
+                        <span class="flex-spacer"></span>
+                        <span id="xcm-details-recipient"></span>
+                    </div>
+                    <div class="xcm-details-row">
+                        <span>Date</span>
+                        <span class="flex-spacer"></span>
+                        <span id="xcm-details-date"></span>
+                    </div>
+                    <div class="xcm-details-row">
+                        <span>Amount</span>
+                        <span class="flex-spacer"></span>
+                        <span id="xcm-details-amount"></span>
+                    </div>
+                </div>
                 <!-- validator details -->
                 <div class="validator-details-board hidden" id="validator-details-board">
                     <div class="validator-details-header">

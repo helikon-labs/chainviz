@@ -279,8 +279,12 @@ class Scene {
         this.removeParaValidatorLines();
     }
 
+    highlightParas(paraIds: number[]) {
+        this.paraMesh.highlightParas(paraIds);
+    }
+
     highlightPara(paraId: number, paraValidatorStashAddresses: string[]) {
-        this.paraMesh.highlightPara(paraId);
+        this.paraMesh.highlightParas([paraId]);
         this.validatorMesh.highlightParaValidators(paraId);
         this.addParaValidatorLines(paraId, paraValidatorStashAddresses);
     }

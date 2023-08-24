@@ -149,10 +149,10 @@ class ParaMesh {
         return undefined;
     }
 
-    highlightPara(paraId: number) {
+    highlightParas(paraIds: number[]) {
         for (let i = 3; i < this.group.children.length; i++) {
             for (const child of this.group.children[i].children) {
-                if (child.userData?.paraId == paraId) {
+                if (paraIds.indexOf(child.userData?.paraId) >= 0) {
                     if (child instanceof THREE.Mesh) {
                         if (child.userData?.type == 'para') {
                             child.material.opacity = 1.0;
