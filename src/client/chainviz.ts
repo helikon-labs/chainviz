@@ -129,6 +129,12 @@ class Chainviz {
         this.eventBus.register(ChainvizEvent.ACTIVE_VALIDATOR_LIST_INITIALIZED, () => {
             this.onActiveValidatorListInitialized();
         });
+        this.eventBus.register(
+            ChainvizEvent.ACTIVE_VALIDATOR_LIST_UPDATED,
+            (updatedValidators: ValidatorSummary[]) => {
+                this.onActiveValidatorListUpdated(updatedValidators);
+            },
+        );
         this.eventBus.register(ChainvizEvent.NETWORK_SELECTED, (network: Network) => {
             this.onNetworkSelected(network);
         });
@@ -268,10 +274,15 @@ class Chainviz {
         await this.dataStore.getInitialBlocks();
         this.start();
     }
+
     private onActiveValidatorListInitialized() {
         setTimeout(() => {
             this.getParas();
         }, Constants.UI_STATE_CHANGE_DELAY_MS);
+    }
+
+    private onActiveValidatorListUpdated(updatedValidators: ValidatorSummary[]) {
+        this.ui.onActiveValidatorListUpdated(this.network, updatedValidators);
     }
 
     private onNewBlock(block: Block) {

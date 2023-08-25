@@ -45,6 +45,8 @@ interface UI {
 class ValidatorDetailsBoard {
     private readonly ui: UI;
     private readonly delegate: ValidatorDetailsBoardDelegate;
+    private mouseIsInside: boolean = false;
+    private validator?: ValidatorSummary = undefined;
 
     constructor(delegate: ValidatorDetailsBoardDelegate) {
         this.delegate = delegate;
@@ -101,13 +103,24 @@ class ValidatorDetailsBoard {
             ),
         };
         setTimeout(() => {
-            this.ui.close.addEventListener('click', (_event) => {
+            this.ui.close.onclick = () => {
                 this.close();
-            });
+            };
+            this.ui.root.onmouseenter = () => {
+                this.mouseIsInside = true;
+            };
+            this.ui.root.onmouseleave = () => {
+                this.mouseIsInside = false;
+            };
         }, 500);
     }
 
+    getMouseIsInside(): boolean {
+        return this.mouseIsInside;
+    }
+
     display(network: Network, validator: ValidatorSummary) {
+        this.validator = validator;
         this.ui.identiconContainer.innerHTML = generateIdenticonSVGHTML(
             validator.address,
             Constants.VALIDATOR_DETAILS_BOARD_IDENTICON_SIZE,
@@ -245,7 +258,15 @@ class ValidatorDetailsBoard {
 
     close() {
         hide(this.ui.root);
+        this.validator = undefined;
         this.delegate.onClose();
+    }
+
+    update(network: Network, updatedValidator: ValidatorSummary) {
+        if (this.validator && this.validator.accountId == updatedValidator.accountId) {
+            Object.assign(this.validator, updatedValidator);
+            this.display(network, this.validator);
+        }
     }
 }
 

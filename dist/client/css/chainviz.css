@@ -286,6 +286,12 @@ img {
     gap: 8px;
 }
 
+.content .center-panel .xcm-details-board .xcm-details-row span {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
 .content .center-panel .xcm-details-board .xcm-details-separator {
     border-bottom: 1px dotted #ffffff;
     height: 0px;

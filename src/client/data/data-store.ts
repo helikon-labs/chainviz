@@ -18,6 +18,8 @@ import { XCMInfo, XCMInfoWrapper, isXCMInfo } from '../model/polkaholic/xcm';
 import { Para } from '../model/substrate/para';
 import { getValidatorIdentityIconHTML, getValidatorSummaryDisplay } from '../util/ui-util';
 import AsyncLock from 'async-lock';
+import { cloneJSONSafeObject } from '../util/object';
+import { getSS58Address } from '../util/crypto-util';
 
 class DataStore {
     private network!: Network;
@@ -176,13 +178,19 @@ class DataStore {
         for (const validator of update.insert) {
             this.validatorMap.set(validator.address, validator);
         }
+        const updatedValidators: ValidatorSummary[] = [];
         for (const diff of update.update) {
-            const validator = this.validatorMap.get(diff.accountId);
+            const validator = this.validatorMap.get(
+                getSS58Address(this.network.ss58Prefix, diff.accountId),
+            );
             if (validator) {
                 Object.assign(validator, diff);
                 this.validatorMap.set(validator.accountId, validator);
-                continue;
+                updatedValidators.push(cloneJSONSafeObject(validator));
             }
+        }
+        if (updatedValidators.length > 0) {
+            this.eventBus.dispatch(ChainvizEvent.ACTIVE_VALIDATOR_LIST_UPDATED, updatedValidators);
         }
         for (const removeAccountId of update.removeIds) {
             this.validatorMap.delete(removeAccountId);
@@ -471,11 +479,6 @@ class DataStore {
                 // message exists, skip
                 continue;
             }
-            console.log(
-                fetchedXCMTransfer.origination.extrinsicHash,
-                fetchedXCMTransfer.origination.amountSent,
-                fetchedXCMTransfer.symbol ?? fetchedXCMTransfer.origination.txFeeSymbol,
-            );
             newXCMTransfers.push(fetchedXCMTransfer);
         }
         this.xcmTransfers = [...newXCMTransfers, ...this.xcmTransfers];

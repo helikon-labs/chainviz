@@ -4,6 +4,7 @@ import { Constants } from '../util/constants';
 import { createTween } from '../util/tween';
 import * as TWEEN from '@tweenjs/tween.js';
 import { rotateAboutPoint } from '../util/geometry';
+import { cloneJSONSafeObject } from '../util/object';
 
 const ARC_GEOMETRY = new THREE.TorusGeometry(Constants.VALIDATOR_ARC_RADIUS, 0.06, 12, 36, Math.PI);
 ARC_GEOMETRY.rotateZ(Math.PI / 2);
@@ -84,7 +85,7 @@ class ValidatorMesh {
             const arcIndex = Math.floor(i / validatorsPerArc);
             const indexInArc = i % validatorsPerArc;
             this.arcs[arcIndex][indexInArc] = {
-                validator,
+                validator: cloneJSONSafeObject(validator),
                 stashAddress: validator.address,
                 scale: 0,
             };
@@ -338,6 +339,23 @@ class ValidatorMesh {
 
     clearSelection() {
         this.validatorSelectorMesh.removeFromParent();
+    }
+
+    updateValidators(updatedValidators: ValidatorSummary[]) {
+        let updatedCount = 0;
+        for (const updatedValidator of updatedValidators) {
+            for (let i = 0; i < this.arcs.length; i++) {
+                for (let j = 0; j <= this.arcs[0].length; j++) {
+                    if (this.arcs[i][j]?.stashAddress === updatedValidator.address) {
+                        updatedCount++;
+                        this.arcs[i][j]!.validator = cloneJSONSafeObject(updatedValidator);
+                    }
+                }
+            }
+        }
+        if (updatedCount > 0) {
+            this.initScales();
+        }
     }
 }
 

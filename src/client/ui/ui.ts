@@ -96,6 +96,17 @@ class UI {
             this.polkadotSelector.classList.add('active');
             this.selectNetwork(Polkadot);
         });
+
+        window.addEventListener('mousemove', (event) => {
+            if (
+                this.validatorDetailsBoard.getMouseIsInside() ||
+                this.xcmTransferDetailsBoard.getMouseIsInside() ||
+                this.blockList.getMouseIsInsideBlockDetailsBoard()
+            ) {
+                return;
+            }
+            this.scene.onMouseMove(event);
+        });
     }
 
     init() {
@@ -397,6 +408,14 @@ class UI {
 
     showXCMTransferDetailsBoard(transfer: XCMInfo) {
         this.xcmTransferDetailsBoard.display(transfer);
+    }
+
+    onActiveValidatorListUpdated(network: Network, updatedValidators: ValidatorSummary[]) {
+        this.scene.updateValidators(updatedValidators);
+        for (const updatedValidator of updatedValidators) {
+            this.validatorSummaryBoard.update(network, updatedValidator);
+            this.validatorDetailsBoard.update(network, updatedValidator);
+        }
     }
 }
 

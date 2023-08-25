@@ -33,6 +33,7 @@ class BlockDetailsBoard {
     private extrinsicsAreVisible: boolean = false;
     private eventsAreVisible: boolean = false;
     private hash: string = '';
+    private mouseIsInside: boolean = false;
 
     constructor() {
         this.ui = {
@@ -59,24 +60,34 @@ class BlockDetailsBoard {
             eventContainer: <HTMLElement>document.getElementById('block-details-event-container'),
         };
         setTimeout(() => {
-            this.ui.close.addEventListener('click', (_event) => {
+            this.ui.close.onclick = () => {
                 this.close();
-            });
-            this.ui.extrinsicCount.parentElement!.addEventListener('click', (_event) => {
+            };
+            this.ui.extrinsicCount.parentElement!.onclick = () => {
                 if (this.extrinsicsAreVisible) {
                     this.hideExtrinsics();
                 } else {
                     this.showExtrinsics();
                 }
-            });
-            this.ui.eventCount.parentElement!.addEventListener('click', (_event) => {
+            };
+            this.ui.eventCount.parentElement!.onclick = () => {
                 if (this.eventsAreVisible) {
                     this.hideEvents();
                 } else {
                     this.showEvents();
                 }
-            });
+            };
+            this.ui.root.onmouseenter = () => {
+                this.mouseIsInside = true;
+            };
+            this.ui.root.onmouseleave = () => {
+                this.mouseIsInside = false;
+            };
         }, 500);
+    }
+
+    getMouseIsInside(): boolean {
+        return this.mouseIsInside;
     }
 
     private hideExtrinsics() {

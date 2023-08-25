@@ -1,5 +1,5 @@
 import { Network } from '../model/substrate/network';
-import { ValidatorSummary, ValidatorSummaryDiff } from '../model/subvt/validator-summary';
+import { ValidatorSummary } from '../model/subvt/validator-summary';
 import { Constants } from '../util/constants';
 import { formatNumber } from '../util/format';
 import { getValidatorIdentityIconHTML, getValidatorSummaryDisplay } from '../util/ui-util';
@@ -17,7 +17,7 @@ interface UI {
 
 class ValidatorSummaryBoard {
     private readonly ui: UI;
-    private summary?: ValidatorSummary = undefined;
+    private validator?: ValidatorSummary = undefined;
 
     constructor() {
         this.ui = {
@@ -32,15 +32,15 @@ class ValidatorSummaryBoard {
         };
     }
 
-    show(network: Network, summary: ValidatorSummary) {
-        this.summary = summary;
+    show(network: Network, validator: ValidatorSummary) {
+        this.validator = validator;
         // identity & para
         {
             this.ui.identity.innerHTML =
-                getValidatorIdentityIconHTML(summary) +
-                `<span class="identity">${getValidatorSummaryDisplay(summary)}</span>`;
-            if (summary.isParaValidator) {
-                const para = network.paras.find((para) => para.paraId == summary.paraId);
+                getValidatorIdentityIconHTML(validator) +
+                `<span class="identity">${getValidatorSummaryDisplay(validator)}</span>`;
+            if (validator.isParaValidator) {
+                const para = network.paras.find((para) => para.paraId == validator.paraId);
                 if (para) {
                     const imageHTML = `<img class="parachain-icon" src="/img/paras/${para.ui.logo}" alt="${para.text}" title="${para.text}" />`;
                     this.ui.paraInfo.innerHTML = `${imageHTML}<span>${para.text} Paravalidator</span>`;
@@ -54,12 +54,12 @@ class ValidatorSummaryBoard {
         }
         // era data
         {
-            const blockCount = summary.blocksAuthored ?? 0;
+            const blockCount = validator.blocksAuthored ?? 0;
             this.ui.blockCount.innerHTML = `${blockCount}`;
-            const points = summary.rewardPoints ?? 0;
+            const points = validator.rewardPoints ?? 0;
             this.ui.rewardPoints.innerHTML = `${points}`;
-            if (summary.returnRatePerBillion) {
-                const returnRate = formatNumber(BigInt(summary.returnRatePerBillion), 7, 2);
+            if (validator.returnRatePerBillion) {
+                const returnRate = formatNumber(BigInt(validator.returnRatePerBillion), 7, 2);
                 this.ui.returnRate.innerHTML = `${returnRate}%`;
             } else {
                 this.ui.returnRate.innerHTML = '-';
@@ -67,11 +67,11 @@ class ValidatorSummaryBoard {
         }
         // stake
         {
-            let activeStake = summary.selfStake.activeAmount;
-            if (summary.validatorStake) {
-                activeStake = summary.validatorStake.totalStake;
+            let activeStake = validator.selfStake.activeAmount;
+            if (validator.validatorStake) {
+                activeStake = validator.validatorStake.totalStake;
             }
-            const inactiveStake = summary.inactiveNominations.totalAmount;
+            const inactiveStake = validator.inactiveNominations.totalAmount;
             this.ui.activeStake.innerHTML = formatNumber(
                 activeStake,
                 network.tokenDecimals,
@@ -95,18 +95,18 @@ class ValidatorSummaryBoard {
 
     hide() {
         this.ui.root.style.visibility = 'hidden';
-        this.summary = undefined;
+        this.validator = undefined;
     }
 
-    update(network: Network, diff: ValidatorSummaryDiff) {
-        if (this.summary && this.summary.accountId == diff.accountId) {
-            Object.assign(this.summary, diff);
-            this.show(network, this.summary);
+    update(network: Network, updatedValidator: ValidatorSummary) {
+        if (this.validator && this.validator.accountId == updatedValidator.accountId) {
+            Object.assign(this.validator, updatedValidator);
+            this.show(network, this.validator);
         }
     }
 
     remove(accountIdHex: string) {
-        if (this.summary && this.summary.accountId == accountIdHex) {
+        if (this.validator && this.validator.accountId == accountIdHex) {
             this.hide();
         }
     }

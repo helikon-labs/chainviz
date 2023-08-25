@@ -155,6 +155,10 @@ class BlockList {
     closeBlockDetailsBoard() {
         this.blockDetailsBoard?.close();
     }
+
+    getMouseIsInsideBlockDetailsBoard(): boolean {
+        return this.blockDetailsBoard?.getMouseIsInside() ?? false;
+    }
 }
 
 export { BlockList };

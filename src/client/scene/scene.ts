@@ -101,9 +101,6 @@ class Scene {
         window.addEventListener('click', (event) => {
             this.onClick(event);
         });
-        window.addEventListener('mousemove', (event) => {
-            this.onMouseMove(event);
-        });
         window.addEventListener(
             'resize',
             () => {
@@ -126,7 +123,7 @@ class Scene {
         }
     }
 
-    private onMouseMove(event: MouseEvent) {
+    onMouseMove(event: MouseEvent) {
         const containerRect = this.container.getBoundingClientRect();
         const x = event.x - containerRect.left;
         const y = event.y - containerRect.top;
@@ -434,6 +431,10 @@ class Scene {
 
     clearValidatorSelection() {
         this.validatorMesh.clearSelection();
+    }
+
+    updateValidators(updatedValidators: ValidatorSummary[]) {
+        this.validatorMesh.updateValidators(updatedValidators);
     }
 }
 

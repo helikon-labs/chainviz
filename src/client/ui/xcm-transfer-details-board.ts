@@ -17,6 +17,7 @@ interface UI {
 
 class XCMTransferDetailsBoard {
     private readonly ui: UI;
+    private mouseIsInside: boolean = false;
 
     constructor() {
         this.ui = {
@@ -31,10 +32,20 @@ class XCMTransferDetailsBoard {
             amount: <HTMLElement>document.getElementById('xcm-details-amount'),
         };
         setTimeout(() => {
-            this.ui.close.addEventListener('click', (_event) => {
+            this.ui.close.onclick = () => {
                 this.close();
-            });
+            };
+            this.ui.root.onmouseenter = () => {
+                this.mouseIsInside = true;
+            };
+            this.ui.root.onmouseleave = () => {
+                this.mouseIsInside = false;
+            };
         }, 500);
+    }
+
+    getMouseIsInside(): boolean {
+        return this.mouseIsInside;
     }
 
     display(transfer: XCMInfo) {
