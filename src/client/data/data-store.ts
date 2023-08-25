@@ -172,11 +172,15 @@ class DataStore {
     }
 
     private processActiveValidatorListUpdate(update: ValidatorListUpdate) {
-        if (this.validatorMap.size == 0) {
-            this.eventBus.dispatch(ChainvizEvent.ACTIVE_VALIDATOR_LIST_INITIALIZED);
-        }
-        for (const validator of update.insert) {
-            this.validatorMap.set(validator.address, validator);
+        if (update.insert.length > 0) {
+            if (this.validatorMap.size == 0) {
+                for (const validator of update.insert) {
+                    this.validatorMap.set(validator.address, validator);
+                }
+                this.eventBus.dispatch(ChainvizEvent.ACTIVE_VALIDATOR_LIST_INITIALIZED);
+            } else {
+                this.eventBus.dispatch(ChainvizEvent.ACTIVE_VALIDATOR_LIST_ADDED, update.insert);
+            }
         }
         const updatedValidators: ValidatorSummary[] = [];
         for (const diff of update.update) {
@@ -192,8 +196,16 @@ class DataStore {
         if (updatedValidators.length > 0) {
             this.eventBus.dispatch(ChainvizEvent.ACTIVE_VALIDATOR_LIST_UPDATED, updatedValidators);
         }
+        const removedStashAddresses: string[] = [];
         for (const removeAccountId of update.removeIds) {
             this.validatorMap.delete(removeAccountId);
+            removedStashAddresses.push(getSS58Address(this.network.ss58Prefix, removeAccountId));
+        }
+        if (removedStashAddresses.length > 0) {
+            this.eventBus.dispatch(
+                ChainvizEvent.ACTIVE_VALIDATOR_LIST_REMOVED,
+                removedStashAddresses,
+            );
         }
     }
 

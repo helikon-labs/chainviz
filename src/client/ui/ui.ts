@@ -344,7 +344,7 @@ class UI {
     }
 
     hideValidatorSummaryBoard() {
-        this.validatorSummaryBoard.hide();
+        this.validatorSummaryBoard.close();
     }
 
     showValidatorHighlightCircle(position: Vec2) {
@@ -375,7 +375,7 @@ class UI {
     }
 
     selectValidator(network: Network, index: number, validator: ValidatorSummary) {
-        this.validatorDetailsBoard.display(network, validator);
+        this.validatorDetailsBoard.show(network, validator);
         this.scene.selectValidator(index);
     }
 
@@ -410,11 +410,23 @@ class UI {
         this.xcmTransferDetailsBoard.display(transfer);
     }
 
+    onActiveValidatorListAdded(newValidators: ValidatorSummary[]) {
+        this.scene.onValidatorsAdded(newValidators);
+    }
+
     onActiveValidatorListUpdated(network: Network, updatedValidators: ValidatorSummary[]) {
-        this.scene.updateValidators(updatedValidators);
+        this.scene.onValidatorsUpdated(updatedValidators);
         for (const updatedValidator of updatedValidators) {
-            this.validatorSummaryBoard.update(network, updatedValidator);
-            this.validatorDetailsBoard.update(network, updatedValidator);
+            this.validatorSummaryBoard.onValidatorUpdated(network, updatedValidator);
+            this.validatorDetailsBoard.onValidatorUpdated(network, updatedValidator);
+        }
+    }
+
+    onActiveValidatorListRemoved(removedStashAddresses: string[]) {
+        this.scene.onValidatorsRemoved(removedStashAddresses);
+        for (const removedStashAddress of removedStashAddresses) {
+            this.validatorSummaryBoard.onValidatorRemoved(removedStashAddress);
+            this.validatorDetailsBoard.onValidatorRemoved(removedStashAddress);
         }
     }
 }

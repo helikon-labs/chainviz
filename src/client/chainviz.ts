@@ -130,9 +130,21 @@ class Chainviz {
             this.onActiveValidatorListInitialized();
         });
         this.eventBus.register(
+            ChainvizEvent.ACTIVE_VALIDATOR_LIST_ADDED,
+            (newValidators: ValidatorSummary[]) => {
+                this.onActiveValidatorListAdded(newValidators);
+            },
+        );
+        this.eventBus.register(
             ChainvizEvent.ACTIVE_VALIDATOR_LIST_UPDATED,
             (updatedValidators: ValidatorSummary[]) => {
                 this.onActiveValidatorListUpdated(updatedValidators);
+            },
+        );
+        this.eventBus.register(
+            ChainvizEvent.ACTIVE_VALIDATOR_LIST_REMOVED,
+            (removedStashAddresses: string[]) => {
+                this.onActiveValidatorListRemoved(removedStashAddresses);
             },
         );
         this.eventBus.register(ChainvizEvent.NETWORK_SELECTED, (network: Network) => {
@@ -281,8 +293,16 @@ class Chainviz {
         }, Constants.UI_STATE_CHANGE_DELAY_MS);
     }
 
+    private onActiveValidatorListAdded(newValidators: ValidatorSummary[]) {
+        this.ui.onActiveValidatorListAdded(newValidators);
+    }
+
     private onActiveValidatorListUpdated(updatedValidators: ValidatorSummary[]) {
         this.ui.onActiveValidatorListUpdated(this.network, updatedValidators);
+    }
+
+    private onActiveValidatorListRemoved(removedStashAddresses: string[]) {
+        this.ui.onActiveValidatorListRemoved(removedStashAddresses);
     }
 
     private onNewBlock(block: Block) {

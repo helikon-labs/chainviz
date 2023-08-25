@@ -4,6 +4,7 @@ import { Constants } from '../util/constants';
 import { getSS58Address } from '../util/crypto-util';
 import { formatNumber, getCondensedAddress } from '../util/format';
 import { generateIdenticonSVGHTML } from '../util/identicon';
+import { cloneJSONSafeObject } from '../util/object';
 import {
     getValidatorIdentityIconHTML,
     getValidatorSummaryDisplay,
@@ -119,8 +120,8 @@ class ValidatorDetailsBoard {
         return this.mouseIsInside;
     }
 
-    display(network: Network, validator: ValidatorSummary) {
-        this.validator = validator;
+    show(network: Network, validator: ValidatorSummary) {
+        this.validator = cloneJSONSafeObject(validator);
         this.ui.identiconContainer.innerHTML = generateIdenticonSVGHTML(
             validator.address,
             Constants.VALIDATOR_DETAILS_BOARD_IDENTICON_SIZE,
@@ -262,10 +263,15 @@ class ValidatorDetailsBoard {
         this.delegate.onClose();
     }
 
-    update(network: Network, updatedValidator: ValidatorSummary) {
+    onValidatorUpdated(network: Network, updatedValidator: ValidatorSummary) {
         if (this.validator && this.validator.accountId == updatedValidator.accountId) {
-            Object.assign(this.validator, updatedValidator);
-            this.display(network, this.validator);
+            this.show(network, updatedValidator);
+        }
+    }
+
+    onValidatorRemoved(stashAddress: string) {
+        if (this.validator && this.validator.address == stashAddress) {
+            this.close();
         }
     }
 }

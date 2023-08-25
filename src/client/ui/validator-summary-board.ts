@@ -2,6 +2,7 @@ import { Network } from '../model/substrate/network';
 import { ValidatorSummary } from '../model/subvt/validator-summary';
 import { Constants } from '../util/constants';
 import { formatNumber } from '../util/format';
+import { cloneJSONSafeObject } from '../util/object';
 import { getValidatorIdentityIconHTML, getValidatorSummaryDisplay } from '../util/ui-util';
 
 interface UI {
@@ -33,7 +34,7 @@ class ValidatorSummaryBoard {
     }
 
     show(network: Network, validator: ValidatorSummary) {
-        this.validator = validator;
+        this.validator = cloneJSONSafeObject(validator);
         // identity & para
         {
             this.ui.identity.innerHTML =
@@ -93,21 +94,21 @@ class ValidatorSummaryBoard {
         this.ui.root.style.top = `${y + Constants.VALIDATOR_SUMMARY_INFO_BOARD_Y_OFFSET}px`;
     }
 
-    hide() {
+    close() {
         this.ui.root.style.visibility = 'hidden';
         this.validator = undefined;
     }
 
-    update(network: Network, updatedValidator: ValidatorSummary) {
+    onValidatorUpdated(network: Network, updatedValidator: ValidatorSummary) {
         if (this.validator && this.validator.accountId == updatedValidator.accountId) {
             Object.assign(this.validator, updatedValidator);
             this.show(network, this.validator);
         }
     }
 
-    remove(accountIdHex: string) {
+    onValidatorRemoved(accountIdHex: string) {
         if (this.validator && this.validator.accountId == accountIdHex) {
-            this.hide();
+            this.close();
         }
     }
 }

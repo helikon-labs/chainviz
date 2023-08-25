@@ -433,8 +433,16 @@ class Scene {
         this.validatorMesh.clearSelection();
     }
 
-    updateValidators(updatedValidators: ValidatorSummary[]) {
-        this.validatorMesh.updateValidators(updatedValidators);
+    onValidatorsAdded(newValidators: ValidatorSummary[]) {
+        this.validatorMesh.onValidatorsAdded(newValidators);
+    }
+
+    onValidatorsUpdated(updatedValidators: ValidatorSummary[]) {
+        this.validatorMesh.onValidatorsUpdated(updatedValidators);
+    }
+
+    onValidatorsRemoved(removedStashAddresses: string[]) {
+        this.validatorMesh.onValidatorsRemoved(removedStashAddresses);
     }
 }
 

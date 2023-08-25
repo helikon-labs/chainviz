@@ -341,7 +341,30 @@ class ValidatorMesh {
         this.validatorSelectorMesh.removeFromParent();
     }
 
-    updateValidators(updatedValidators: ValidatorSummary[]) {
+    onValidatorsAdded(newValidators: ValidatorSummary[]) {
+        const count = newValidators.length;
+        for (let i = 0; i < this.arcs.length; i++) {
+            for (let j = 0; j <= this.arcs[0].length; j++) {
+                if (newValidators.length == 0) {
+                    return;
+                }
+                if (this.arcs[i][j] == undefined) {
+                    const validator = newValidators.pop()!;
+                    this.arcs[i][j] = {
+                        validator: cloneJSONSafeObject(validator),
+                        stashAddress: validator.address,
+                        scale: 0,
+                    };
+                }
+            }
+        }
+        if (count > 0) {
+            this.initScales();
+            this.resetScales();
+        }
+    }
+
+    onValidatorsUpdated(updatedValidators: ValidatorSummary[]) {
         let updatedCount = 0;
         for (const updatedValidator of updatedValidators) {
             for (let i = 0; i < this.arcs.length; i++) {
@@ -355,6 +378,25 @@ class ValidatorMesh {
         }
         if (updatedCount > 0) {
             this.initScales();
+            this.resetScales();
+        }
+    }
+
+    onValidatorsRemoved(removedStashAddresses: string[]) {
+        let removedCount = 0;
+        for (let i = 0; i < this.arcs.length; i++) {
+            for (let j = 0; j <= this.arcs[0].length; j++) {
+                for (const removedStashAddress of removedStashAddresses) {
+                    if (this.arcs[i][j]?.stashAddress == removedStashAddress) {
+                        removedCount++;
+                        this.arcs[i][j] = undefined;
+                    }
+                }
+            }
+        }
+        if (removedCount > 0) {
+            this.initScales();
+            this.resetScales();
         }
     }
 }

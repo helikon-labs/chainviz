@@ -20,7 +20,9 @@ export abstract class ChainvizEvent {
     static readonly ACTIVE_VALIDATOR_LIST_SERVICE_ERROR =
         'event.active_validator_list_service_error';
     static readonly ACTIVE_VALIDATOR_LIST_INITIALIZED = 'event.active_validator_list_initialized';
+    static readonly ACTIVE_VALIDATOR_LIST_ADDED = 'event.active_validator_list_added';
     static readonly ACTIVE_VALIDATOR_LIST_UPDATED = 'event.active_validator_list_updated';
+    static readonly ACTIVE_VALIDATOR_LIST_REMOVED = 'event.active_validator_list_removed';
     static readonly NEW_BLOCK = 'event.new_block';
     static readonly FINALIZED_BLOCK = 'event.finalized_block';
     static readonly DISCARDED_BLOCK = 'event.discarded_block';
