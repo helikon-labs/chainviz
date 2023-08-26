@@ -59,16 +59,4 @@ interface ValidatorListUpdate {
     removeIds: Array<string>;
 }
 
-function applyValidatorSummaryDiff(validator: ValidatorSummary, diff: ValidatorSummaryDiff) {
-    if (diff.controllerAccountId != validator.controllerAccountId) {
-        validator.controllerAccountId = diff.controllerAccountId;
-    }
-    if (diff.isParaValidator != validator.isParaValidator) {
-        validator.isParaValidator = diff.isParaValidator ?? false;
-    }
-    if (diff.paraId != validator.paraId) {
-        validator.paraId = diff.paraId;
-    }
-}
-
-export { ValidatorSummary, ValidatorSummaryDiff, ValidatorListUpdate, applyValidatorSummaryDiff };
+export { ValidatorSummary, ValidatorSummaryDiff, ValidatorListUpdate };
