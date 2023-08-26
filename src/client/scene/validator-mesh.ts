@@ -47,6 +47,8 @@ class ValidatorMesh {
     private validatorSelectorMesh!: THREE.Mesh;
     private group!: THREE.Group;
     private arcs: (ValidatorSlot | undefined)[][] = [];
+    private highlightedValidatorIndex: number | undefined = undefined;
+    private highlightedParaId: number | undefined = undefined;
 
     private getMinMaxRewardPoints(): [number, number] {
         let minRewardPoints = Number.MAX_SAFE_INTEGER;
@@ -252,43 +254,62 @@ class ValidatorMesh {
     }
 
     highlightValidator(index: number) {
+        this.highlightedValidatorIndex = index;
         this.resetScales();
-        for (let i = 0; i < this.arcs.length; i++) {
-            const arcFirstIndex = i * this.arcs[0].length;
-            const arcLastIndex = arcFirstIndex + this.arcs[0].length - 1;
-            for (let j = arcFirstIndex; j <= arcLastIndex; j++) {
-                const matrix = new THREE.Matrix4();
-                this.validatorMesh.getMatrixAt(j, matrix);
-                let scale = 0.0;
-                if (j == index) {
-                    scale = 2;
-                } else if (index >= arcFirstIndex && index <= arcLastIndex) {
-                    scale = 1;
-                }
-                matrix.scale(new THREE.Vector3(scale, scale, scale));
-                this.validatorMesh.setMatrixAt(j, matrix);
-            }
-        }
-        ARC_MATERIAL.opacity = Constants.VALIDATOR_ARC_LOW_OPACITY;
-        this.validatorMesh.instanceMatrix.needsUpdate = true;
-        this.validatorMesh.computeBoundingSphere();
     }
 
     private resetScales() {
         for (let i = 0; i < this.arcs.length; i++) {
-            for (let j = 0; j < this.arcs[i].length; j++) {
-                const scale = this.arcs[i][j]?.scale ?? 0;
-                const object = new THREE.Object3D();
-                object.scale.x = scale;
-                object.scale.y = scale;
-                object.scale.z = scale;
-                object.updateMatrix();
-                const targetMatrix = object.matrix;
-                const currentMatrix = new THREE.Matrix4();
-                const index = i * this.arcs[0].length + j;
-                this.validatorMesh.getMatrixAt(index, currentMatrix);
-                targetMatrix.copyPosition(currentMatrix);
-                this.validatorMesh.setMatrixAt(index, targetMatrix);
+            const arcFirstIndex = i * this.arcs[0].length;
+            const arcLastIndex = arcFirstIndex + this.arcs[0].length - 1;
+            if (this.highlightedParaId) {
+                for (let j = 0; j <= this.arcs[0].length; j++) {
+                    const index = i * this.arcs[0].length + j;
+                    const slot = this.arcs[i][j];
+                    if (slot) {
+                        let scale = 0.0;
+                        if (slot.validator.paraId == this.highlightedParaId) {
+                            scale = 1;
+                        }
+                        const matrix = new THREE.Matrix4();
+                        this.validatorMesh.getMatrixAt(index, matrix);
+                        matrix.scale(new THREE.Vector3(scale, scale, scale));
+                        this.validatorMesh.setMatrixAt(index, matrix);
+                    }
+                }
+                ARC_MATERIAL.opacity = Constants.VALIDATOR_ARC_LOW_OPACITY;
+            } else if (this.highlightedValidatorIndex) {
+                for (let j = arcFirstIndex; j <= arcLastIndex; j++) {
+                    const matrix = new THREE.Matrix4();
+                    this.validatorMesh.getMatrixAt(j, matrix);
+                    let scale = 0.0;
+                    if (j == this.highlightedValidatorIndex) {
+                        scale = 2;
+                    } else if (
+                        this.highlightedValidatorIndex >= arcFirstIndex &&
+                        this.highlightedValidatorIndex <= arcLastIndex
+                    ) {
+                        scale = 1;
+                    }
+                    matrix.scale(new THREE.Vector3(scale, scale, scale));
+                    this.validatorMesh.setMatrixAt(j, matrix);
+                }
+                ARC_MATERIAL.opacity = Constants.VALIDATOR_ARC_LOW_OPACITY;
+            } else {
+                for (let j = 0; j < this.arcs[i].length; j++) {
+                    const scale = this.arcs[i][j]?.scale ?? 0;
+                    const object = new THREE.Object3D();
+                    object.scale.x = scale;
+                    object.scale.y = scale;
+                    object.scale.z = scale;
+                    object.updateMatrix();
+                    const targetMatrix = object.matrix;
+                    const currentMatrix = new THREE.Matrix4();
+                    const index = i * this.arcs[0].length + j;
+                    this.validatorMesh.getMatrixAt(index, currentMatrix);
+                    targetMatrix.copyPosition(currentMatrix);
+                    this.validatorMesh.setMatrixAt(index, targetMatrix);
+                }
             }
         }
         this.validatorMesh.instanceMatrix.needsUpdate = true;
@@ -296,6 +317,8 @@ class ValidatorMesh {
     }
 
     clearHighlight() {
+        this.highlightedValidatorIndex = undefined;
+        this.highlightedParaId = undefined;
         this.resetScales();
         ARC_MATERIAL.opacity = Constants.VALIDATOR_ARC_NORMAL_OPACITY;
     }
@@ -307,26 +330,8 @@ class ValidatorMesh {
     }
 
     highlightParaValidators(paraId: number) {
+        this.highlightedParaId = paraId;
         this.resetScales();
-        for (let i = 0; i < this.arcs.length; i++) {
-            for (let j = 0; j <= this.arcs[0].length; j++) {
-                const index = i * this.arcs[0].length + j;
-                const slot = this.arcs[i][j];
-                if (slot) {
-                    let scale = 0.0;
-                    if (slot.validator.paraId == paraId) {
-                        scale = 1;
-                    }
-                    const matrix = new THREE.Matrix4();
-                    this.validatorMesh.getMatrixAt(index, matrix);
-                    matrix.scale(new THREE.Vector3(scale, scale, scale));
-                    this.validatorMesh.setMatrixAt(index, matrix);
-                }
-            }
-        }
-        ARC_MATERIAL.opacity = Constants.VALIDATOR_ARC_LOW_OPACITY;
-        this.validatorMesh.instanceMatrix.needsUpdate = true;
-        this.validatorMesh.computeBoundingSphere();
     }
 
     selectValidator(index: number) {
@@ -345,9 +350,6 @@ class ValidatorMesh {
         const count = newValidators.length;
         for (let i = 0; i < this.arcs.length; i++) {
             for (let j = 0; j <= this.arcs[0].length; j++) {
-                if (newValidators.length == 0) {
-                    return;
-                }
                 if (this.arcs[i][j] == undefined) {
                     const validator = newValidators.pop()!;
                     this.arcs[i][j] = {
@@ -355,6 +357,9 @@ class ValidatorMesh {
                         stashAddress: validator.address,
                         scale: 0,
                     };
+                }
+                if (newValidators.length == 0) {
+                    return;
                 }
             }
         }
@@ -369,7 +374,7 @@ class ValidatorMesh {
         for (const updatedValidator of updatedValidators) {
             for (let i = 0; i < this.arcs.length; i++) {
                 for (let j = 0; j <= this.arcs[0].length; j++) {
-                    if (this.arcs[i][j]?.stashAddress === updatedValidator.address) {
+                    if (this.arcs[i][j]?.stashAddress == updatedValidator.address) {
                         updatedCount++;
                         this.arcs[i][j]!.validator = cloneJSONSafeObject(updatedValidator);
                     }
@@ -386,10 +391,12 @@ class ValidatorMesh {
         let removedCount = 0;
         for (let i = 0; i < this.arcs.length; i++) {
             for (let j = 0; j <= this.arcs[0].length; j++) {
-                for (const removedStashAddress of removedStashAddresses) {
-                    if (this.arcs[i][j]?.stashAddress == removedStashAddress) {
-                        removedCount++;
-                        this.arcs[i][j] = undefined;
+                const index = i * this.arcs[0].length + j;
+                if (removedStashAddresses.indexOf(this.arcs[i][j]?.stashAddress ?? '') >= 0) {
+                    removedCount++;
+                    this.arcs[i][j] = undefined;
+                    if (this.highlightedValidatorIndex == index) {
+                        this.highlightedValidatorIndex = undefined;
                     }
                 }
             }

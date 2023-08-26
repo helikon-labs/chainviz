@@ -383,10 +383,10 @@ class UI {
         this.scene.highlightParas(paraIds);
     }
 
-    highlightPara(para: Para, paraValidatorStashAdresses: string[]) {
-        this.scene.highlightPara(para.paraId, paraValidatorStashAdresses);
+    highlightPara(para: Para, paravalidatorStashAdresses: string[]) {
+        this.scene.highlightPara(para.paraId, paravalidatorStashAdresses);
         const position = this.scene.getParaOnScreenPosition(para.paraId);
-        this.showParaSummaryBoard(para, paraValidatorStashAdresses.length, position);
+        this.showParaSummaryBoard(para, paravalidatorStashAdresses.length, position);
     }
 
     clearParaHighlight() {
@@ -394,8 +394,8 @@ class UI {
         this.hideParaSummaryBoard();
     }
 
-    showParaSummaryBoard(para: Para, paraValidatorCount: number, position: Vec2) {
-        this.paraSummaryBoard.show(para, paraValidatorCount);
+    showParaSummaryBoard(para: Para, paravalidatorCount: number, position: Vec2) {
+        this.paraSummaryBoard.show(para, paravalidatorCount);
         this.paraSummaryBoard.setPosition(
             position.x + this.sceneContainer.getBoundingClientRect().left,
             position.y + this.sceneContainer.getBoundingClientRect().top,
@@ -410,11 +410,11 @@ class UI {
         this.xcmTransferDetailsBoard.display(transfer);
     }
 
-    onActiveValidatorListAdded(newValidators: ValidatorSummary[]) {
+    onValidatorsAdded(newValidators: ValidatorSummary[]) {
         this.scene.onValidatorsAdded(newValidators);
     }
 
-    onActiveValidatorListUpdated(network: Network, updatedValidators: ValidatorSummary[]) {
+    onValidatorsUpdated(network: Network, updatedValidators: ValidatorSummary[]) {
         this.scene.onValidatorsUpdated(updatedValidators);
         for (const updatedValidator of updatedValidators) {
             this.validatorSummaryBoard.onValidatorUpdated(network, updatedValidator);
@@ -422,7 +422,7 @@ class UI {
         }
     }
 
-    onActiveValidatorListRemoved(removedStashAddresses: string[]) {
+    onValidatorsRemoved(removedStashAddresses: string[]) {
         this.scene.onValidatorsRemoved(removedStashAddresses);
         for (const removedStashAddress of removedStashAddresses) {
             this.validatorSummaryBoard.onValidatorRemoved(removedStashAddress);

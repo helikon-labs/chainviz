@@ -435,6 +435,8 @@ img {
 }
 
 .content .center-panel .block-details-board .block-details-close {
+    width: 18px;
+    height: 18px;
     cursor: pointer;
 }
 

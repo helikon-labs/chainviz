@@ -294,15 +294,15 @@ class Chainviz {
     }
 
     private onActiveValidatorListAdded(newValidators: ValidatorSummary[]) {
-        this.ui.onActiveValidatorListAdded(newValidators);
+        this.ui.onValidatorsAdded(newValidators);
     }
 
     private onActiveValidatorListUpdated(updatedValidators: ValidatorSummary[]) {
-        this.ui.onActiveValidatorListUpdated(this.network, updatedValidators);
+        this.ui.onValidatorsUpdated(this.network, updatedValidators);
     }
 
     private onActiveValidatorListRemoved(removedStashAddresses: string[]) {
-        this.ui.onActiveValidatorListRemoved(removedStashAddresses);
+        this.ui.onValidatorsRemoved(removedStashAddresses);
     }
 
     private onNewBlock(block: Block) {

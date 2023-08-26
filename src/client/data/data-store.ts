@@ -172,30 +172,6 @@ class DataStore {
     }
 
     private processActiveValidatorListUpdate(update: ValidatorListUpdate) {
-        if (update.insert.length > 0) {
-            if (this.validatorMap.size == 0) {
-                for (const validator of update.insert) {
-                    this.validatorMap.set(validator.address, validator);
-                }
-                this.eventBus.dispatch(ChainvizEvent.ACTIVE_VALIDATOR_LIST_INITIALIZED);
-            } else {
-                this.eventBus.dispatch(ChainvizEvent.ACTIVE_VALIDATOR_LIST_ADDED, update.insert);
-            }
-        }
-        const updatedValidators: ValidatorSummary[] = [];
-        for (const diff of update.update) {
-            const validator = this.validatorMap.get(
-                getSS58Address(this.network.ss58Prefix, diff.accountId),
-            );
-            if (validator) {
-                Object.assign(validator, diff);
-                this.validatorMap.set(validator.accountId, validator);
-                updatedValidators.push(cloneJSONSafeObject(validator));
-            }
-        }
-        if (updatedValidators.length > 0) {
-            this.eventBus.dispatch(ChainvizEvent.ACTIVE_VALIDATOR_LIST_UPDATED, updatedValidators);
-        }
         const removedStashAddresses: string[] = [];
         for (const removeAccountId of update.removeIds) {
             this.validatorMap.delete(removeAccountId);
@@ -207,6 +183,30 @@ class DataStore {
                 removedStashAddresses,
             );
         }
+        if (update.insert.length > 0) {
+            const isInit = this.validatorMap.size == 0;
+            for (const validator of update.insert) {
+                this.validatorMap.set(validator.address, cloneJSONSafeObject(validator));
+            }
+            if (isInit) {
+                this.eventBus.dispatch(ChainvizEvent.ACTIVE_VALIDATOR_LIST_INITIALIZED);
+            } else {
+                this.eventBus.dispatch(ChainvizEvent.ACTIVE_VALIDATOR_LIST_ADDED, update.insert);
+            }
+        }
+        const updatedValidators: ValidatorSummary[] = [];
+        for (const diff of update.update) {
+            const address = getSS58Address(this.network.ss58Prefix, diff.accountId);
+            const validator = this.validatorMap.get(address);
+            if (validator != undefined) {
+                Object.assign(validator, diff);
+                this.validatorMap.set(address, validator);
+                updatedValidators.push(cloneJSONSafeObject(validator));
+            }
+        }
+        if (updatedValidators.length > 0) {
+            this.eventBus.dispatch(ChainvizEvent.ACTIVE_VALIDATOR_LIST_UPDATED, updatedValidators);
+        }
     }
 
     getParaById(paraId: number): Para | undefined {
@@ -214,13 +214,14 @@ class DataStore {
     }
 
     getParavalidatorStashAddresses(para: Para): string[] {
-        const addresses: string[] = [];
-        for (const validator of this.validatorMap.values()) {
-            if (validator.paraId == para.paraId) {
-                addresses.push(validator.address);
+        const stashAddresses: string[] = [];
+        for (const stashAddress of this.validatorMap.keys()) {
+            const validator = this.validatorMap.get(stashAddress);
+            if (validator?.paraId == para.paraId) {
+                stashAddresses.push(validator.address);
             }
         }
-        return addresses;
+        return stashAddresses;
     }
 
     async getInitialBlocks() {

@@ -265,7 +265,7 @@ class ValidatorDetailsBoard {
 
     onValidatorUpdated(network: Network, updatedValidator: ValidatorSummary) {
         if (this.validator && this.validator.accountId == updatedValidator.accountId) {
-            this.show(network, updatedValidator);
+            this.show(network, cloneJSONSafeObject(updatedValidator));
         }
     }
 

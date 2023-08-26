@@ -236,12 +236,12 @@ class Scene {
         return getOnScreenPosition(position, this.renderer, this.camera);
     }
 
-    private addParaValidatorLines(paraId: number, paraValidatorStashAddresses: string[]) {
+    private addParavalidatorLines(paraId: number, paravalidatorStashAddresses: string[]) {
         const paraPosition = this.paraMesh.getParaPosition(paraId);
         if (paraPosition) {
-            for (const paraValidatorStashAddress of paraValidatorStashAddresses) {
+            for (const paravalidatorStashAddress of paravalidatorStashAddresses) {
                 const validatorPosition =
-                    this.validatorMesh.getValidatorPosition(paraValidatorStashAddress);
+                    this.validatorMesh.getValidatorPosition(paravalidatorStashAddress);
                 if (validatorPosition == undefined) {
                     continue;
                 }
@@ -266,7 +266,7 @@ class Scene {
     highlightValidator(index: number, validator: ValidatorSummary) {
         this.validatorMesh.highlightValidator(index);
         if (validator.paraId) {
-            this.addParaValidatorLines(validator.paraId, [validator.address]);
+            this.addParavalidatorLines(validator.paraId, [validator.address]);
         }
     }
 
@@ -280,10 +280,10 @@ class Scene {
         this.paraMesh.highlightParas(paraIds);
     }
 
-    highlightPara(paraId: number, paraValidatorStashAddresses: string[]) {
+    highlightPara(paraId: number, paravalidatorStashAddresses: string[]) {
         this.paraMesh.highlightParas([paraId]);
         this.validatorMesh.highlightParaValidators(paraId);
-        this.addParaValidatorLines(paraId, paraValidatorStashAddresses);
+        this.addParavalidatorLines(paraId, paravalidatorStashAddresses);
     }
 
     clearParaHighlight() {
