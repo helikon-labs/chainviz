@@ -24,6 +24,12 @@ hr {
     width: 100%;
 }
 
+.no-select {
+    user-select: none;
+    -moz-user-select: none;
+    -webkit-user-select: none;
+}
+
 .flex-spacer {
     flex-grow: 1;
 }
@@ -103,23 +109,101 @@ a:active {
 }
 
 .content .left-panel {
-    width: 200px;
+    width: 220px;
     display: flex;
     flex-direction: column;
     gap: 8px;
     flex-shrink: 0;
 }
 
-.content .left-panel .main-logo {
+.content .left-panel .main-logo-container {
+    min-height: 32px;
     margin-left: 26px;
     margin-top: 26px;
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
 }
 
-.content .left-panel .validator-list {
+.content .left-panel .main-logo {
+    width: 116px;
+}
+
+/* validator list */
+.content .left-panel .validator-list-container {
     margin-left: 26px;
+    display: flex;
+    flex-flow: column;
+    min-height: 0;
     flex-grow: 1;
+    border: 1px solid #ffffff55;
+    border-radius: 10px;
+    padding: 10px 0px 8px 10px;
 }
 
+.validator-list-filter-container .validator-list-filter {
+    height: 28px;
+    margin-right: 10px;
+    border: 1px solid #ffffff55;
+    border-radius: 10px;
+    display: flex;
+    flex-flow: row nowrap;
+    align-items: center;
+}
+
+.validator-list-filter em {
+    font-size: 12px;
+    margin-left: 8px;
+}
+
+.validator-list-filter input {
+    font-family: 'Mont';
+    font-size: 12px;
+    margin-top: 3px;
+    line-height: 26px;
+    flex-grow: 1;
+    margin-left: 6px;
+    height: 26px;
+    background-color: transparent;
+    border: none;
+    color: #ffffffdd;
+}
+
+.validator-list-search-container input:focus {
+    outline: none;
+}
+
+.validator-list-container .validator-list {
+    margin-top: 4px;
+    overflow-y: scroll;
+}
+
+.validator-list .validator {
+    display: flex;
+    font-size: 12px;
+    padding: 2px 0px;
+    margin-top: 3px;
+    margin-right: 10px;
+    cursor: pointer;
+    height: 30px;
+    align-items: center;
+    flex-flow: row nowrap;
+    border-radius: 6px;
+}
+
+.validator-list .validator:hover {
+    background-color: #ffffff33;
+}
+
+.validator-list .validator-list-display {
+    min-width: 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    margin-top: 2px;
+}
+
+/* xcm transfer list */
 .content .left-panel .xcm-transfer-list {
     margin-left: 26px;
     display: flex;
@@ -129,7 +213,7 @@ a:active {
 }
 
 .content .left-panel .xcm-transfer-list .xcm-transfer {
-    border-radius: 12px;
+    border-radius: 10px;
     border: 1px solid #ffffff55;
     padding: 6px 10px 6px 10px;
     display: flex;
@@ -256,7 +340,7 @@ img {
     backdrop-filter: blur(7px);
     -webkit-backdrop-filter: blur(7px);
     font-size: 11px;
-    border-radius: 12px;
+    border-radius: 10px;
     border: 1px solid #ffffff55;
     padding: 10px 10px 8px 10px;
     font-size: 12px;
@@ -309,7 +393,7 @@ img {
     backdrop-filter: blur(7px);
     -webkit-backdrop-filter: blur(7px);
     font-size: 12px;
-    border-radius: 12px;
+    border-radius: 10px;
     border: 1px solid #ffffff55;
     padding: 10px 10px 8px 10px;
     font-size: 12px;
@@ -407,7 +491,7 @@ img {
     height: 284px;
     backdrop-filter: blur(7px);
     -webkit-backdrop-filter: blur(7px);
-    border-radius: 12px;
+    border-radius: 10px;
     border: 1px solid #ffffff55;
     padding: 10px 10px 8px 10px;
     font-size: 12px;
@@ -511,7 +595,7 @@ img {
     margin-top: 26px;
     margin-right: 26px;
     border: 1px solid #ffffff55;
-    border-radius: 12px;
+    border-radius: 10px;
     padding: 10px;
     display: flex;
     flex-direction: column;
@@ -553,7 +637,7 @@ img {
 }
 
 .content .right-panel .block-list-container .block {
-    border-radius: 12px;
+    border-radius: 10px;
     border: 1px solid #ffffff55;
     display: flex;
     flex-direction: column;

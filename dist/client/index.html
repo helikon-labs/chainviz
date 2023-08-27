@@ -18,8 +18,21 @@
         <div class="background" id="background"></div>
         <div class="content" id="content">
             <div id="left-panel" class="left-panel">
-                <canvas class="main-logo" id="main-logo"></canvas>
-                <div class="validator-list"></div>
+                <div class="main-logo-container">
+                    <img class="main-logo" src="/img/logo/chainviz-logo.svg" />
+                </div>
+                <div class="validator-list-container" id="validator-list-container" id="no-select">
+                    <div
+                        class="validator-list-filter-container"
+                        id="validator-list-filter-container"
+                    >
+                        <div class="validator-list-filter" id="validator-list-filter">
+                            <em class="fas fa-search"></em>
+                            <input type="text" id="validator-list-filter-input" />
+                        </div>
+                    </div>
+                    <div id="validator-list" class="validator-list"></div>
+                </div>
                 <div class="xcm-transfer-list-container">
                     <div class="xcm-transfer-list" id="xcm-transfer-list"></div>
                 </div>

@@ -221,7 +221,7 @@ class ValidatorMesh {
         this.animate(true, onComplete);
     }
 
-    private getValidatorIndex(stashAddress: string): number | undefined {
+    getValidatorIndex(stashAddress: string): number | undefined {
         for (let i = 0; i < this.arcs.length; i++) {
             for (let j = 0; j < this.arcs[i].length; j++) {
                 const slot = this.arcs[i][j];
@@ -253,9 +253,12 @@ class ValidatorMesh {
         return innerPosition.applyMatrix4(groupMatrix);
     }
 
-    highlightValidator(index: number) {
-        this.highlightedValidatorIndex = index;
-        this.resetScales();
+    highlightValidator(stashAddress: string) {
+        const index = this.getValidatorIndex(stashAddress);
+        if (index != undefined) {
+            this.highlightedValidatorIndex = index;
+            this.resetScales();
+        }
     }
 
     private resetScales() {
@@ -334,12 +337,15 @@ class ValidatorMesh {
         this.resetScales();
     }
 
-    selectValidator(index: number) {
-        const position = this.getInnerValidatorPosition(index);
-        this.group.add(this.validatorSelectorMesh);
-        this.validatorSelectorMesh.position.x = position.x;
-        this.validatorSelectorMesh.position.y = position.y;
-        this.validatorSelectorMesh.position.z = position.z;
+    selectValidator(stashAddress: string) {
+        const index = this.getValidatorIndex(stashAddress);
+        if (index != undefined) {
+            const position = this.getInnerValidatorPosition(index);
+            this.group.add(this.validatorSelectorMesh);
+            this.validatorSelectorMesh.position.x = position.x;
+            this.validatorSelectorMesh.position.y = position.y;
+            this.validatorSelectorMesh.position.z = position.z;
+        }
     }
 
     clearSelection() {

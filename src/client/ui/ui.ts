@@ -3,7 +3,6 @@ import { NetworkStatus } from '../model/subvt/network-status';
 import { Constants } from '../util/constants';
 import { createTween } from '../util/tween';
 import { show } from '../util/ui-util';
-import { Logo, getRandomCharacterType, getRandomShapeType } from './logo';
 import { NetworkStatusBoard } from './network-status-board';
 import { BlockList } from './block-list';
 import * as TWEEN from '@tweenjs/tween.js';
@@ -21,6 +20,7 @@ import { XCMInfo } from '../model/polkaholic/xcm';
 import { Block } from '../model/chainviz/block';
 import { ValidatorDetailsBoard, ValidatorDetailsBoardDelegate } from './validator-details-board';
 import { XCMTransferDetailsBoard } from './xcm-transfer-details-board';
+import { ValidatorList, ValidatorListDelegate } from './validator-list';
 
 class UI {
     private readonly scene: Scene;
@@ -29,8 +29,6 @@ class UI {
     private readonly background: HTMLDivElement;
     private readonly content: HTMLDivElement;
     private readonly leftPanel: HTMLDivElement;
-    private readonly mainLogoCanvas: HTMLCanvasElement;
-    private readonly logo: Logo;
     private readonly xcmTransferList: XCMTransferList;
     private readonly centerPanel: HTMLDivElement;
     private readonly kusamaSelector: HTMLDivElement;
@@ -48,15 +46,19 @@ class UI {
     private readonly paraSummaryBoard: ParaSummaryBoard;
     private readonly validatorDetailsBoard: ValidatorDetailsBoard;
     private readonly xcmTransferDetailsBoard: XCMTransferDetailsBoard;
+    private readonly validatorList: ValidatorList;
+    private highlightedValidatorStashAddress: string | undefined = undefined;
 
-    constructor(sceneDelegate: SceneDelegate, xcmTransferListDelegate: XCMTransferListDelegate) {
+    constructor(
+        sceneDelegate: SceneDelegate,
+        validatorListDelegate: ValidatorListDelegate,
+        xcmTransferListDelegate: XCMTransferListDelegate,
+    ) {
         this.root = <HTMLElement>document.getElementById('root');
         this.sceneContainer = <HTMLDivElement>document.getElementById('scene-container');
         this.background = <HTMLDivElement>document.getElementById('background');
         this.content = <HTMLDivElement>document.getElementById('content');
         this.leftPanel = <HTMLDivElement>document.getElementById('left-panel');
-        this.mainLogoCanvas = <HTMLCanvasElement>document.getElementById('main-logo');
-        this.logo = new Logo(getRandomShapeType(), getRandomCharacterType());
         this.xcmTransferList = new XCMTransferList(xcmTransferListDelegate);
         this.centerPanel = <HTMLDivElement>document.getElementById('center-panel');
         this.kusamaSelector = <HTMLDivElement>document.getElementById('kusama-selector');
@@ -78,6 +80,7 @@ class UI {
             },
         });
         this.xcmTransferDetailsBoard = new XCMTransferDetailsBoard();
+        this.validatorList = new ValidatorList(validatorListDelegate);
 
         this.scene = new Scene(this.sceneContainer, sceneDelegate);
         this.kusamaSelector.addEventListener('click', (_event) => {
@@ -97,7 +100,7 @@ class UI {
             this.selectNetwork(Polkadot);
         });
 
-        window.addEventListener('mousemove', (event) => {
+        window.onmousemove = (event) => {
             if (
                 this.validatorDetailsBoard.getMouseIsInside() ||
                 this.xcmTransferDetailsBoard.getMouseIsInside() ||
@@ -106,11 +109,10 @@ class UI {
                 return;
             }
             this.scene.onMouseMove(event);
-        });
+        };
     }
 
     init() {
-        this.logo.draw(this.mainLogoCanvas, 0.6);
         this.animate();
     }
 
@@ -125,6 +127,7 @@ class UI {
         });
         TWEEN.update();
         this.scene.animate();
+        this.updateValidatorHighlightCirclePosition();
     }
 
     setLoadingInfo(info: string) {
@@ -210,12 +213,18 @@ class UI {
             Constants.CONTENT_FADE_ANIM_DURATION_MS,
             undefined,
             () => {
+                this.validatorList.setOpacity(opacity.opacity);
                 this.xcmTransferList.setOpacity(opacity.opacity);
                 this.networkStatusBoard.setOpacity(opacity.opacity);
                 this.blockList.setOpacity(opacity.opacity);
                 this.sceneContainer.style.opacity = `${opacity.opacity}%`;
             },
-            onComplete,
+            () => {
+                if (onComplete) {
+                    this.validatorList.clearFilter();
+                    onComplete();
+                }
+            },
         ).start();
     }
 
@@ -228,6 +237,7 @@ class UI {
             Constants.CONTENT_FADE_ANIM_DURATION_MS,
             undefined,
             () => {
+                this.validatorList.setOpacity(opacity.opacity);
                 this.xcmTransferList.setOpacity(opacity.opacity);
                 this.networkStatusBoard.setOpacity(opacity.opacity);
                 this.blockList.setOpacity(opacity.opacity);
@@ -245,9 +255,11 @@ class UI {
     ) {
         this.clearBlocks();
         this.clearXCMTransfers();
+        this.clearValidatorList();
         this.fadeOutLoadingContainer(() => {
             if (this.isChangingNetwork) {
                 this.blockList.initialize(blocks);
+                this.validatorList.initialize(validatorMap);
                 this.scene.start(paras, validatorMap);
                 this.fadeInAfterNetworkChange(() => {
                     this.isChangingNetwork = false;
@@ -258,6 +270,7 @@ class UI {
             } else {
                 this.fadeInBackground(() => {
                     this.blockList.initialize(blocks);
+                    this.validatorList.initialize(validatorMap);
                     this.fadeInContent();
                     this.scene.start(paras, validatorMap, () => {
                         if (onComplete) {
@@ -347,36 +360,48 @@ class UI {
         this.validatorSummaryBoard.close();
     }
 
-    showValidatorHighlightCircle(position: Vec2) {
-        const x = position.x - 10.5;
-        const y = this.sceneContainer.getBoundingClientRect().top + position.y - 10.5;
-        this.validatorHighlightCircle.style.left = `${x}px`;
-        this.validatorHighlightCircle.style.top = `${y}px`;
-        this.validatorHighlightCircle.style.display = 'block';
+    updateValidatorHighlightCirclePosition() {
+        if (this.highlightedValidatorStashAddress != undefined) {
+            const position = this.scene.getValidatorOnScreenPosition(
+                this.highlightedValidatorStashAddress,
+            );
+            if (position != undefined) {
+                const x = position.x - 10.5;
+                const y = this.sceneContainer.getBoundingClientRect().top + position.y - 10.5;
+                this.validatorHighlightCircle.style.left = `${x}px`;
+                this.validatorHighlightCircle.style.top = `${y}px`;
+            }
+        }
     }
 
-    hideValidatorHighlightCircle() {
-        this.validatorHighlightCircle.style.display = 'none';
-    }
-
-    highlightValidator(network: Network, index: number, validator: ValidatorSummary) {
+    highlightValidator(
+        network: Network,
+        validator: ValidatorSummary,
+        highlightValidatorInScene: boolean,
+        showValidatorSummaryBoard: boolean,
+    ) {
         const position = this.scene.getValidatorOnScreenPosition(validator.address);
         if (position != undefined) {
-            this.scene.highlightValidator(index, validator);
-            this.showValidatorSummaryBoard(network, cloneJSONSafeObject(validator), position);
-            this.showValidatorHighlightCircle(position);
+            if (highlightValidatorInScene) {
+                this.scene.highlightValidator(validator);
+            }
+            if (showValidatorSummaryBoard) {
+                this.showValidatorSummaryBoard(network, cloneJSONSafeObject(validator), position);
+            }
+            this.highlightedValidatorStashAddress = validator.address;
+            this.validatorHighlightCircle.style.display = 'block';
         }
     }
 
     clearValidatorHighlight() {
         this.scene.clearValidatorHighlight();
         this.hideValidatorSummaryBoard();
-        this.hideValidatorHighlightCircle();
+        this.validatorHighlightCircle.style.display = 'none';
     }
 
-    selectValidator(network: Network, index: number, validator: ValidatorSummary) {
+    selectValidator(network: Network, validator: ValidatorSummary) {
         this.validatorDetailsBoard.show(network, validator);
-        this.scene.selectValidator(index);
+        this.scene.selectValidator(validator.address);
     }
 
     highlightParas(paraIds: number[]) {
@@ -412,6 +437,9 @@ class UI {
 
     onValidatorsAdded(newValidators: ValidatorSummary[]) {
         this.scene.onValidatorsAdded(newValidators);
+        for (const newValidator of newValidators) {
+            this.validatorList.onValidatorAdded(cloneJSONSafeObject(newValidator));
+        }
     }
 
     onValidatorsUpdated(network: Network, updatedValidators: ValidatorSummary[]) {
@@ -427,7 +455,12 @@ class UI {
         for (const removedStashAddress of removedStashAddresses) {
             this.validatorSummaryBoard.onValidatorRemoved(removedStashAddress);
             this.validatorDetailsBoard.onValidatorRemoved(removedStashAddress);
+            this.validatorList.onValidatorRemoved(removedStashAddress);
         }
+    }
+
+    clearValidatorList() {
+        this.validatorList.clear();
     }
 }
 

@@ -19,7 +19,7 @@ const BlOCK_LINE_MATERIAL = new THREE.LineBasicMaterial({
 });
 
 interface SceneDelegate {
-    onValidatorMouseEnter(index: number, validator: ValidatorSummary): void;
+    onValidatorMouseEnter(validator: ValidatorSummary): void;
     onValidatorMouseLeave(): void;
     onParaMouseEnter(paraId: number): void;
     onParaMouseLeave(): void;
@@ -177,7 +177,7 @@ class Scene {
             if (validatorIndex != this.highlightedValidatorIndex) {
                 const slot = this.validatorMesh.getSlotAtIndex(validatorIndex);
                 if (slot) {
-                    this.delegate.onValidatorMouseEnter(validatorIndex, slot.validator);
+                    this.delegate.onValidatorMouseEnter(slot.validator);
                 }
                 this.highlightedValidatorIndex = validatorIndex;
             }
@@ -263,8 +263,8 @@ class Scene {
         this.validatorParaLines = [];
     }
 
-    highlightValidator(index: number, validator: ValidatorSummary) {
-        this.validatorMesh.highlightValidator(index);
+    highlightValidator(validator: ValidatorSummary) {
+        this.validatorMesh.highlightValidator(validator.address);
         if (validator.paraId) {
             this.addParavalidatorLines(validator.paraId, [validator.address]);
         }
@@ -425,8 +425,8 @@ class Scene {
         ).start();
     }
 
-    selectValidator(index: number) {
-        this.validatorMesh.selectValidator(index);
+    selectValidator(stashAddress: string) {
+        this.validatorMesh.selectValidator(stashAddress);
     }
 
     clearValidatorSelection() {

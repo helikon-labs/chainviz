@@ -11,6 +11,7 @@ import { Block } from './model/chainviz/block';
 import { XCMInfo } from './model/polkaholic/xcm';
 import { SceneDelegate } from './scene/scene';
 import { XCMTransferListDelegate } from './ui/xcm-transfer-list';
+import { ValidatorListDelegate } from './ui/validator-list';
 
 THREE.Cache.enabled = true;
 
@@ -22,8 +23,8 @@ class Chainviz {
     private started = false;
 
     private readonly sceneDelegate = <SceneDelegate>{
-        onValidatorMouseEnter: (index: number, validator: ValidatorSummary) => {
-            this.ui.highlightValidator(this.network, index, validator);
+        onValidatorMouseEnter: (validator: ValidatorSummary) => {
+            this.ui.highlightValidator(this.network, validator, true, true);
         },
         onValidatorMouseLeave: () => {
             this.ui.clearValidatorHighlight();
@@ -40,7 +41,25 @@ class Chainviz {
             this.ui.clearParaHighlight();
         },
         onValidatorClick: (index: number, validator: ValidatorSummary) => {
-            this.ui.selectValidator(this.network, index, validator);
+            this.ui.selectValidator(this.network, validator);
+        },
+    };
+
+    private readonly validatorListDelegate = <ValidatorListDelegate>{
+        onMouseOver: (stashAddress: string) => {
+            const validator = this.dataStore.validatorMap.get(stashAddress);
+            if (validator) {
+                this.ui.highlightValidator(this.network, validator, false, false);
+            }
+        },
+        onMouseLeave: (_stashAddress: string) => {
+            this.ui.clearValidatorHighlight();
+        },
+        onClick: (stashAddress: string) => {
+            const validator = this.dataStore.validatorMap.get(stashAddress);
+            if (validator) {
+                this.ui.selectValidator(this.network, validator);
+            }
         },
     };
 
@@ -72,7 +91,11 @@ class Chainviz {
     };
 
     constructor() {
-        this.ui = new UI(this.sceneDelegate, this.xcmTransferListDelegate);
+        this.ui = new UI(
+            this.sceneDelegate,
+            this.validatorListDelegate,
+            this.xcmTransferListDelegate,
+        );
 
         this.dataStore = new DataStore();
         // substrate api events
