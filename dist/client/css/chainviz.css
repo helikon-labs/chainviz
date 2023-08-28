@@ -30,6 +30,18 @@ hr {
     -webkit-user-select: none;
 }
 
+.hidden {
+    visibility: hidden !important;
+}
+
+.visible {
+    visibility: visible !important;
+}
+
+.no-display {
+    display: none !important;
+}
+
 .flex-spacer {
     flex-grow: 1;
 }
@@ -109,7 +121,7 @@ a:active {
 }
 
 .content .left-panel {
-    width: 220px;
+    width: 200px;
     display: flex;
     flex-direction: column;
     gap: 8px;
@@ -127,80 +139,6 @@ a:active {
 
 .content .left-panel .main-logo {
     width: 116px;
-}
-
-/* validator list */
-.content .left-panel .validator-list-container {
-    margin-left: 26px;
-    display: flex;
-    flex-flow: column;
-    min-height: 0;
-    flex-grow: 1;
-    border: 1px solid #ffffff55;
-    border-radius: 10px;
-    padding: 10px 0px 8px 10px;
-}
-
-.validator-list-filter-container .validator-list-filter {
-    height: 28px;
-    margin-right: 10px;
-    border: 1px solid #ffffff55;
-    border-radius: 10px;
-    display: flex;
-    flex-flow: row nowrap;
-    align-items: center;
-}
-
-.validator-list-filter em {
-    font-size: 12px;
-    margin-left: 8px;
-}
-
-.validator-list-filter input {
-    font-family: 'Mont';
-    font-size: 12px;
-    margin-top: 3px;
-    line-height: 26px;
-    flex-grow: 1;
-    margin-left: 6px;
-    height: 26px;
-    background-color: transparent;
-    border: none;
-    color: #ffffffdd;
-}
-
-.validator-list-search-container input:focus {
-    outline: none;
-}
-
-.validator-list-container .validator-list {
-    margin-top: 4px;
-    overflow-y: scroll;
-}
-
-.validator-list .validator {
-    display: flex;
-    font-size: 12px;
-    padding: 2px 0px;
-    margin-top: 3px;
-    margin-right: 10px;
-    cursor: pointer;
-    height: 30px;
-    align-items: center;
-    flex-flow: row nowrap;
-    border-radius: 6px;
-}
-
-.validator-list .validator:hover {
-    background-color: #ffffff33;
-}
-
-.validator-list .validator-list-display {
-    min-width: 0;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    margin-top: 2px;
 }
 
 /* xcm transfer list */
@@ -281,7 +219,7 @@ img {
 
 .content .center-panel {
     flex-grow: 1;
-    flex-shrink: 1;
+    flex-shrink: 2;
     display: flex;
     flex-direction: column;
     position: relative;
@@ -290,7 +228,7 @@ img {
 .content .center-panel .network-selector {
     margin-top: 26px;
     border: 1px solid #ffffff55;
-    border-radius: 12px;
+    border-radius: 10px;
     display: flex;
     flex-direction: row;
     padding: 1px;
@@ -302,7 +240,7 @@ img {
     height: 28px;
     color: #ffffff88;
     border: 1px solid #ffffff00;
-    border-radius: 10px;
+    border-radius: 8px;
     cursor: pointer;
     display: flex;
     align-items: center;
@@ -581,28 +519,78 @@ img {
     font-size: 9px;
 }
 
+/* right panel */
 .content .right-panel {
     height: 100%;
     width: 280px;
     display: flex;
     flex-direction: column;
-    gap: 12px;
     flex-shrink: 0;
-    position: relative;
 }
 
-.content .right-panel .network-status {
+.content .right-panel .menu {
     margin-top: 26px;
     margin-right: 26px;
     border: 1px solid #ffffff55;
     border-radius: 10px;
-    padding: 10px;
+    display: flex;
+    flex-direction: row;
+    padding: 1px;
+    gap: 2px;
+}
+
+.content .right-panel .menu .menu-item {
+    height: 28px;
+    border: 1px solid #ffffff00;
+    border-radius: 8px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-grow: 1;
+}
+
+.content .right-panel .menu .menu-item:hover {
+    background-color: #ffffff22;
+}
+
+.content .right-panel .menu .selected {
+    color: #ffffffe5;
+    background-color: #ffffff22;
+    border: 1px solid #ffffff55;
+}
+
+.content .right-panel .menu .menu-item span {
+    font-size: 13px;
+    margin-top: 1.5px;
+}
+
+.content .right-panel .right-panel-content {
+    width: 100%;
+    position: relative;
+    flex-grow: 1;
+}
+
+.content .right-panel .right-panel-content .menu-item-content {
+    position: absolute;
+    top: 0px;
+    left: 0px;
+    width: 100%;
+    height: 100%;
     display: flex;
     flex-direction: column;
-    gap: 10px;
+}
+
+.content .right-panel .network-status {
+    margin-top: 12px;
+    margin-right: 26px;
+    border: 1px solid #ffffff55;
+    border-radius: 10px;
+    padding: 10px;
 }
 
 .content .right-panel .network-status .network-status-row {
+    margin-top: 10px;
     display: flex;
     flex-direction: row;
     justify-content: space-between;
@@ -610,8 +598,10 @@ img {
 }
 
 .content .right-panel .block-list-container {
+    margin-top: 12px;
     position: relative;
-    display: flex;
+    top: 0px;
+    left: 0px;
     flex-grow: 1;
     overflow-y: scroll;
     margin-right: 26px;
@@ -673,8 +663,97 @@ img {
     font-size: 10.2px;
 }
 
-.hidden {
-    display: none !important;
+/* validator list */
+.content .right-panel .validator-list-container {
+    margin: 12px 26px 26px 0px;
+    display: flex;
+    flex-flow: column;
+    min-height: 0;
+    flex-grow: 1;
+    border: 1px solid #ffffff55;
+    border-radius: 10px;
+    padding: 10px 0px 8px 10px;
+}
+
+.validator-list-filter-container .validator-list-filter {
+    height: 28px;
+    margin-right: 10px;
+    border: 1px solid #ffffff55;
+    border-radius: 10px;
+    display: flex;
+    flex-flow: row nowrap;
+    align-items: center;
+}
+
+.validator-list-filter em {
+    font-size: 12px;
+    margin-left: 8px;
+}
+
+.validator-list-filter input {
+    font-family: 'Mont';
+    font-size: 12px;
+    margin-top: 3px;
+    line-height: 26px;
+    flex-grow: 1;
+    margin-left: 6px;
+    height: 26px;
+    background-color: transparent;
+    border: none;
+    color: #ffffffdd;
+}
+
+.validator-list-search-container input:focus {
+    outline: none;
+}
+
+.validator-list-container .validator-list {
+    margin-top: 4px;
+    overflow-y: scroll;
+}
+
+.validator-list .validator {
+    display: flex;
+    font-size: 12px;
+    padding: 2px 0px;
+    margin-top: 3px;
+    margin-right: 10px;
+    cursor: pointer;
+    height: 30px;
+    align-items: center;
+    flex-flow: row nowrap;
+    border-radius: 6px;
+}
+
+.validator-list .validator:hover {
+    background-color: #ffffff33;
+}
+
+.validator-list .validator-list-display {
+    min-width: 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    margin-top: 2px;
+}
+
+/* about */
+.content .right-panel .about-container {
+    margin: 12px 26px 26px 0px;
+    display: flex;
+    flex-flow: column;
+    min-height: 0;
+    flex-grow: 1;
+    border: 1px solid #ffffff55;
+    border-radius: 10px;
+    padding: 10px 0px 8px 10px;
+    overflow-y: scroll;
+    line-height: 19px;
+}
+
+.content .right-panel .about-content {
+    margin-top: 12px;
+    font-size: 12px;
 }
 
 /* validator summary board */

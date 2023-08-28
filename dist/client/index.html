@@ -21,18 +21,7 @@
                 <div class="main-logo-container">
                     <img class="main-logo" src="/img/logo/chainviz-logo.svg" />
                 </div>
-                <div class="validator-list-container" id="validator-list-container" id="no-select">
-                    <div
-                        class="validator-list-filter-container"
-                        id="validator-list-filter-container"
-                    >
-                        <div class="validator-list-filter" id="validator-list-filter">
-                            <em class="fas fa-search"></em>
-                            <input type="text" id="validator-list-filter-input" />
-                        </div>
-                    </div>
-                    <div id="validator-list" class="validator-list"></div>
-                </div>
+                <div class="flex-spacer"></div>
                 <div class="xcm-transfer-list-container">
                     <div class="xcm-transfer-list" id="xcm-transfer-list"></div>
                 </div>
@@ -81,7 +70,7 @@
                 <!-- validator highlight circle -->
                 <div class="validator-highlight-circle" id="validator-highlight-circle"></div>
                 <!-- xcm details -->
-                <div class="xcm-details-board hidden" id="xcm-details-board">
+                <div class="xcm-details-board no-display" id="xcm-details-board">
                     <div class="xcm-details-header">
                         <span> XCM </span>
                         <span class="flex-spacer"></span>
@@ -129,7 +118,7 @@
                     </div>
                 </div>
                 <!-- validator details -->
-                <div class="validator-details-board hidden" id="validator-details-board">
+                <div class="validator-details-board no-display" id="validator-details-board">
                     <div class="validator-details-header">
                         <span
                             class="validator-details-identity"
@@ -248,7 +237,7 @@
                         />
                     </div>
                 </div>
-                <div class="block-details-board hidden" id="block-details-board">
+                <div class="block-details-board no-display" id="block-details-board">
                     <div class="block-details-header" id="block-details-header">
                         <em class="fas fa-cube"></em>
                         <span class="block-details-number" id="block-details-number">13452463</span>
@@ -322,44 +311,105 @@
                 </div>
             </div>
             <div class="right-panel" id="right-panel">
-                <div class="network-status" id="network-status">
-                    <div>CHAINVIZ v1.0.0</div>
-                    <div class="network-status-row">
-                        <span>Best Block</span>
-                        <span id="network-best-block">-</span>
-                    </div>
-                    <div class="network-status-row">
-                        <span>Finalized Block</span>
-                        <span id="network-finalized-block">-</span>
-                    </div>
-                    <div class="network-status-row">
-                        <span>Era</span>
-                        <span id="network-era-index">-</span>
-                    </div>
-                    <div class="network-status-row">
-                        <span>Era Reward Points</span>
-                        <span id="network-era-reward-points">-</span>
-                    </div>
-                    <div class="network-status-row">
-                        <span id="network-total-stake-title">Total Stake (MKSM)</span>
-                        <span id="network-total-stake">-</span>
-                    </div>
-                    <div class="network-status-row">
-                        <span id="network-min-stake-title">Min Stake (KSM)</span>
-                        <span id="network-min-stake">-</span>
-                    </div>
-                    <div class="network-status-row">
-                        <span id="network-average-stake-title">Avg Stake (KSM)</span>
-                        <span id="network-average-stake">-</span>
-                    </div>
-                    <div class="network-status-row">
-                        <span id="network-max-stake-title">Max Stake (KSM)</span>
-                        <span id="network-max-stake">-</span>
-                    </div>
+                <div class="menu" id="menu">
+                    <div class="menu-item selected" id="menu-item-main"><span>Main</span></div>
+                    <div class="menu-item" id="menu-item-validators"><span>Validators</span></div>
+                    <div class="menu-item" id="menu-item-about"><span>About</span></div>
                 </div>
-                <div class="block-list-container">
-                    <div class="block-list" id="block-list"></div>
-                    <div class="new-block-list" id="new-block-list"></div>
+                <div class="right-panel-content">
+                    <div id="menu-content-main" class="menu-item-content">
+                        <div class="network-status" id="network-status">
+                            <div>CHAINVIZ v1.0.0</div>
+                            <div class="network-status-row">
+                                <span>Best Block</span>
+                                <span id="network-best-block">-</span>
+                            </div>
+                            <div class="network-status-row">
+                                <span>Finalized Block</span>
+                                <span id="network-finalized-block">-</span>
+                            </div>
+                            <div class="network-status-row">
+                                <span>Era</span>
+                                <span id="network-era-index">-</span>
+                            </div>
+                            <div class="network-status-row">
+                                <span>Era Reward Points</span>
+                                <span id="network-era-reward-points">-</span>
+                            </div>
+                            <div class="network-status-row">
+                                <span id="network-total-stake-title">Total Stake (MKSM)</span>
+                                <span id="network-total-stake">-</span>
+                            </div>
+                            <div class="network-status-row">
+                                <span id="network-min-stake-title">Min Stake (KSM)</span>
+                                <span id="network-min-stake">-</span>
+                            </div>
+                            <div class="network-status-row">
+                                <span id="network-average-stake-title">Avg Stake (KSM)</span>
+                                <span id="network-average-stake">-</span>
+                            </div>
+                            <div class="network-status-row">
+                                <span id="network-max-stake-title">Max Stake (KSM)</span>
+                                <span id="network-max-stake">-</span>
+                            </div>
+                        </div>
+                        <div class="block-list-container">
+                            <div class="block-list" id="block-list"></div>
+                            <div class="new-block-list" id="new-block-list"></div>
+                        </div>
+                    </div>
+                    <div id="menu-content-validators" class="menu-item-content hidden">
+                        <div
+                            class="validator-list-container no-select"
+                            id="validator-list-container"
+                        >
+                            <div
+                                class="validator-list-filter-container"
+                                id="validator-list-filter-container"
+                            >
+                                <div class="validator-list-filter" id="validator-list-filter">
+                                    <em class="fas fa-search"></em>
+                                    <input type="text" id="validator-list-filter-input" />
+                                </div>
+                            </div>
+                            <div id="validator-list" class="validator-list"></div>
+                        </div>
+                    </div>
+                    <div id="menu-content-about" class="menu-item-content hidden">
+                        <div class="about-container">
+                            <span class="about-title">CHAINVIZ v1.0.0</span>
+                            <span class="about-content">
+                                Chainviz is a real-time 3D visualization of the Polkadot machine.
+                                <br /><br />
+                                Chainviz is a
+                                <a href="https://helikon.io" target="_blank" rel="noopener"
+                                    >Helikon Labs</a
+                                >
+                                project, envisioned and developed by
+                                <a href="https://github.com/kukabi" target="_blank" rel="noopener"
+                                    >Kutsal Kaan Bilgin</a
+                                >
+                                and designed by
+                                <a href="https://helikon.io" target="_blank" rel="noopener">Klad</a
+                                >. <br /><br />
+                                Development of this software is proudly supported by the
+                                <a
+                                    href="https://github.com/w3f/Grants-Program/blob/master/applications/chainviz.md"
+                                    target="_blank"
+                                    rel="noopener"
+                                    >Web3 Foundation Grants Program</a
+                                >. <br /><br />
+                                Chainviz is powered by the
+                                <a href="https://subvt.io" target="_blank" rel="noopener">SubVT</a>
+                                <a
+                                    href="https://github.com/helikon-labs/subvt-backend"
+                                    target="_blank"
+                                    rel="noopened"
+                                    >backend system</a
+                                >.
+                            </span>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>

@@ -2,11 +2,11 @@ import { ValidatorSummary } from '../model/subvt/validator-summary';
 import { getCondensedAddress } from './format';
 
 function show(element: HTMLElement) {
-    element.classList.remove('hidden');
+    element.classList.remove('no-display');
 }
 
 function hide(element: HTMLElement) {
-    element.classList.add('hidden');
+    element.classList.add('no-display');
 }
 
 function getValidatorIdentityIconHTML(summary: ValidatorSummary): string {

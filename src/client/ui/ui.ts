@@ -21,6 +21,7 @@ import { Block } from '../model/chainviz/block';
 import { ValidatorDetailsBoard, ValidatorDetailsBoardDelegate } from './validator-details-board';
 import { XCMTransferDetailsBoard } from './xcm-transfer-details-board';
 import { ValidatorList, ValidatorListDelegate } from './validator-list';
+import { Menu, MenuItem } from './menu';
 
 class UI {
     private readonly scene: Scene;
@@ -47,6 +48,7 @@ class UI {
     private readonly validatorDetailsBoard: ValidatorDetailsBoard;
     private readonly xcmTransferDetailsBoard: XCMTransferDetailsBoard;
     private readonly validatorList: ValidatorList;
+    private readonly menu: Menu;
     private highlightedValidatorStashAddress: string | undefined = undefined;
 
     constructor(
@@ -81,6 +83,7 @@ class UI {
         });
         this.xcmTransferDetailsBoard = new XCMTransferDetailsBoard();
         this.validatorList = new ValidatorList(validatorListDelegate);
+        this.menu = new Menu();
 
         this.scene = new Scene(this.sceneContainer, sceneDelegate);
         this.kusamaSelector.addEventListener('click', (_event) => {
@@ -213,6 +216,7 @@ class UI {
             Constants.CONTENT_FADE_ANIM_DURATION_MS,
             undefined,
             () => {
+                this.menu.setOpacity(opacity.opacity);
                 this.validatorList.setOpacity(opacity.opacity);
                 this.xcmTransferList.setOpacity(opacity.opacity);
                 this.networkStatusBoard.setOpacity(opacity.opacity);
@@ -221,6 +225,7 @@ class UI {
             },
             () => {
                 if (onComplete) {
+                    this.menu.select(MenuItem.Main);
                     this.validatorList.clearFilter();
                     onComplete();
                 }
@@ -237,6 +242,7 @@ class UI {
             Constants.CONTENT_FADE_ANIM_DURATION_MS,
             undefined,
             () => {
+                this.menu.setOpacity(opacity.opacity);
                 this.validatorList.setOpacity(opacity.opacity);
                 this.xcmTransferList.setOpacity(opacity.opacity);
                 this.networkStatusBoard.setOpacity(opacity.opacity);
@@ -307,17 +313,21 @@ class UI {
     }
 
     onNewBlock(block: Block) {
-        this.newBlockList.onNewBlock(block);
-        this.scene.onNewBlock(
-            block,
-            () => {
-                this.newBlockList.showBlock(block);
-            },
-            () => {
-                this.newBlockList.onDiscardedBlock(block);
-                this.blockList.onNewBlock(block);
-            },
-        );
+        if (this.menu.getCurrentItem() == MenuItem.Main) {
+            this.newBlockList.onNewBlock(block);
+            this.scene.onNewBlock(
+                block,
+                () => {
+                    this.newBlockList.showBlock(block);
+                },
+                () => {
+                    this.newBlockList.onDiscardedBlock(block);
+                    this.blockList.onNewBlock(block);
+                },
+            );
+        } else {
+            this.blockList.onNewBlock(block);
+        }
     }
 
     onFinalizedBlock(block: Block) {
