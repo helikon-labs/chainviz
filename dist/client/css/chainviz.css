@@ -746,7 +746,7 @@ img {
     flex-grow: 1;
     border: 1px solid #ffffff55;
     border-radius: 10px;
-    padding: 10px 0px 8px 10px;
+    padding: 10px;
     overflow-y: scroll;
     line-height: 19px;
 }
