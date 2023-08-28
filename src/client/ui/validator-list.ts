@@ -115,7 +115,8 @@ class ValidatorList {
     }
 
     private updateTitle() {
-        this.ui.filterInput.placeholder = `Validators (${this.validators.length})`;
+        //this.ui.filterInput.placeholder = `Validators (${this.validators.length})`;
+        this.ui.filterInput.placeholder = '';
     }
 
     clear() {
