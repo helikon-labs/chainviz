@@ -119,11 +119,6 @@ class UI {
         this.animate();
     }
 
-    displayLoading() {
-        this.content.style.opacity = '0%';
-        this.background.style.opacity = '0%';
-    }
-
     animate() {
         requestAnimationFrame(() => {
             this.animate();
@@ -175,6 +170,7 @@ class UI {
 
     private fadeInBackground(onComplete: () => void) {
         this.background.style.opacity = '0%';
+        this.background.classList.remove('hidden');
         show(this.background);
         const opacity = { opacity: 0 };
         createTween(
@@ -192,6 +188,7 @@ class UI {
 
     private fadeInContent(onComplete?: () => void) {
         this.content.style.opacity = '0%';
+        this.content.classList.remove('hidden');
         show(this.content);
         const opacity = { opacity: 0 };
         createTween(

@@ -4,7 +4,7 @@ import { formatNumber } from '../util/format';
 
 interface UI {
     root: HTMLElement;
-    // progress: HTMLElement;
+    blockProgress: HTMLElement;
     bestBlock: HTMLElement;
     finalizedBlock: HTMLElement;
     eraIndex: HTMLElement;
@@ -22,11 +22,13 @@ interface UI {
 
 class NetworkStatusBoard {
     private readonly ui: UI;
+    private lastBlockTime = 0;
+    private readonly blockTimeMs = 6000;
 
     constructor() {
         this.ui = {
             root: <HTMLElement>document.getElementById('network-status'),
-            // progress: <HTMLElement>document.getElementById('block-progress'),
+            blockProgress: <HTMLElement>document.getElementById('block-progress'),
             bestBlock: <HTMLElement>document.getElementById('network-best-block'),
             finalizedBlock: <HTMLElement>document.getElementById('network-finalized-block'),
             eraIndex: <HTMLElement>document.getElementById('network-era-index'),
@@ -41,10 +43,20 @@ class NetworkStatusBoard {
             averageStakeTitle: <HTMLElement>document.getElementById('network-average-stake-title'),
             averageStake: <HTMLElement>document.getElementById('network-average-stake'),
         };
+        this.updateProgressBar();
     }
 
     setOpacity(opacity: number) {
         this.ui.root.style.opacity = `${opacity}%`;
+    }
+
+    updateProgressBar() {
+        const elapsed = Math.min(this.blockTimeMs, Date.now() - this.lastBlockTime);
+        const progressPercent = (elapsed * 100) / this.blockTimeMs;
+        this.ui.blockProgress.style.width = progressPercent + '%';
+        setTimeout(() => {
+            this.updateProgressBar();
+        }, 1);
     }
 
     display(network: Network, status: NetworkStatus) {
@@ -91,6 +103,7 @@ class NetworkStatusBoard {
                 2,
             );
         }
+        this.lastBlockTime = Date.now();
     }
 
     getBoundingClientRect(): DOMRect {

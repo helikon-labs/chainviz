@@ -15,8 +15,8 @@
     </head>
     <body id="root">
         <script src="bundle.js"></script>
-        <div class="background" id="background"></div>
-        <div class="content" id="content">
+        <div class="background hidden" id="background"></div>
+        <div class="content hidden" id="content">
             <div id="left-panel" class="left-panel">
                 <div class="main-logo-container">
                     <img class="main-logo" src="/img/logo/chainviz-logo.svg" />
@@ -320,6 +320,9 @@
                     <div id="menu-content-main" class="menu-item-content">
                         <div class="network-status" id="network-status">
                             <div>CHAINVIZ v1.0.0</div>
+                            <div class="block-progress-bar" id="block-progress-bar">
+                                <div class="block-progress" id="block-progress"></div>
+                            </div>
                             <div class="network-status-row">
                                 <span>Best Block</span>
                                 <span id="network-best-block">-</span>

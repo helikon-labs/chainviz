@@ -187,7 +187,6 @@ class Chainviz {
     }
 
     async connect() {
-        this.ui.displayLoading();
         await this.dataStore.setNetwork(this.network);
         this.ui.setLoadingInfo('connecting to blockchain');
         this.dataStore.connectSubstrateRPC();
