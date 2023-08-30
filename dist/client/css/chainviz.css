@@ -620,8 +620,9 @@ img {
     top: 0px;
     left: 0px;
     flex-grow: 1;
-    overflow-y: scroll;
     margin-right: 26px;
+    display: flex;
+    min-height: 0px;
 }
 
 .content .right-panel .new-block-list {
@@ -641,6 +642,7 @@ img {
     flex-direction: column;
     gap: 4px;
     padding-bottom: 26px;
+    overflow-y: scroll;
 }
 
 .content .right-panel .block-list-container .block {

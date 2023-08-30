@@ -310,7 +310,7 @@ class UI {
     }
 
     onNewBlock(block: Block) {
-        if (this.menu.getCurrentItem() == MenuItem.Main) {
+        if (this.menu.getCurrentItem() == MenuItem.Main && !document.hidden) {
             this.networkStatusBoard.onNewBlock();
             this.newBlockList.onNewBlock(block);
             this.scene.onNewBlock(
