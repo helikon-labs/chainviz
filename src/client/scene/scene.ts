@@ -119,7 +119,7 @@ class Scene {
                 this.delegate.onValidatorClick(this.highlightedValidatorIndex, slot.validator);
             }
         } else if (this.highlightedParaId != undefined) {
-            console.log('para details', this.highlightedParaId);
+            // view para details
         }
     }
 

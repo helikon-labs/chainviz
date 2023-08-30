@@ -103,11 +103,14 @@ class NetworkStatusBoard {
                 2,
             );
         }
-        this.lastBlockTime = Date.now();
     }
 
     getBoundingClientRect(): DOMRect {
         return this.ui.root.getBoundingClientRect();
+    }
+
+    onNewBlock() {
+        this.lastBlockTime = Date.now();
     }
 }
 
