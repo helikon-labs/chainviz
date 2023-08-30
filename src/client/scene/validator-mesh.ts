@@ -102,7 +102,6 @@ class ValidatorMesh {
         if (maxRewardPoints != 0) {
             scaleStep = (1.0 - minScale) / (maxRewardPoints - minRewardPoints);
         }
-        console.log(maxRewardPoints, minRewardPoints);
         for (let i = 0; i < this.arcs.length; i++) {
             for (let j = 0; j < this.arcs[i].length; j++) {
                 if (this.arcs[i][j]) {
