@@ -1,6 +1,11 @@
 import { XCMInfo } from '../model/polkaholic/xcm';
 import { Constants } from '../util/constants';
-import { getBlockTimeFormatted, getCondensedAddress, getCondensedHash } from '../util/format';
+import {
+    formatNumber,
+    getBlockTimeFormatted,
+    getCondensedAddress,
+    getCondensedHash,
+} from '../util/format';
 import { hide, show } from '../util/ui-util';
 
 interface UI {
@@ -64,7 +69,14 @@ class XCMTransferDetailsBoard {
         }" target="_blank">${getCondensedAddress(transfer.destination.beneficiary)}</a>`;
         this.ui.date.innerHTML = getBlockTimeFormatted(new Date(transfer.origination.ts * 1000));
         const ticker = transfer.symbol ?? transfer.origination.txFeeSymbol;
-        this.ui.amount.innerHTML = `${transfer.origination.amountSent} ${ticker}`;
+        const formattedAmount = formatNumber(
+            BigInt(Math.floor(transfer.origination.amountSent * 100)),
+            2,
+            2,
+            ticker,
+        );
+
+        this.ui.amount.innerHTML = formattedAmount;
 
         show(this.ui.root);
     }
