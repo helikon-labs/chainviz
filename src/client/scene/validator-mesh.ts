@@ -300,13 +300,7 @@ class ValidatorMesh {
                     this.validatorMesh.getMatrixAt(j, matrix);
                     let scale = 0.0;
                     if (j == this.highlightedValidatorIndex) {
-                        const currentScale = new THREE.Vector3();
-                        matrix.decompose(new THREE.Vector3(), new THREE.Quaternion(), currentScale);
-                        if (currentScale.x != 2) {
-                            scale = 1;
-                        } else {
-                            scale = 1;
-                        }
+                        scale = 2;
                     } else if (
                         this.highlightedValidatorIndex >= arcFirstIndex &&
                         this.highlightedValidatorIndex <= arcLastIndex
@@ -339,6 +333,19 @@ class ValidatorMesh {
     highlightParaValidators(paraId: number) {
         this.highlightedParaId = paraId;
         this.resetScales();
+    }
+
+    getParavalidatorStashAddresses(paraId: number): string[] {
+        const result: string[] = [];
+        for (let i = 0; i < this.arcs.length; i++) {
+            for (let j = 0; j <= this.arcs[0].length; j++) {
+                const slot = this.arcs[i][j];
+                if (slot != undefined && slot.validator.paraId == paraId) {
+                    result.push(slot.stashAddress);
+                }
+            }
+        }
+        return result;
     }
 
     selectValidator(stashAddress: string) {

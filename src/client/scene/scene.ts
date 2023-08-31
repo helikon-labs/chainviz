@@ -440,19 +440,33 @@ class Scene {
 
     onValidatorsUpdated(updatedValidators: ValidatorSummary[]) {
         this.validatorMesh.onValidatorsUpdated(updatedValidators);
-        for (const updatedValidator of updatedValidators) {
-            const validatorIndex = this.validatorMesh.getValidatorIndex(updatedValidator.address);
-            if (validatorIndex == this.highlightedValidatorIndex) {
-                this.removeParaValidatorLines();
-                this.addParavalidatorLines(updatedValidator.paraId ?? -1, [
+        if (this.highlightedValidatorIndex != undefined) {
+            for (const updatedValidator of updatedValidators) {
+                const validatorIndex = this.validatorMesh.getValidatorIndex(
                     updatedValidator.address,
-                ]);
+                );
+                if (validatorIndex == this.highlightedValidatorIndex) {
+                    this.removeParaValidatorLines();
+                    this.addParavalidatorLines(updatedValidator.paraId ?? -1, [
+                        updatedValidator.address,
+                    ]);
+                }
             }
+        } else if (this.highlightedParaId != undefined) {
+            this.removeParaValidatorLines();
+            const stashAddresses = this.validatorMesh.getParavalidatorStashAddresses(
+                this.highlightedParaId,
+            );
+            this.addParavalidatorLines(this.highlightedParaId, stashAddresses);
         }
     }
 
     onValidatorsRemoved(removedStashAddresses: string[]) {
         this.validatorMesh.onValidatorsRemoved(removedStashAddresses);
+    }
+
+    getParavalidatorStashAddresses(paraId: number): string[] {
+        return this.validatorMesh.getParavalidatorStashAddresses(paraId);
     }
 }
 

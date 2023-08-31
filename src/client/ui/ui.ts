@@ -50,6 +50,7 @@ class UI {
     private readonly validatorList: ValidatorList;
     private readonly menu: Menu;
     private highlightedValidatorStashAddress: string | undefined = undefined;
+    private highlightedPara: Para | undefined = undefined;
 
     constructor(
         sceneDelegate: SceneDelegate,
@@ -420,11 +421,13 @@ class UI {
         this.scene.highlightPara(para.paraId, paravalidatorStashAdresses);
         const position = this.scene.getParaOnScreenPosition(para.paraId);
         this.showParaSummaryBoard(para, paravalidatorStashAdresses.length, position);
+        this.highlightedPara = para;
     }
 
     clearParaHighlight() {
         this.scene.clearParaHighlight();
         this.hideParaSummaryBoard();
+        this.highlightedPara = undefined;
     }
 
     showParaSummaryBoard(para: Para, paravalidatorCount: number, position: Vec2) {
@@ -455,6 +458,13 @@ class UI {
         for (const updatedValidator of updatedValidators) {
             this.validatorSummaryBoard.onValidatorUpdated(network, updatedValidator);
             this.validatorDetailsBoard.onValidatorUpdated(network, updatedValidator);
+        }
+        if (this.highlightedPara != undefined) {
+            this.showParaSummaryBoard(
+                this.highlightedPara,
+                this.scene.getParavalidatorStashAddresses(this.highlightedPara.paraId).length,
+                this.scene.getParaOnScreenPosition(this.highlightedPara.paraId),
+            );
         }
     }
 
