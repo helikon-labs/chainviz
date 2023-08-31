@@ -389,6 +389,12 @@ img {
     text-overflow: ellipsis;
 }
 
+.content .center-panel .validator-details-board #validator-details-para-info img {
+    width: 18px;
+    height: 18px;
+    border-radius: 9px;
+}
+
 .content .center-panel .validator-details-board .validator-details-separator {
     border-bottom: 1px dotted #ffffff;
     height: 0px;
@@ -837,11 +843,7 @@ img {
     height: 14px;
     margin-right: 8px;
     margin-bottom: 2px;
-    background-color: #fff;
-    border-radius: 12px;
-    border-style: solid;
-    border-width: 1px;
-    border-color: #ffffff22;
+    border-radius: 7px;
 }
 
 #validator-summary-board #validator-summary-era-data {

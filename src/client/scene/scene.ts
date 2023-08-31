@@ -284,6 +284,7 @@ class Scene {
         this.paraMesh.highlightParas([paraId]);
         this.validatorMesh.highlightParaValidators(paraId);
         this.addParavalidatorLines(paraId, paravalidatorStashAddresses);
+        this.validatorMesh.clearSelection();
     }
 
     clearParaHighlight() {
@@ -439,6 +440,15 @@ class Scene {
 
     onValidatorsUpdated(updatedValidators: ValidatorSummary[]) {
         this.validatorMesh.onValidatorsUpdated(updatedValidators);
+        for (const updatedValidator of updatedValidators) {
+            const validatorIndex = this.validatorMesh.getValidatorIndex(updatedValidator.address);
+            if (validatorIndex == this.highlightedValidatorIndex) {
+                this.removeParaValidatorLines();
+                this.addParavalidatorLines(updatedValidator.paraId ?? -1, [
+                    updatedValidator.address,
+                ]);
+            }
+        }
     }
 
     onValidatorsRemoved(removedStashAddresses: string[]) {

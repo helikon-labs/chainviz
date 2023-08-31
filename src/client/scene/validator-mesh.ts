@@ -264,6 +264,20 @@ class ValidatorMesh {
         for (let i = 0; i < this.arcs.length; i++) {
             const arcFirstIndex = i * this.arcs[0].length;
             const arcLastIndex = arcFirstIndex + this.arcs[0].length - 1;
+            for (let j = 0; j < this.arcs[i].length; j++) {
+                const scale = this.arcs[i][j]?.scale ?? 0;
+                const object = new THREE.Object3D();
+                object.scale.x = scale;
+                object.scale.y = scale;
+                object.scale.z = scale;
+                object.updateMatrix();
+                const targetMatrix = object.matrix;
+                const currentMatrix = new THREE.Matrix4();
+                const index = i * this.arcs[0].length + j;
+                this.validatorMesh.getMatrixAt(index, currentMatrix);
+                targetMatrix.copyPosition(currentMatrix);
+                this.validatorMesh.setMatrixAt(index, targetMatrix);
+            }
             if (this.highlightedParaId) {
                 for (let j = 0; j <= this.arcs[0].length; j++) {
                     const index = i * this.arcs[0].length + j;
@@ -286,7 +300,13 @@ class ValidatorMesh {
                     this.validatorMesh.getMatrixAt(j, matrix);
                     let scale = 0.0;
                     if (j == this.highlightedValidatorIndex) {
-                        scale = 2;
+                        const currentScale = new THREE.Vector3();
+                        matrix.decompose(new THREE.Vector3(), new THREE.Quaternion(), currentScale);
+                        if (currentScale.x != 2) {
+                            scale = 1;
+                        } else {
+                            scale = 1;
+                        }
                     } else if (
                         this.highlightedValidatorIndex >= arcFirstIndex &&
                         this.highlightedValidatorIndex <= arcLastIndex
@@ -297,21 +317,6 @@ class ValidatorMesh {
                     this.validatorMesh.setMatrixAt(j, matrix);
                 }
                 ARC_MATERIAL.opacity = Constants.VALIDATOR_ARC_LOW_OPACITY;
-            } else {
-                for (let j = 0; j < this.arcs[i].length; j++) {
-                    const scale = this.arcs[i][j]?.scale ?? 0;
-                    const object = new THREE.Object3D();
-                    object.scale.x = scale;
-                    object.scale.y = scale;
-                    object.scale.z = scale;
-                    object.updateMatrix();
-                    const targetMatrix = object.matrix;
-                    const currentMatrix = new THREE.Matrix4();
-                    const index = i * this.arcs[0].length + j;
-                    this.validatorMesh.getMatrixAt(index, currentMatrix);
-                    targetMatrix.copyPosition(currentMatrix);
-                    this.validatorMesh.setMatrixAt(index, targetMatrix);
-                }
             }
         }
         this.validatorMesh.instanceMatrix.needsUpdate = true;
