@@ -1,4 +1,4 @@
-name: Prettier & ESLint
+name: Format, Lint & Test
 
 on:
     push:
@@ -17,19 +17,15 @@ concurrency:
 
 jobs:
     ts-lint:
-        name: Prettier & ESLint
+        name: Format, Lint & Test
         runs-on: ubuntu-latest
         steps:
             - uses: actions/checkout@v1
             - name: Prepare
-              run: npm ci
+              run: npm install
+            - name: Format
+              run: npm run format:check
             - name: Lint
               run: npm run lint
             - name: Test
               run: npm run test
-            #- name: Lint
-            #  uses: wearerequired/lint-action@v1
-            #  with:
-            #      eslint: true
-            #      prettier: true
-            #      eslint_extensions: js,ts
