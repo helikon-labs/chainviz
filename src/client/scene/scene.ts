@@ -439,7 +439,9 @@ class Scene {
     }
 
     onValidatorsUpdated(updatedValidators: ValidatorSummary[]) {
-        this.validatorMesh.onValidatorsUpdated(updatedValidators);
+        if (this.started) {
+            this.validatorMesh.onValidatorsUpdated(updatedValidators);
+        }
         if (this.highlightedValidatorIndex != undefined) {
             for (const updatedValidator of updatedValidators) {
                 const validatorIndex = this.validatorMesh.getValidatorIndex(

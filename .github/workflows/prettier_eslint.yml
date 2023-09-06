@@ -24,8 +24,12 @@ jobs:
             - name: Prepare
               run: npm ci
             - name: Lint
-              uses: wearerequired/lint-action@v1
-              with:
-                  eslint: true
-                  prettier: true
-                  eslint_extensions: js,ts
+              run: npm run lint
+            - name: Test
+              run: npm run test
+            #- name: Lint
+            #  uses: wearerequired/lint-action@v1
+            #  with:
+            #      eslint: true
+            #      prettier: true
+            #      eslint_extensions: js,ts
