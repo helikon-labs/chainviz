@@ -32,8 +32,10 @@ class UI {
     private readonly leftPanel: HTMLDivElement;
     private readonly xcmTransferList: XCMTransferList;
     private readonly centerPanel: HTMLDivElement;
-    private readonly kusamaSelector: HTMLDivElement;
-    private readonly polkadotSelector: HTMLDivElement;
+    private readonly leftKusamaSelector: HTMLDivElement;
+    private readonly centerKusamaSelector: HTMLDivElement;
+    private readonly leftPolkadotSelector: HTMLDivElement;
+    private readonly centerPolkadotSelector: HTMLDivElement;
     private readonly rightPanel: HTMLDivElement;
     private readonly networkStatusBoard: NetworkStatusBoard;
     private readonly blockList: BlockList;
@@ -64,8 +66,16 @@ class UI {
         this.leftPanel = <HTMLDivElement>document.getElementById('left-panel');
         this.xcmTransferList = new XCMTransferList(xcmTransferListDelegate);
         this.centerPanel = <HTMLDivElement>document.getElementById('center-panel');
-        this.kusamaSelector = <HTMLDivElement>document.getElementById('kusama-selector');
-        this.polkadotSelector = <HTMLDivElement>document.getElementById('polkadot-selector');
+        this.leftKusamaSelector = <HTMLDivElement>document.getElementById('left-kusama-selector');
+        this.centerKusamaSelector = <HTMLDivElement>(
+            document.getElementById('center-kusama-selector')
+        );
+        this.leftPolkadotSelector = <HTMLDivElement>(
+            document.getElementById('left-polkadot-selector')
+        );
+        this.centerPolkadotSelector = <HTMLDivElement>(
+            document.getElementById('center-polkadot-selector')
+        );
         this.rightPanel = <HTMLDivElement>document.getElementById('right-panel');
         this.networkStatusBoard = new NetworkStatusBoard();
         this.blockList = new BlockList('block-list', false);
@@ -87,21 +97,17 @@ class UI {
         this.menu = new Menu();
 
         this.scene = new Scene(this.sceneContainer, sceneDelegate);
-        this.kusamaSelector.addEventListener('click', (_event) => {
-            if (this.isChangingNetwork) {
-                return;
-            }
-            this.kusamaSelector.classList.add('active');
-            this.polkadotSelector.classList.remove('active');
-            this.selectNetwork(Kusama);
+        this.leftKusamaSelector.addEventListener('click', (_event) => {
+            this.selectKusama();
         });
-        this.polkadotSelector.addEventListener('click', (_event) => {
-            if (this.isChangingNetwork) {
-                return;
-            }
-            this.kusamaSelector.classList.remove('active');
-            this.polkadotSelector.classList.add('active');
-            this.selectNetwork(Polkadot);
+        this.centerKusamaSelector.addEventListener('click', (_event) => {
+            this.selectKusama();
+        });
+        this.leftPolkadotSelector.addEventListener('click', (_event) => {
+            this.selectPolkadot();
+        });
+        this.centerPolkadotSelector.addEventListener('click', (_event) => {
+            this.selectPolkadot();
         });
 
         window.onmousemove = (event) => {
@@ -114,6 +120,28 @@ class UI {
             }
             this.scene.onMouseMove(event);
         };
+    }
+
+    private selectKusama() {
+        if (this.isChangingNetwork) {
+            return;
+        }
+        this.leftKusamaSelector.classList.add('active');
+        this.centerKusamaSelector.classList.add('active');
+        this.leftPolkadotSelector.classList.remove('active');
+        this.centerPolkadotSelector.classList.remove('active');
+        this.selectNetwork(Kusama);
+    }
+
+    private selectPolkadot() {
+        if (this.isChangingNetwork) {
+            return;
+        }
+        this.leftKusamaSelector.classList.remove('active');
+        this.centerKusamaSelector.classList.remove('active');
+        this.leftPolkadotSelector.classList.add('active');
+        this.centerPolkadotSelector.classList.add('active');
+        this.selectNetwork(Polkadot);
     }
 
     init() {

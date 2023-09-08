@@ -3,6 +3,7 @@
     <head>
         <title>ChainViz by Helikon</title>
         <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale = 1" />
         <link rel="icon" type="image/png" href="./img/icon/favicon.png" />
         <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Fira%20Mono" />
         <link
@@ -21,7 +22,17 @@
                 <div class="main-logo-container">
                     <img class="main-logo" src="/img/logo/chainviz-logo.svg" />
                 </div>
-                <div class="flex-spacer"></div>
+                <div id="left-panel-flex-spacer" class="flex-spacer"></div>
+                <div class="network-selector">
+                    <div class="network active" id="left-kusama-selector">
+                        <img src="./img/icon/kusama-icon.svg" alt="Kusama" />
+                        <span>Kusama</span>
+                    </div>
+                    <div class="network" id="left-polkadot-selector">
+                        <img src="./img/icon/polkadot-icon.svg" alt="Polkadot" />
+                        <span>Polkadot</span>
+                    </div>
+                </div>
                 <div class="xcm-transfer-list-container">
                     <div class="xcm-transfer-list" id="xcm-transfer-list"></div>
                 </div>
@@ -54,13 +65,13 @@
             </div>
             <!--div class="left-panel-spacer"></div-->
             <div class="center-panel" id="center-panel">
-                <div style="display: flex; align-items: center; justify-content: center">
+                <div class="network-selector-container">
                     <div class="network-selector">
-                        <div class="network active" id="kusama-selector">
+                        <div class="network active" id="center-kusama-selector">
                             <img src="./img/icon/kusama-icon.svg" alt="Kusama" />
                             <span>Kusama</span>
                         </div>
-                        <div class="network" id="polkadot-selector">
+                        <div class="network" id="center-polkadot-selector">
                             <img src="./img/icon/polkadot-icon.svg" alt="Polkadot" />
                             <span>Polkadot</span>
                         </div>
@@ -237,78 +248,6 @@
                         />
                     </div>
                 </div>
-                <div class="block-details-board no-display" id="block-details-board">
-                    <div class="block-details-header" id="block-details-header">
-                        <em class="fas fa-cube"></em>
-                        <span class="block-details-number" id="block-details-number">13452463</span>
-                        <span class="flex-spacer"></span>
-                        <img
-                            class="block-details-close"
-                            id="block-details-close"
-                            src="/img/icon/close-icon.png"
-                        />
-                    </div>
-                    <div class="block-details-separator"></div>
-                    <div class="block-details-content">
-                        <div class="block-details-content-inner">
-                            <div class="block-details-row">
-                                <span>Timestamp</span>
-                                <span id="block-details-timestamp"></span>
-                            </div>
-                            <div class="block-details-row">
-                                <span>Status</span>
-                                <span id="block-details-status"></span>
-                            </div>
-                            <div class="block-details-row">
-                                <span>Hash</span>
-                                <span class="hash" id="block-details-hash"></span>
-                            </div>
-                            <div class="block-details-row">
-                                <span>Parent Hash</span>
-                                <span class="hash" id="block-details-parent-hash"></span>
-                            </div>
-                            <div class="block-details-row">
-                                <span>State Root</span>
-                                <span class="hash" id="block-details-state-root"></span>
-                            </div>
-                            <div class="block-details-row">
-                                <span>Extrinsics Root</span>
-                                <span class="hash" id="block-details-extrinsics-root"></span>
-                            </div>
-                            <div class="block-details-row">
-                                <span>Author</span>
-                                <span id="block-details-author"></span>
-                            </div>
-                            <div class="block-details-row">
-                                <span>Runtime</span>
-                                <span id="block-details-runtime"></span>
-                            </div>
-                            <!-- spacer -->
-                            <div class="block-details-row"></div>
-                            <div class="block-details-separator"></div>
-                            <div class="block-details-section-header">
-                                <span id="block-details-extrinsic-count"></span>
-                                <span class="flex-spacer"></span>
-                                <em
-                                    id="block-details-extrinsics-chevron"
-                                    class="fas fa-chevron-right"
-                                ></em>
-                            </div>
-                            <div class="block-details-separator"></div>
-                            <div id="block-details-extrinsic-container"></div>
-                            <div class="block-details-section-header">
-                                <span id="block-details-event-count"></span>
-                                <span class="flex-spacer"></span>
-                                <em
-                                    id="block-details-events-chevron"
-                                    class="fas fa-chevron-right"
-                                ></em>
-                            </div>
-                            <div class="block-details-separator"></div>
-                            <div id="block-details-event-container"></div>
-                        </div>
-                    </div>
-                </div>
             </div>
             <div class="right-panel" id="right-panel">
                 <div class="menu" id="menu">
@@ -461,6 +400,79 @@
         <div id="para-summary-board" class="no-select">
             <div id="para-summary-name-and-id"></div>
             <div id="para-summary-para-validator-count"></div>
+        </div>
+        <!-- block details board -->
+        <div class="block-details-board no-display" id="block-details-board">
+            <div class="block-details-header" id="block-details-header">
+                <em class="fas fa-cube"></em>
+                <span class="block-details-number" id="block-details-number">13452463</span>
+                <span class="flex-spacer"></span>
+                <img
+                    class="block-details-close"
+                    id="block-details-close"
+                    src="/img/icon/close-icon.png"
+                />
+            </div>
+            <div class="block-details-separator"></div>
+            <div class="block-details-content">
+                <div class="block-details-content-inner">
+                    <div class="block-details-row">
+                        <span>Timestamp</span>
+                        <span id="block-details-timestamp"></span>
+                    </div>
+                    <div class="block-details-row">
+                        <span>Status</span>
+                        <span id="block-details-status"></span>
+                    </div>
+                    <div class="block-details-row">
+                        <span>Hash</span>
+                        <span class="hash" id="block-details-hash"></span>
+                    </div>
+                    <div class="block-details-row">
+                        <span>Parent Hash</span>
+                        <span class="hash" id="block-details-parent-hash"></span>
+                    </div>
+                    <div class="block-details-row">
+                        <span>State Root</span>
+                        <span class="hash" id="block-details-state-root"></span>
+                    </div>
+                    <div class="block-details-row">
+                        <span>Extrinsics Root</span>
+                        <span class="hash" id="block-details-extrinsics-root"></span>
+                    </div>
+                    <div class="block-details-row">
+                        <span>Author</span>
+                        <span id="block-details-author"></span>
+                    </div>
+                    <div class="block-details-row">
+                        <span>Runtime</span>
+                        <span id="block-details-runtime"></span>
+                    </div>
+                    <!-- spacer -->
+                    <div class="block-details-row"></div>
+                    <div class="block-details-separator"></div>
+                    <div class="block-details-section-header">
+                        <span id="block-details-extrinsic-count"></span>
+                        <span class="flex-spacer"></span>
+                        <em
+                            id="block-details-extrinsics-chevron"
+                            class="fas fa-chevron-right"
+                        ></em>
+                    </div>
+                    <div class="block-details-separator"></div>
+                    <div id="block-details-extrinsic-container"></div>
+                    <div class="block-details-section-header">
+                        <span id="block-details-event-count"></span>
+                        <span class="flex-spacer"></span>
+                        <em
+                            id="block-details-events-chevron"
+                            class="fas fa-chevron-right"
+                        ></em>
+                    </div>
+                    <div class="block-details-separator"></div>
+                    <div id="block-details-event-container"></div>
+                </div>
+            </div>
         </div>
     </body>
 </html>

@@ -10,7 +10,7 @@ export abstract class Constants {
     static readonly CONNECTION_TIMEOUT_MS = 30000;
     static readonly CONNECTION_RETRY_MS = 5000;
     static readonly XCM_TRANSFER_FETCH_LIMIT = 10;
-    static readonly XCM_DISPLAY_LIMIT = 3;
+    static readonly XCM_DISPLAY_LIMIT = 5;
     static readonly XCM_TRANSFER_FETCH_PERIOD_MS = 12000;
     // UI
     static readonly HASH_TRIM_SIZE = 7;
