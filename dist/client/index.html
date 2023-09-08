@@ -128,126 +128,6 @@
                         <span id="xcm-details-amount"></span>
                     </div>
                 </div>
-                <!-- validator details -->
-                <div class="validator-details-board no-display" id="validator-details-board">
-                    <div class="validator-details-header">
-                        <span
-                            class="validator-details-identity"
-                            id="validator-details-identity"
-                        ></span>
-                        <span class="flex-spacer"></span>
-                        <img
-                            class="validator-details-close"
-                            id="validator-details-close"
-                            src="/img/icon/close-icon.png"
-                        />
-                    </div>
-                    <div class="validator-details-separator"></div>
-                    <div id="validator-details-para-info-container">
-                        <div class="validator-details-row" id="validator-details-para-info"></div>
-                        <div class="validator-details-separator"></div>
-                    </div>
-                    <div class="validator-details-row">
-                        <span>Stash</span>
-                        <span class="flex-spacer"></span>
-                        <span id="validator-details-stash-address"></span>
-                    </div>
-                    <div class="validator-details-row">
-                        <span>Controller</span>
-                        <span class="flex-spacer"></span>
-                        <span id="validator-details-controller-address"></span>
-                    </div>
-                    <div class="validator-details-row">
-                        <span>Commission</span>
-                        <span class="flex-spacer"></span>
-                        <span id="validator-details-commission"></span>
-                    </div>
-                    <div class="validator-details-row">
-                        <span>Finalized blocks in era</span>
-                        <span class="flex-spacer"></span>
-                        <span id="validator-details-blocks-in-era"></span>
-                    </div>
-                    <div class="validator-details-row">
-                        <span>Era reward points</span>
-                        <span class="flex-spacer"></span>
-                        <span id="validator-details-era-reward-points"></span>
-                    </div>
-                    <div class="validator-details-row">
-                        <span>Return rate</span>
-                        <span class="flex-spacer"></span>
-                        <span id="validator-details-return-rate"></span>
-                    </div>
-                    <div class="validator-details-separator"></div>
-                    <div class="validator-details-row">
-                        <span class="active-stake">Active Stake</span>
-                        <span class="flex-spacer"></span>
-                    </div>
-                    <div class="validator-details-row">
-                        <span>Self</span>
-                        <span class="flex-spacer"></span>
-                        <span id="validator-details-self-stake-amount"></span>
-                    </div>
-                    <div class="validator-details-row">
-                        <span id="validator-details-active-staker-count"></span>
-                        <span class="flex-spacer"></span>
-                        <span id="validator-details-active-stake-amount"></span>
-                    </div>
-                    <div class="validator-details-separator"></div>
-                    <div class="validator-details-row">
-                        <span class="inactive-stake">Inactive Nominations</span>
-                        <span class="flex-spacer"></span>
-                    </div>
-                    <div class="validator-details-row">
-                        <span id="validator-details-inactive-nominator-count"></span>
-                        <span class="flex-spacer"></span>
-                        <span id="validator-details-inactive-nomination-amount"></span>
-                    </div>
-                    <div class="validator-details-separator"></div>
-                    <div
-                        class="validator-details-status-icon-container"
-                        id="validator-details-status-icon-container"
-                    >
-                        <span
-                            id="validator-details-identicon-container"
-                            class="validator-details-identicon-container"
-                        ></span>
-                        <img
-                            id="validator-details-icon-onekv"
-                            src="/img/status/status-icon-1kv.svg"
-                            alt="Is enrolled in the Thousand Validators Programme"
-                        />
-                        <img
-                            id="validator-details-icon-heartbeat"
-                            src="/img/status/status-icon-heartbeat-received.svg"
-                            alt="Heartbeat received"
-                            title="Heartbeat received"
-                        />
-                        <img
-                            id="validator-details-icon-next-session"
-                            src="/img/status/status-icon-active-next-session.svg"
-                            alt="Is active next session"
-                            title="Is active next session"
-                        />
-                        <img
-                            id="validator-details-icon-slashed"
-                            src="/img/status/status-icon-slashed.svg"
-                            alt="Has been slashed before"
-                            title="Has been slashed before"
-                        />
-                        <img
-                            id="validator-details-icon-blocks-nominations"
-                            src="/img/status/status-icon-blocks-nominations.svg"
-                            alt="Blocks nominations"
-                            title="Blocks nominations"
-                        />
-                        <img
-                            id="validator-details-icon-oversubscribed"
-                            src="/img/status/status-icon-oversubscribed.svg"
-                            alt="Oversubscribed"
-                            title="Oversubscribed"
-                        />
-                    </div>
-                </div>
             </div>
             <div class="right-panel" id="right-panel">
                 <div class="menu" id="menu">
@@ -454,24 +334,135 @@
                     <div class="block-details-section-header">
                         <span id="block-details-extrinsic-count"></span>
                         <span class="flex-spacer"></span>
-                        <em
-                            id="block-details-extrinsics-chevron"
-                            class="fas fa-chevron-right"
-                        ></em>
+                        <em id="block-details-extrinsics-chevron" class="fas fa-chevron-right"></em>
                     </div>
                     <div class="block-details-separator"></div>
                     <div id="block-details-extrinsic-container"></div>
                     <div class="block-details-section-header">
                         <span id="block-details-event-count"></span>
                         <span class="flex-spacer"></span>
-                        <em
-                            id="block-details-events-chevron"
-                            class="fas fa-chevron-right"
-                        ></em>
+                        <em id="block-details-events-chevron" class="fas fa-chevron-right"></em>
                     </div>
                     <div class="block-details-separator"></div>
                     <div id="block-details-event-container"></div>
                 </div>
+            </div>
+        </div>
+        <!-- validator details -->
+        <div class="validator-details-board no-display" id="validator-details-board">
+            <div class="validator-details-header">
+                <span class="validator-details-identity" id="validator-details-identity"></span>
+                <span class="flex-spacer"></span>
+                <img
+                    class="validator-details-close"
+                    id="validator-details-close"
+                    src="/img/icon/close-icon.png"
+                />
+            </div>
+            <div class="validator-details-separator"></div>
+            <div id="validator-details-para-info-container">
+                <div class="validator-details-row" id="validator-details-para-info"></div>
+                <div class="validator-details-separator"></div>
+            </div>
+            <div class="validator-details-row">
+                <span>Stash</span>
+                <span class="flex-spacer"></span>
+                <span id="validator-details-stash-address"></span>
+            </div>
+            <div class="validator-details-row">
+                <span>Controller</span>
+                <span class="flex-spacer"></span>
+                <span id="validator-details-controller-address"></span>
+            </div>
+            <div class="validator-details-row">
+                <span>Commission</span>
+                <span class="flex-spacer"></span>
+                <span id="validator-details-commission"></span>
+            </div>
+            <div class="validator-details-row">
+                <span>Finalized blocks in era</span>
+                <span class="flex-spacer"></span>
+                <span id="validator-details-blocks-in-era"></span>
+            </div>
+            <div class="validator-details-row">
+                <span>Era reward points</span>
+                <span class="flex-spacer"></span>
+                <span id="validator-details-era-reward-points"></span>
+            </div>
+            <div class="validator-details-row">
+                <span>Return rate</span>
+                <span class="flex-spacer"></span>
+                <span id="validator-details-return-rate"></span>
+            </div>
+            <div class="validator-details-separator"></div>
+            <div class="validator-details-row">
+                <span class="active-stake">Active Stake</span>
+                <span class="flex-spacer"></span>
+            </div>
+            <div class="validator-details-row">
+                <span>Self</span>
+                <span class="flex-spacer"></span>
+                <span id="validator-details-self-stake-amount"></span>
+            </div>
+            <div class="validator-details-row">
+                <span id="validator-details-active-staker-count"></span>
+                <span class="flex-spacer"></span>
+                <span id="validator-details-active-stake-amount"></span>
+            </div>
+            <div class="validator-details-separator"></div>
+            <div class="validator-details-row">
+                <span class="inactive-stake">Inactive Nominations</span>
+                <span class="flex-spacer"></span>
+            </div>
+            <div class="validator-details-row">
+                <span id="validator-details-inactive-nominator-count"></span>
+                <span class="flex-spacer"></span>
+                <span id="validator-details-inactive-nomination-amount"></span>
+            </div>
+            <div class="validator-details-separator"></div>
+            <div
+                class="validator-details-status-icon-container"
+                id="validator-details-status-icon-container"
+            >
+                <span
+                    id="validator-details-identicon-container"
+                    class="validator-details-identicon-container"
+                ></span>
+                <img
+                    id="validator-details-icon-onekv"
+                    src="/img/status/status-icon-1kv.svg"
+                    alt="Is enrolled in the Thousand Validators Programme"
+                />
+                <img
+                    id="validator-details-icon-heartbeat"
+                    src="/img/status/status-icon-heartbeat-received.svg"
+                    alt="Heartbeat received"
+                    title="Heartbeat received"
+                />
+                <img
+                    id="validator-details-icon-next-session"
+                    src="/img/status/status-icon-active-next-session.svg"
+                    alt="Is active next session"
+                    title="Is active next session"
+                />
+                <img
+                    id="validator-details-icon-slashed"
+                    src="/img/status/status-icon-slashed.svg"
+                    alt="Has been slashed before"
+                    title="Has been slashed before"
+                />
+                <img
+                    id="validator-details-icon-blocks-nominations"
+                    src="/img/status/status-icon-blocks-nominations.svg"
+                    alt="Blocks nominations"
+                    title="Blocks nominations"
+                />
+                <img
+                    id="validator-details-icon-oversubscribed"
+                    src="/img/status/status-icon-oversubscribed.svg"
+                    alt="Oversubscribed"
+                    title="Oversubscribed"
+                />
             </div>
         </div>
     </body>

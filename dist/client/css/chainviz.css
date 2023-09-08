@@ -66,6 +66,10 @@ hr {
     }
 }
 
+.scene-container canvas {
+    width: 100% !important;
+}
+
 .mono {
     font-family: 'Fira Mono';
 }
@@ -375,6 +379,13 @@ img {
     flex-direction: column;
 }
 
+@media screen and (max-width: 900px) {
+    .content .center-panel .xcm-details-board {
+        display: none;
+    }
+    
+}
+
 .content .center-panel .xcm-details-board .xcm-details-header {
     display: flex;
     flex-direction: row;
@@ -412,10 +423,10 @@ img {
 }
 
 /* validator details board */
-.content .center-panel .validator-details-board {
+.validator-details-board {
     position: absolute;
     top: 66px;
-    left: 4px;
+    left: 204px;
     width: 232px;
     backdrop-filter: blur(7px);
     -webkit-backdrop-filter: blur(7px);
@@ -428,7 +439,13 @@ img {
     flex-direction: column;
 }
 
-.content .center-panel .validator-details-board .validator-details-header {
+@media screen and (max-width: 900px) {
+    .validator-details-board {
+        left: 26px;
+    }
+}
+
+.validator-details-board .validator-details-header {
     height: 22px;
     display: flex;
     flex-direction: row;
@@ -436,7 +453,7 @@ img {
     gap: 8px;
 }
 
-.content .center-panel .validator-details-board .validator-details-identity {
+.validator-details-board .validator-details-identity {
     margin-top: 2px;
     font-size: 13px;
     white-space: nowrap;
@@ -447,22 +464,22 @@ img {
     gap: 4px;
 }
 
-.content .center-panel .validator-details-board .validator-details-identity img {
+.validator-details-board .validator-details-identity img {
     width: 14px;
     height: 14px;
 }
 
-.content .center-panel .validator-details-board .validator-details-identity .identity {
+.validator-details-board .validator-details-identity .identity {
     margin-top: 0px;
 }
 
-.content .center-panel .validator-details-board .validator-details-close {
+.validator-details-board .validator-details-close {
     width: 18px;
     height: 18px;
     cursor: pointer;
 }
 
-.content .center-panel .validator-details-board .validator-details-row {
+.validator-details-board .validator-details-row {
     display: flex;
     flex-direction: row;
     justify-content: space-between;
@@ -471,20 +488,20 @@ img {
     gap: 8px;
 }
 
-.content .center-panel .validator-details-board #validator-details-para-info span {
+.validator-details-board #validator-details-para-info span {
     margin-top: 2px;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
 }
 
-.content .center-panel .validator-details-board #validator-details-para-info img {
+.validator-details-board #validator-details-para-info img {
     width: 18px;
     height: 18px;
     border-radius: 9px;
 }
 
-.content .center-panel .validator-details-board .validator-details-separator {
+.validator-details-board .validator-details-separator {
     border-bottom: 1px dotted #ffffff;
     height: 0px;
     width: 100%;
@@ -492,7 +509,7 @@ img {
     margin-top: 8px;
 }
 
-.content .center-panel .validator-details-board .validator-details-status-icon-container {
+.validator-details-board .validator-details-status-icon-container {
     display: flex;
     flex-direction: row;
     align-items: center;
@@ -501,16 +518,14 @@ img {
     margin-top: 8px;
 }
 
-.content
-    .center-panel
-    .validator-details-board
+.validator-details-board
     .validator-details-status-icon-container
     .validator-details-identicon-container {
     width: 24px;
     height: 24px;
 }
 
-.content .center-panel .validator-details-board .validator-details-status-icon-container img {
+.validator-details-board .validator-details-status-icon-container img {
     width: 24px;
     height: 24px;
 }
@@ -530,6 +545,12 @@ img {
     font-size: 12px;
     display: flex;
     flex-direction: column;
+}
+
+@media screen and (max-width: 900px) {
+    .block-details-board {
+        right: 26px;
+    }
 }
 
 .block-details-board .block-details-header {
