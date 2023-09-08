@@ -383,7 +383,6 @@ img {
     .content .center-panel .xcm-details-board {
         display: none;
     }
-    
 }
 
 .content .center-panel .xcm-details-board .xcm-details-header {
@@ -441,6 +440,7 @@ img {
 
 @media screen and (max-width: 900px) {
     .validator-details-board {
+        top: 26px;
         left: 26px;
     }
 }
@@ -664,6 +664,7 @@ img {
     flex-direction: row;
     padding: 1px;
     gap: 2px;
+    box-sizing: border-box;
 }
 
 .content .right-panel .menu .menu-item {

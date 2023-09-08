@@ -46,6 +46,7 @@ class Scene {
     private highlightedValidatorIndex: number | undefined = undefined;
     private validatorParaLines: THREE.Line[] = [];
     private highlightedParaId: number | undefined = undefined;
+    private readonly narrowScreen = window.matchMedia('(max-width: 900px)');
 
     constructor(container: HTMLDivElement, delegate: SceneDelegate) {
         this.container = container;
@@ -155,6 +156,9 @@ class Scene {
     }
 
     private checkMouseHoverRaycast() {
+        if (this.narrowScreen.matches) {
+            return;
+        }
         this.raycaster.setFromCamera(this.mouseHoverPoint, this.camera);
         const intersects = this.raycaster.intersectObjects(this.scene.children, true);
         let validatorIndex: number | undefined = undefined;
@@ -339,6 +343,10 @@ class Scene {
     }
 
     onNewBlock(block: Block, onHalfTime: () => void, onComplete: () => void) {
+        if (this.narrowScreen.matches) {
+            onComplete();
+            return;
+        }
         if (this.highlightedValidatorIndex != undefined || this.highlightedParaId != undefined) {
             onComplete();
             return;
