@@ -1,6 +1,13 @@
+/**
+ * Polkaholic API XCM data wrapper.
+ */
 export interface XCMInfoWrapper {
     xcmInfo: XCMInfo;
 }
+
+/**
+ * Polkaholic API XCM transfer instance.
+ */
 export interface XCMInfo {
     symbol?: string;
     relayChain: XCMRelayChain;
@@ -8,16 +15,25 @@ export interface XCMInfo {
     destination: XCMDestination;
 }
 
+/**
+ * For type-safety.
+ */
 // prettier-ignore
 export function isXCMInfo(object: any): object is XCMInfo { // eslint-disable-line @typescript-eslint/no-explicit-any
     return 'relayChain' in object && 'origination' in object && 'destination' in object;
 }
 
+/**
+ * XCM transfer relay chain type.
+ */
 export interface XCMRelayChain {
     relayChain: string;
     relayAt: number;
 }
 
+/**
+ * XCM transfer origination data.
+ */
 export interface XCMOrigination {
     chainName: string;
     id: string;
@@ -47,6 +63,9 @@ export interface XCMOrigination {
     transferIndex: number;
 }
 
+/**
+ * XCM transfer destination data.
+ */
 export interface XCMDestination {
     chainName: string;
     id: string;

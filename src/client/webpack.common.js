@@ -1,3 +1,7 @@
+/**
+ * Webpack common configuration.
+ */
+
 const path = require('path');
 
 module.exports = {

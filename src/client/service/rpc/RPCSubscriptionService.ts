@@ -1,6 +1,9 @@
 import ReconnectingWebSocket from 'reconnecting-websocket';
 import camelcaseKeysDeep from 'camelcase-keys-deep';
 
+/**
+ * JSON-RPC 2.0 request.
+ */
 class RPCRequest {
     id: number;
     jsonrpc: string;
@@ -15,6 +18,9 @@ class RPCRequest {
     }
 }
 
+/**
+ * JSON-RPC WS service listener interface.
+ */
 interface RPCSubscriptionServiceListener<T> {
     onConnected(): void;
     onSubscribed(subscriptionId: number): void;
@@ -24,6 +30,9 @@ interface RPCSubscriptionServiceListener<T> {
     onError(code: number, message: string): void;
 }
 
+/**
+ * JSON-RPC WS service state.
+ */
 enum RPCSubscriptionServiceState {
     NotConnected,
     Connected,
@@ -31,6 +40,9 @@ enum RPCSubscriptionServiceState {
     Error,
 }
 
+/**
+ * JSON-RPC service client generic class for SubVT WS services. `T` is the response type.
+ */
 class RPCSubscriptionService<T> {
     private readonly url: string;
     private readonly subscribeMethod: string;

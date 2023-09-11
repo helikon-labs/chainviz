@@ -2,6 +2,9 @@ import { Kusama, Network } from '../model/substrate/network';
 import { NetworkStatus } from '../model/subvt/network-status';
 import { formatNumber } from '../util/format';
 
+/**
+ * Network status board UI.
+ */
 interface UI {
     root: HTMLElement;
     blockProgress: HTMLElement;
@@ -9,7 +12,6 @@ interface UI {
     finalizedBlock: HTMLElement;
     eraIndex: HTMLElement;
     eraRewardPoints: HTMLElement;
-    //return: HTMLElement;
     totalStakeTitle: HTMLElement;
     totalStake: HTMLElement;
     minStakeTitle: HTMLElement;
@@ -20,6 +22,10 @@ interface UI {
     averageStake: HTMLElement;
 }
 
+/**
+ * Network status board. Display the real-time network status data as
+ * fetched from the SubVT network status service.
+ */
 class NetworkStatusBoard {
     private readonly ui: UI;
     private lastBlockTime = 0;
@@ -33,7 +39,6 @@ class NetworkStatusBoard {
             finalizedBlock: <HTMLElement>document.getElementById('network-finalized-block'),
             eraIndex: <HTMLElement>document.getElementById('network-era-index'),
             eraRewardPoints: <HTMLElement>document.getElementById('network-era-reward-points'),
-            //return: <HTMLElement>document.getElementById('network-return'),
             totalStakeTitle: <HTMLElement>document.getElementById('network-total-stake-title'),
             totalStake: <HTMLElement>document.getElementById('network-total-stake'),
             minStakeTitle: <HTMLElement>document.getElementById('network-min-stake-title'),
@@ -59,13 +64,17 @@ class NetworkStatusBoard {
         }, 1);
     }
 
+    /**
+     * Displays the given network status.
+     *
+     * @param network current network (Kusama, Polkadot, etc.)
+     * @param status current network status
+     */
     display(network: Network, status: NetworkStatus) {
         this.ui.bestBlock.innerHTML = status.bestBlockNumber.toString();
         this.ui.finalizedBlock.innerHTML = status.finalizedBlockNumber.toString();
         this.ui.eraIndex.innerHTML = status.activeEra.index.toString();
         this.ui.eraRewardPoints.innerHTML = status.eraRewardPoints.toString();
-        //this.ui.return.innerHTML =
-        //    formatNumber(BigInt(status.returnRatePerMillion), 4, 2) + '%';
         this.ui.totalStakeTitle.innerHTML = `Total Stake (M${network.tokenTicker})`;
         this.ui.totalStake.innerHTML = formatNumber(
             status.totalStake,
@@ -109,6 +118,9 @@ class NetworkStatusBoard {
         return this.ui.root.getBoundingClientRect();
     }
 
+    /**
+     * To display the block progress bar correctly.
+     */
     onNewBlock() {
         this.lastBlockTime = Date.now();
     }

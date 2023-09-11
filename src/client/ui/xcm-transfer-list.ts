@@ -2,6 +2,9 @@ import { XCMInfo } from '../model/polkaholic/xcm';
 import { Network, getNetworkPara } from '../model/substrate/network';
 import { Para } from '../model/substrate/para';
 
+/**
+ * XCM transfer list UI.
+ */
 interface UI {
     root: HTMLDivElement;
 }
@@ -12,6 +15,9 @@ interface XCMTransferListDelegate {
     onMouseLeave(originExtrinsicHash: string): void;
 }
 
+/**
+ * Displays the list of XCM transfers for the selected network as fetched from the Polkaholic API.
+ */
 class XCMTransferList {
     private readonly ui: UI;
     private readonly delegate: XCMTransferListDelegate;
@@ -23,6 +29,14 @@ class XCMTransferList {
         this.delegate = delegate;
     }
 
+    /**
+     * Inner HTML for a single transfer item in the list.
+     *
+     * @param relayChain relay chain of the transfer
+     * @param originPara origina parachain/thread
+     * @param destinationPara destination parachain/thread
+     * @returns inner HTML for the XCM transfer item
+     */
     private getXCMTransferInnerHTML(
         relayChain: Network,
         originPara: Para | undefined,

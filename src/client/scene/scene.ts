@@ -18,21 +18,48 @@ const BlOCK_LINE_MATERIAL = new THREE.LineBasicMaterial({
     color: Constants.BLOCK_LINE_COLOR,
 });
 
+/**
+ * Delegate for the 3D scene.
+ */
 interface SceneDelegate {
+    /**
+     * Called when the mouse enters a validator sphere.
+     *
+     * @param validator hovered validator
+     */
     onValidatorMouseEnter(validator: ValidatorSummary): void;
+    /**
+     * Called when the mouse leaves the hovered validator.
+     */
     onValidatorMouseLeave(): void;
+    /**
+     * Called when the mouse enters a para icon.
+     *
+     * @param paraId hovered para id
+     */
     onParaMouseEnter(paraId: number): void;
+    /**
+     * Called when the mouse leaves a para icon.
+     */
     onParaMouseLeave(): void;
+    /**
+     * Called when the user clicks on the hovered validator.
+     *
+     * @param index index of the validator
+     * @param validator clicked validator
+     */
     onValidatorClick(index: number, validator: ValidatorSummary): void;
 }
 
+/**
+ * 3D scene.
+ */
 class Scene {
     private readonly scene: THREE.Scene;
     private readonly delegate: SceneDelegate;
     private readonly camera: THREE.PerspectiveCamera;
     private readonly controls: OrbitControls;
     private readonly renderer: THREE.WebGLRenderer;
-    private readonly stats: Stats;
     private readonly container: HTMLElement;
     private readonly paraMesh: ParaMesh;
     private readonly validatorMesh: ValidatorMesh;
@@ -48,6 +75,12 @@ class Scene {
     private highlightedParaId: number | undefined = undefined;
     private readonly narrowScreen = window.matchMedia('(max-width: 900px)');
 
+    /**
+     * Scene constructor - called once at startup.
+     *
+     * @param container container div
+     * @param delegate scene delegate
+     */
     constructor(container: HTMLDivElement, delegate: SceneDelegate) {
         this.container = container;
         this.delegate = delegate;
@@ -68,7 +101,7 @@ class Scene {
         );
         this.camera.lookAt(new THREE.Vector3());
 
-        // renderer
+        // init renderer
         this.renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
         this.renderer.setSize(container.clientWidth, container.clientHeight);
         this.renderer.setPixelRatio(window.devicePixelRatio);
@@ -92,10 +125,6 @@ class Scene {
         circle.renderOrder = Number.MAX_SAFE_INTEGER;
         this.scene.add(circle);
 
-        // stats
-        this.stats = new Stats();
-        //document.body.appendChild(this.stats.dom);
-        //this.stats.domElement.style.cssText = "position:absolute; bottom:0px; right:0px;";
         // orbit controls
         this.controls = new OrbitControls(this.camera, this.renderer.domElement);
         this.controls.enabled = false;
@@ -111,19 +140,27 @@ class Scene {
         );
     }
 
+    /**
+     * Call delegate if a validator is clicked.
+     *
+     * @param _event mouse event
+     */
     private onClick(_event: MouseEvent) {
-        //const x = (event.clientX / window.innerWidth) * 2 - 1;
-        //const y = -(event.clientY / window.innerHeight) * 2 + 1;
         if (this.highlightedValidatorIndex != undefined) {
             const slot = this.validatorMesh.getSlotAtIndex(this.highlightedValidatorIndex);
             if (slot) {
                 this.delegate.onValidatorClick(this.highlightedValidatorIndex, slot.validator);
             }
         } else if (this.highlightedParaId != undefined) {
-            // view para details
+            // could view para details
         }
     }
 
+    /**
+     * Update the hover point instance when the mouse moves.
+     *
+     * @param event mouse event
+     */
     onMouseMove(event: MouseEvent) {
         const containerRect = this.container.getBoundingClientRect();
         const x = event.x - containerRect.left;
@@ -132,16 +169,20 @@ class Scene {
         this.mouseHoverPoint.y = -((y / containerRect.height) * 2 - 1);
     }
 
+    /**
+     * Update camera and renderer on window resize.
+     */
     private onWindowResize() {
         this.camera.aspect = this.container.clientWidth / this.container.clientHeight;
         this.camera.updateProjectionMatrix();
         this.renderer.setSize(this.container.clientWidth, this.container.clientHeight);
-        this.render();
     }
 
+    /**
+     * Called at every frame.
+     */
     animate() {
         this.controls.update();
-        this.stats.update();
         this.render();
         if (this.validatorMeshIsRotating && this.highlightedParaId == undefined) {
             this.validatorMesh.rotate();
@@ -155,6 +196,9 @@ class Scene {
         this.renderer.render(this.scene, this.camera);
     }
 
+    /**
+     * Utilized to detect mouse hovers over paras and validators.
+     */
     private checkMouseHoverRaycast() {
         if (this.narrowScreen.matches) {
             return;
@@ -215,6 +259,13 @@ class Scene {
         document.getElementsByTagName('html')[0].style.cursor = 'default';
     }
 
+    /**
+     * Initialize the scene.
+     *
+     * @param paras list of paras
+     * @param validatorMap map of validators
+     * @param onComplete completion callback
+     */
     start(paras: Para[], validatorMap: Map<string, ValidatorSummary>, onComplete?: () => void) {
         this.paraMesh.start(this.scene, paras);
         this.validatorMesh.start(this.scene, validatorMap, () => {
@@ -226,12 +277,23 @@ class Scene {
         this.validatorMeshIsRotating = true;
     }
 
+    /**
+     * Reset the scene. Called before network changes.
+     *
+     * @param onComplete completion callback
+     */
     reset(onComplete?: () => void) {
         this.validatorMeshIsRotating = false;
         this.paraMesh.reset();
         this.validatorMesh.reset(onComplete);
     }
 
+    /**
+     * Get on-screen position of a validator with the gives stash address.
+     *
+     * @param stashAddress validator stash address in SS58 encoding
+     * @returns position of the validator if exists, undefined otherwise
+     */
     getValidatorOnScreenPosition(stashAddress: string): THREE.Vec2 | undefined {
         const position = this.validatorMesh.getValidatorPosition(stashAddress);
         if (position == undefined) {
@@ -240,6 +302,12 @@ class Scene {
         return getOnScreenPosition(position, this.renderer, this.camera);
     }
 
+    /**
+     * Add lines from a para to its validators.
+     *
+     * @param paraId para id
+     * @param paravalidatorStashAddresses stash addresses of the paravalidators
+     */
     private addParavalidatorLines(paraId: number, paravalidatorStashAddresses: string[]) {
         const paraPosition = this.paraMesh.getParaPosition(paraId);
         if (paraPosition) {
@@ -260,6 +328,9 @@ class Scene {
         }
     }
 
+    /**
+     * Remove previously added paravalidator lines.
+     */
     private removeParaValidatorLines() {
         for (const validatorParaLine of this.validatorParaLines) {
             this.scene.remove(validatorParaLine);
@@ -267,6 +338,11 @@ class Scene {
         this.validatorParaLines = [];
     }
 
+    /**
+     * Highlight the gives validator, and add a paravalidator line if it's a paravalidator.
+     *
+     * @param validator validator to be highlighted
+     */
     highlightValidator(validator: ValidatorSummary) {
         this.validatorMesh.highlightValidator(validator.address);
         if (validator.paraId) {
@@ -274,16 +350,30 @@ class Scene {
         }
     }
 
+    /**
+     * Clear previously highlighted validator.
+     */
     clearValidatorHighlight() {
         this.validatorMesh.clearHighlight();
         this.paraMesh.clearHighlight();
         this.removeParaValidatorLines();
     }
 
+    /**
+     * Highlight paras with the given para ids.
+     *
+     * @param paraIds ids of paras to be highlighted
+     */
     highlightParas(paraIds: number[]) {
         this.paraMesh.highlightParas(paraIds);
     }
 
+    /**
+     * Highlight a single para and its validators.
+     *
+     * @param paraId para id
+     * @param paravalidatorStashAddresses stash addresses of the para's validators
+     */
     highlightPara(paraId: number, paravalidatorStashAddresses: string[]) {
         this.paraMesh.highlightParas([paraId]);
         this.validatorMesh.highlightParaValidators(paraId);
@@ -291,12 +381,21 @@ class Scene {
         this.validatorMesh.clearSelection();
     }
 
+    /**
+     * Clear any highlight.
+     */
     clearParaHighlight() {
         this.paraMesh.clearHighlight();
         this.validatorMesh.clearHighlight();
         this.removeParaValidatorLines();
     }
 
+    /**
+     * Get on-screen position of the para with the gives id.
+     *
+     * @param paraId para id
+     * @returns position of the para with the gives id
+     */
     getParaOnScreenPosition(paraId: number): THREE.Vec2 {
         return getOnScreenPosition(
             this.paraMesh.getParaPosition(paraId)!,
@@ -319,6 +418,12 @@ class Scene {
         return height * this.camera.aspect;
     }
 
+    /**
+     * Utilized to display the block production beam animation.
+     *
+     * @param hash block hash
+     * @returns position of the target of the beam if the block with the gives hash exists, undefined otherwise
+     */
     getCandidateBlockBeamTargetPosition(hash: string): THREE.Vector3 | undefined {
         const candidateBlock = document.getElementById(`candidate-block-${hash}`);
         if (!candidateBlock) {
@@ -342,6 +447,13 @@ class Scene {
         return new THREE.Vector3(width / 2 - 1, targetY, 0);
     }
 
+    /**
+     * Called on a newly added block.
+     *
+     * @param block new block
+     * @param onHalfTime callback to be called when the animation is half-completed
+     * @param onComplete callback to be called when the animation is fully completed
+     */
     onNewBlock(block: Block, onHalfTime: () => void, onComplete: () => void) {
         if (this.narrowScreen.matches) {
             onComplete();
@@ -434,18 +546,38 @@ class Scene {
         ).start();
     }
 
+    /**
+     * Select the given validator.
+     *
+     * @param stashAddress validator stash address
+     */
     selectValidator(stashAddress: string) {
         this.validatorMesh.selectValidator(stashAddress);
     }
 
+    /**
+     * Clear previously applied validator selection.
+     */
     clearValidatorSelection() {
         this.validatorMesh.clearSelection();
     }
 
+    /**
+     * To be called when new validators get added to the active set. This data is sent by the
+     * SubVT active validator list service.
+     *
+     * @param newValidators list of new validators to be added
+     */
     onValidatorsAdded(newValidators: ValidatorSummary[]) {
         this.validatorMesh.onValidatorsAdded(newValidators);
     }
 
+    /**
+     * To be called when a number of validators are updated. This data is sent by the
+     * SubVT active validator list service.
+     *
+     * @param updatedValidators list of new validators to be updated
+     */
     onValidatorsUpdated(updatedValidators: ValidatorSummary[]) {
         if (this.started) {
             this.validatorMesh.onValidatorsUpdated(updatedValidators);
@@ -471,10 +603,22 @@ class Scene {
         }
     }
 
+    /**
+     * To be called when a number of validators get removed from the active set. This data is sent by the
+     * SubVT active validator list service.
+     *
+     * @param removedStashAddresses stash addresses of the removed validators
+     */
     onValidatorsRemoved(removedStashAddresses: string[]) {
         this.validatorMesh.onValidatorsRemoved(removedStashAddresses);
     }
 
+    /**
+     * Get paravalidator stash addresses for a given para id.
+     *
+     * @param paraId para id
+     * @returns paravalidaor stash addresses
+     */
     getParavalidatorStashAddresses(paraId: number): string[] {
         return this.validatorMesh.getParavalidatorStashAddresses(paraId);
     }

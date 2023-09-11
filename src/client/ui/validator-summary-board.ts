@@ -5,6 +5,9 @@ import { formatNumber } from '../util/format';
 import { cloneJSONSafeObject } from '../util/object';
 import { getValidatorIdentityIconHTML, getValidatorSummaryDisplay } from '../util/ui-util';
 
+/**
+ * Validator summary board UI.
+ */
 interface UI {
     root: HTMLElement;
     identity: HTMLElement;
@@ -16,6 +19,9 @@ interface UI {
     inactiveStake: HTMLElement;
 }
 
+/**
+ * Displays a summary of a hovered validator.
+ */
 class ValidatorSummaryBoard {
     private readonly ui: UI;
     private validator?: ValidatorSummary = undefined;

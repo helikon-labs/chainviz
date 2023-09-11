@@ -5,6 +5,9 @@ export interface ParaUI {
     logo: string;
 }
 
+/**
+ * Parachain/thread type.
+ */
 export interface Para {
     homepage?: string;
     info: string;

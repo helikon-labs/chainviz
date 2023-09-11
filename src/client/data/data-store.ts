@@ -21,6 +21,12 @@ import AsyncLock from 'async-lock';
 import { cloneJSONSafeObject } from '../util/object';
 import { getSS58Address } from '../util/crypto-util';
 
+/**
+ * Stores data and contains data-related logic.
+ *   - Substrate RPC connection.
+ *   - SubVT services - network status and active validator list.
+ *   - XCM transfers.
+ */
 class DataStore {
     private network!: Network;
     private substrateClient!: ApiPromise;
@@ -39,6 +45,9 @@ class DataStore {
     paras: Para[] = [];
     xcmTransfers: XCMInfo[] = [];
 
+    /**
+     * Receives network status and updates from the SubVT network status server.
+     */
     private readonly networkStatusListener: RPCSubscriptionServiceListener<NetworkStatusUpdate> = {
         onConnected: () => {
             this.eventBus.dispatch<string>(ChainvizEvent.NETWORK_STATUS_SERVICE_CONNECTED);
@@ -62,6 +71,9 @@ class DataStore {
         },
     };
 
+    /**
+     * Receives the active validator list and updates from the SubVT active validator list server.
+     */
     private readonly activeValidatorListListener: RPCSubscriptionServiceListener<ValidatorListUpdate> =
         {
             onConnected: () => {
@@ -94,25 +106,37 @@ class DataStore {
             },
         };
 
+    /**
+     * Changes the selected network. Disconnects Substrate RPC and SubVT service connections,
+     * and resets data.
+     *
+     * @param network selected network (Kusama or Polkadot)
+     */
     async setNetwork(network: Network) {
         this.network = network;
+        // disconnect services
         await this.disconnectSubstrateClient();
         this.disconnectNetworkStatusService();
         this.disconnectActiveValidatorListService();
         if (this.xcmTransferGetTimeout) {
             clearTimeout(this.xcmTransferGetTimeout);
         }
+        // reset data
         this.blocks = [];
         this.validatorMap.clear();
         this.paras = [];
         this.xcmTransfers = [];
     }
 
+    /**
+     * Establishes the Substrate WS-RPC connection.
+     */
     async connectSubstrateRPC() {
         this.substrateClient = new ApiPromise({
             provider: new WsProvider(this.network.rpcURL),
         });
         try {
+            // connection timeout handling
             await setAsyncTimeout(async (done) => {
                 await this.substrateClient.isReady;
                 done(0);
@@ -123,6 +147,9 @@ class DataStore {
         }
     }
 
+    /**
+     * Establishes the SubVT network status WS service connection.
+     */
     connectNetworkStatusService() {
         this.networkStatusClient = new RPCSubscriptionService(
             this.network.networkStatusServiceURL,
@@ -137,10 +164,16 @@ class DataStore {
         this.networkStatusClient?.disconnect();
     }
 
+    /**
+     * Subscribes to network status updates.
+     */
     subscribeToNetworkStatus() {
         this.networkStatusClient.subscribe();
     }
 
+    /**
+     * Establishes the SubVT active validator list WS service connection.
+     */
     connectActiveValidatorListService() {
         this.activeValidatorListClient = new RPCSubscriptionService(
             this.network.activeValidatorListServiceURL,
@@ -155,24 +188,37 @@ class DataStore {
         this.activeValidatorListClient?.disconnect();
     }
 
+    /**
+     * Subscribes to active validator list updates.
+     */
     subscribeToActiveValidatorList() {
         this.activeValidatorListClient.subscribe();
     }
 
+    /**
+     * Processes the network status update sent from the SubVT service.
+     */
     private processNetworkStatusUpdate(update: NetworkStatusUpdate) {
         if (update.status) {
+            // receiving the network status for the first time
             this.networkStatus = update.status;
         } else if (update.diff) {
+            // received a diff - apply it
             Object.assign(this.networkStatus, update.diff);
         }
+        // dispatch the update
         this.eventBus.dispatch<NetworkStatus>(
             ChainvizEvent.NETWORK_STATUS_UPDATE,
             this.networkStatus,
         );
     }
 
+    /**
+     * Processes the active validator list update sent from the SubVT service.
+     */
     private processActiveValidatorListUpdate(update: ValidatorListUpdate) {
         const removedStashAddresses: string[] = [];
+        // remove first
         for (const removeAccountId of update.removeIds) {
             this.validatorMap.delete(removeAccountId);
             removedStashAddresses.push(getSS58Address(this.network.ss58Prefix, removeAccountId));
@@ -183,7 +229,9 @@ class DataStore {
                 removedStashAddresses,
             );
         }
+        // add new validators
         if (update.insert.length > 0) {
+            // check whether we're receiving the first update
             const isInit = this.validatorMap.size == 0;
             for (const validator of update.insert) {
                 this.validatorMap.set(validator.address, cloneJSONSafeObject(validator));
@@ -194,6 +242,7 @@ class DataStore {
                 this.eventBus.dispatch(ChainvizEvent.ACTIVE_VALIDATOR_LIST_ADDED, update.insert);
             }
         }
+        // apply updates to the existing validators
         const updatedValidators: ValidatorSummary[] = [];
         for (const diff of update.update) {
             const address = getSS58Address(this.network.ss58Prefix, diff.accountId);
@@ -213,6 +262,12 @@ class DataStore {
         return this.paras.find((para) => para.paraId == paraId);
     }
 
+    /**
+     * Gets the stash addresses of paravalidators for a given parachain/thread.
+     *
+     * @param para parachain/thread
+     * @returns paravalidator stash addresses in an array
+     */
     getParavalidatorStashAddresses(para: Para): string[] {
         const stashAddresses: string[] = [];
         for (const stashAddress of this.validatorMap.keys()) {
@@ -224,6 +279,12 @@ class DataStore {
         return stashAddresses;
     }
 
+    /**
+     * Called at the initial setup or after a network change to get an initial list of finalized
+     * and unfinalized blocks.
+     *
+     * @returns list of blocks
+     */
     async getInitialBlocks() {
         const finalizedBlocks: Block[] = [];
         // get finalized blocks
@@ -244,8 +305,8 @@ class DataStore {
         } else {
             return;
         }
-        // get non-finalized blocks
-        const nonFinalizedBlocks: Block[] = [];
+        // get unfinalized blocks
+        const unFinalizedBlocks: Block[] = [];
         let nonFinalizedHeader = await this.substrateClient.rpc.chain.getHeader();
         while (
             nonFinalizedHeader.number.toNumber() !=
@@ -253,7 +314,7 @@ class DataStore {
         ) {
             const nonFinalizedBlock = await this.getBlockByHash(nonFinalizedHeader.hash);
             if (nonFinalizedBlock) {
-                nonFinalizedBlocks.push(nonFinalizedBlock);
+                unFinalizedBlocks.push(nonFinalizedBlock);
                 nonFinalizedHeader = await this.substrateClient.rpc.chain.getHeader(
                     nonFinalizedHeader.parentHash,
                 );
@@ -261,13 +322,23 @@ class DataStore {
                 break;
             }
         }
-        this.blocks = [...nonFinalizedBlocks, ...finalizedBlocks];
+        // join finalized and non-
+        this.blocks = [...unFinalizedBlocks, ...finalizedBlocks];
     }
 
+    /**
+     * Fetch the list parachain/thread ids from the Substrate node.
+     *
+     * @returns  parachain/thread ids
+     */
     private async getParaIds(): Promise<number[]> {
         return (await this.substrateClient.query.paras.parachains()).toJSON() as number[];
     }
 
+    /**
+     * Initialize paras list for the selected network. This list is extracted from a static file, which
+     * is fetched from the Polkadot JS apps repository.
+     */
     async getParas() {
         this.paras = [];
         const paraIds = await this.getParaIds();
@@ -279,6 +350,11 @@ class DataStore {
         }
     }
 
+    /**
+     * Subscribe to Substrate new block events.
+     *
+     * @returns unsubscribe promise
+     */
     subscribeToNewBlocks() {
         if (this.newBlockSubscription) {
             return;
@@ -290,6 +366,11 @@ class DataStore {
         );
     }
 
+    /**
+     * Subscribe to Substrate finalized block events.
+     *
+     * @returns unsubscribe promise
+     */
     subscribeToFinalizedBlocks() {
         if (this.finalizedHeaderSubscription) {
             return;
@@ -301,6 +382,11 @@ class DataStore {
         );
     }
 
+    /**
+     * Insert a new block into its appropriate position in the list of blocks.
+     *
+     * @param block new block
+     */
     private insertBlock(block: Block) {
         let insertIndex = 0;
         for (let i = 0; i < this.blocks.length; i++) {
@@ -319,6 +405,11 @@ class DataStore {
         ];
     }
 
+    /**
+     * Called when a new block is received from the Substrate node.
+     *
+     * @param header new block header
+     */
     private async onNewBlock(header: Header) {
         this.lock.acquire(
             this.blockProcessLockKey,
@@ -334,6 +425,12 @@ class DataStore {
         );
     }
 
+    /**
+     * Called when a new block is received from the Substrate node.
+     *
+     * @param header new block header
+     * @param done completion callback
+     */
     private async processNewBlock(header: Header, done: AsyncLock.AsyncLockDoneCallback<unknown>) {
         if (
             this.blocks.findIndex((block) => block.block.header.toHex() == header.hash.toHex()) >= 0
@@ -351,6 +448,11 @@ class DataStore {
         done();
     }
 
+    /**
+     * Called when a finalized block is received from the Substrate node.
+     *
+     * @param header finalized block header
+     */
     private async onFinalizedBlock(header: Header) {
         this.lock.acquire(
             this.blockProcessLockKey,
@@ -366,11 +468,17 @@ class DataStore {
         );
     }
 
+    /**
+     * Called when a finalized block is received from the Substrate node.
+     *
+     * @param header finalized block header
+     * @param done completion callback
+     */
     private async processFinalizedBlock(
         header: Header,
         done: AsyncLock.AsyncLockDoneCallback<unknown>,
     ) {
-        // find unfinalized slots before this one & discard & finalize
+        // find unfinalized blocks before this one & discard & finalize
         const removeIndices: number[] = [];
         for (let i = 0; i < this.blocks.length; i++) {
             if (
@@ -418,6 +526,12 @@ class DataStore {
         done();
     }
 
+    /**
+     * Fetches a block from the Substrate RPC node.
+     *
+     * @param hash block hash
+     * @returns promise for the block with the actual Substrate block, timestamp, events, extrinsics, etc.
+     */
     async getBlockByHash(hash: BlockHash): Promise<Block | undefined> {
         try {
             const extendedHeader = await this.substrateClient.derive.chain.getHeader(hash);
@@ -447,11 +561,21 @@ class DataStore {
         }
     }
 
+    /**
+     * Fetches a block from the Substrate RPC node by block number.
+     *
+     * @param hash block number
+     * @returns promise for the block with the actual Substrate block, timestamp, events, extrinsics, etc.
+     */
     async getBlockByNumber(number: number): Promise<Block | undefined> {
         const hash = await this.substrateClient.rpc.chain.getBlockHash(number);
         return this.getBlockByHash(hash);
     }
 
+    /**
+     * Fetches the list of recent XCM transfers from the Polkaholic API,
+     * and populates the data array.
+     */
     async getXCMTransfers() {
         const url = 'https://api.polkaholic.io/xcmtransfers';
         let xcmInfoWrapperList: XCMInfoWrapper[] = [];

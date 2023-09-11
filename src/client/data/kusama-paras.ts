@@ -1,5 +1,9 @@
 import { Para } from '../model/substrate/para';
 
+/**
+ * List of Polkadot parachains.
+ * From https://github.com/polkadot-js/apps/blob/master/packages/apps-config/src/endpoints/productionRelayKusama.ts.
+ */
 export const KUSAMA_PARAS: Para[] = [
     {
         homepage: 'https://a.band',

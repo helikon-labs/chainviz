@@ -1,3 +1,6 @@
+/**
+ * Main menu UI.
+ */
 interface UI {
     root: HTMLElement;
     mainItem: HTMLElement;
@@ -8,12 +11,18 @@ interface UI {
     aboutContent: HTMLElement;
 }
 
+/**
+ * Menu items.
+ */
 enum MenuItem {
     Main,
     Validators,
     About,
 }
 
+/**
+ * Main menu and item contents.
+ */
 class Menu {
     private readonly ui: UI;
     private currentItem: MenuItem = MenuItem.Main;
@@ -28,6 +37,7 @@ class Menu {
             aboutItem: <HTMLElement>document.getElementById('menu-item-about'),
             aboutContent: <HTMLElement>document.getElementById('menu-content-about'),
         };
+
         setTimeout(() => {
             this.ui.mainItem.onclick = () => {
                 this.select(MenuItem.Main);

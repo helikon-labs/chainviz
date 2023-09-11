@@ -1,3 +1,9 @@
+/**
+ * Typescript event bus implementation.
+ * From https://github.com/luixaviles/event-bus-typescript.
+ * Details https://www.thisdot.co/blog/how-to-implement-an-event-bus-in-typescript/.
+ */
+
 export interface Registry {
     unregister: () => void;
 }

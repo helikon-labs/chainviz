@@ -15,6 +15,9 @@ import { ValidatorListDelegate } from './ui/validator-list';
 
 THREE.Cache.enabled = true;
 
+/**
+ * Top-level application class.
+ */
 class Chainviz {
     private readonly ui: UI;
     private readonly dataStore: DataStore;
@@ -22,6 +25,9 @@ class Chainviz {
     private network: Network = Kusama;
     private started = false;
 
+    /**
+     * Delegate implementation for the 3D scene.
+     */
     private readonly sceneDelegate = <SceneDelegate>{
         onValidatorMouseEnter: (validator: ValidatorSummary) => {
             this.ui.highlightValidator(this.network, validator, true, true);
@@ -45,6 +51,9 @@ class Chainviz {
         },
     };
 
+    /**
+     * Delegate implementation for the validator list.
+     */
     private readonly validatorListDelegate = <ValidatorListDelegate>{
         onMouseOver: (stashAddress: string) => {
             const validator = this.dataStore.validatorMap.get(stashAddress);
@@ -63,6 +72,9 @@ class Chainviz {
         },
     };
 
+    /**
+     * Delegate implementation for the XCM transfer list.
+     */
     private readonly xcmTransferListDelegate = <XCMTransferListDelegate>{
         onClick: (originExtrinsicHash: string) => {
             const transfer =
@@ -90,6 +102,9 @@ class Chainviz {
         },
     };
 
+    /**
+     * Initializes the UI, data store and subscribe to the event bus events.
+     */
     constructor() {
         this.ui = new UI(
             this.sceneDelegate,
@@ -186,6 +201,9 @@ class Chainviz {
         await this.connect();
     }
 
+    /**
+     * Make necessary connections for the selected network.
+     */
     async connect() {
         await this.dataStore.setNetwork(this.network);
         this.ui.setLoadingInfo('connecting to blockchain');

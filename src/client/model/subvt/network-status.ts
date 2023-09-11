@@ -3,6 +3,9 @@ import { Era } from '../substrate/era';
 
 type NetworkStatusKeys = keyof NetworkStatus;
 
+/**
+ * SubVT network status type.
+ */
 interface NetworkStatus {
     finalizedBlockNumber: number;
     finalizedBlockHash: string;
@@ -24,6 +27,9 @@ interface NetworkStatus {
 
 type NetworkStatusDiff = Partial<NetworkStatus>;
 
+/**
+ * SubVT network status update type.
+ */
 interface NetworkStatusUpdate {
     network: string;
     status?: NetworkStatus;

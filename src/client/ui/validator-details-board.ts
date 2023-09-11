@@ -16,6 +16,9 @@ interface ValidatorDetailsBoardDelegate {
     onClose(): void;
 }
 
+/**
+ * Validator details board UI.
+ */
 interface UI {
     root: HTMLElement;
     close: HTMLElement;
@@ -43,6 +46,10 @@ interface UI {
     oversubscribedIcon: HTMLElement;
 }
 
+/**
+ * Utilized to display a selected validator's details, and gets updated according to the updates
+ * from the SubVT active validator list service.
+ */
 class ValidatorDetailsBoard {
     private readonly ui: UI;
     private readonly delegate: ValidatorDetailsBoardDelegate;
@@ -120,6 +127,12 @@ class ValidatorDetailsBoard {
         return this.mouseIsInside;
     }
 
+    /**
+     * Display the given validator's details.
+     *
+     * @param network current network
+     * @param validator selected validator
+     */
     show(network: Network, validator: ValidatorSummary) {
         this.validator = cloneJSONSafeObject(validator);
         this.ui.identiconContainer.innerHTML = generateIdenticonSVGHTML(

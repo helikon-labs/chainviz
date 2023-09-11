@@ -3,6 +3,9 @@ import { POLKADOT_PARAS } from '../../data/polkadot-paras';
 import { Constants } from '../../util/constants';
 import { Para } from './para';
 
+/**
+ * Substrate network.
+ */
 interface Network {
     readonly id: string;
     readonly display: string;

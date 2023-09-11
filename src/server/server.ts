@@ -4,6 +4,9 @@ import http from 'http';
 
 const port = 3000;
 
+/**
+ * Webpack boilerplate.
+ */
 class App {
     private server: http.Server;
     private port: number;

@@ -10,29 +10,38 @@ const CROSSHAIR_LINE_MATERIAL = new THREE.LineBasicMaterial({
     opacity: Constants.PARAS_CROSSHAIR_OPACITY,
 });
 
+/**
+ * 3D paravalidator mesh view.
+ */
 class ParaMesh {
     private group!: THREE.Group;
 
+    /**
+     * Does the initial construction of the mesh and animation.
+     * @param scene
+     * @param paras
+     */
     start(scene: THREE.Scene, paras: Para[]) {
+        // clear data if exists
         if (this.group) {
             scene.remove(this.group);
         }
         this.group = new THREE.Group();
-        // horizontal line
+        // add horizontal crosshair line
         let linePoints = [];
         linePoints.push(new THREE.Vector3(-Constants.PARAS_CROSSHAIR_HORIZONTAL_RADIUS, 0, 0));
         linePoints.push(new THREE.Vector3(Constants.PARAS_CROSSHAIR_HORIZONTAL_RADIUS, 0, 0));
         let lineGeometry = new THREE.BufferGeometry().setFromPoints(linePoints);
         let line = new THREE.Line(lineGeometry, CROSSHAIR_LINE_MATERIAL);
         this.group.add(line);
-        // vertical line
+        // add vertical crosshair line
         linePoints = [];
         linePoints.push(new THREE.Vector3(0, Constants.PARAS_CROSSHAIR_VERTICAL_RADIUS, 0));
         linePoints.push(new THREE.Vector3(0, -Constants.PARAS_CROSSHAIR_VERTICAL_RADIUS, 0));
         lineGeometry = new THREE.BufferGeometry().setFromPoints(linePoints);
         line = new THREE.Line(lineGeometry, CROSSHAIR_LINE_MATERIAL);
         this.group.add(line);
-        // ring
+        // add ring
         const ringMaterial = new THREE.LineBasicMaterial({
             color: Constants.PARAS_CROSSHAIR_COLOR,
             transparent: true,
@@ -47,7 +56,6 @@ class ParaMesh {
         this.group.add(ring);
 
         const initialRadius = Constants.VALIDATOR_ARC_RADIUS;
-        const _backgroundGeometry = new THREE.CircleGeometry(Constants.PARA_BG_RADIUS);
         const logoGeometry = new THREE.CircleGeometry(Constants.PARA_LOGO_RADIUS);
         const backgroundMaterial = new THREE.MeshBasicMaterial({
             color: Constants.PARA_BG_COLOR,
@@ -59,22 +67,6 @@ class ParaMesh {
             const para = paras[i];
             const paraGroup = new THREE.Group();
             const angle = (Math.PI / paras.length) * 2 * i;
-            // add background circle
-            /*
-            const background = new THREE.Mesh(backgroundGeometry, backgroundMaterial);
-            background.position.set(
-                Math.sin(angle) * initialRadius,
-                Math.cos(angle) * initialRadius,
-                0,
-            );
-            background.material.opacity = 0;
-            background.userData = {
-                type: 'paraBackground',
-                paraId: para.paraId,
-            };
-            paraGroup.add(background);
-            */
-
             // add logo
             const logoTexture = new THREE.TextureLoader().load('/img/paras/' + para.ui.logo);
             const logoMaterial = new THREE.MeshBasicMaterial({
@@ -98,6 +90,11 @@ class ParaMesh {
         this.animate(false);
     }
 
+    /**
+     * Startup or stop animation.
+     *
+     * @param isReverse true for the animation before a network change
+     */
     private animate(isReverse: boolean) {
         const progress = { progress: isReverse ? 1.0 : 0.0 };
         const initialRadius = Constants.VALIDATOR_ARC_RADIUS;
@@ -138,6 +135,12 @@ class ParaMesh {
         ).start();
     }
 
+    /**
+     * Get local position of a para icon.
+     *
+     * @param paraId para id
+     * @returns position if para with the given id exists, undefined otherwise
+     */
     getParaPosition(paraId: number): THREE.Vector3 | undefined {
         for (let i = 3; i < this.group.children.length; i++) {
             for (const child of this.group.children[i].children) {
@@ -149,6 +152,11 @@ class ParaMesh {
         return undefined;
     }
 
+    /**
+     * Highlights the paras with the given ids
+     *
+     * @param paraIds para ids
+     */
     highlightParas(paraIds: number[]) {
         for (let i = 3; i < this.group.children.length; i++) {
             for (const child of this.group.children[i].children) {
@@ -166,6 +174,9 @@ class ParaMesh {
         }
     }
 
+    /**
+     * Clear any highlight.
+     */
     clearHighlight() {
         for (let i = 3; i < this.group.children.length; i++) {
             for (const child of this.group.children[i].children) {
@@ -183,6 +194,9 @@ class ParaMesh {
         }
     }
 
+    /**
+     * Called before a network change.
+     */
     reset() {
         this.animate(true);
     }

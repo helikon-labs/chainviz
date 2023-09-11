@@ -7,8 +7,6 @@ body {
     overflow: hidden;
     margin: 0px;
     background-color: #1d1d1d;
-    /* background-color: #000000; */
-    /*color: #ffffffe9;*/
     color: #ffffff;
     font-family: 'Mont';
     font-variant-numeric: tabular-nums;
@@ -229,6 +227,7 @@ a:active {
     opacity: 0.75;
 }
 
+/* icon container */
 .content .left-panel .icon-container {
     margin-top: 0px;
     margin-right: 0px;

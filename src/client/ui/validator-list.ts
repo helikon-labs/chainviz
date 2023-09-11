@@ -2,6 +2,9 @@ import { ValidatorSummary } from '../model/subvt/validator-summary';
 import { cloneJSONSafeObject } from '../util/object';
 import { getValidatorSummaryDisplay } from '../util/ui-util';
 
+/**
+ * Validator list UI.
+ */
 interface UI {
     container: HTMLElement;
     filterContainer: HTMLElement;
@@ -15,6 +18,9 @@ interface ValidatorListDelegate {
     onClick(stashAddress: string): void;
 }
 
+/**
+ * Validator list. Displayed as a tab under the main menu. Supports filter/search by address/identity.
+ */
 class ValidatorList {
     private readonly delegate: ValidatorListDelegate;
     private readonly ui: UI;

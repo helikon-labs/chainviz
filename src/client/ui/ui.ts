@@ -23,6 +23,9 @@ import { XCMTransferDetailsBoard } from './xcm-transfer-details-board';
 import { ValidatorList, ValidatorListDelegate } from './validator-list';
 import { Menu, MenuItem } from './menu';
 
+/**
+ * Chainviz top-level UI.
+ */
 class UI {
     private readonly scene: Scene;
     private readonly root: HTMLElement;
@@ -148,6 +151,9 @@ class UI {
         this.animate();
     }
 
+    /**
+     * Called at each frame.
+     */
     animate() {
         requestAnimationFrame(() => {
             this.animate();

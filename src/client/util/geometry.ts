@@ -1,5 +1,14 @@
 import * as THREE from 'three';
 
+/**
+ * Rotates an object around a pivot point in 3D space.
+ *
+ * @param obj object to be rotated
+ * @param point pivot point
+ * @param axis
+ * @param theta rotation angle
+ * @param pointIsWorld whether to compensate for world coordinate
+ */
 function rotateAboutPoint(
     obj: THREE.Object3D,
     point: THREE.Vector3,
@@ -27,6 +36,14 @@ function rotateAboutPoint(
     obj.rotateOnAxis(axis, theta);
 }
 
+/**
+ * Get on-screen position of a given 3D position.
+ *
+ * @param position 3D position/coordinates
+ * @param renderer Three.js renderer
+ * @param camera Three.js camera
+ * @returns
+ */
 function getOnScreenPosition(
     position: THREE.Vector3,
     renderer: THREE.WebGLRenderer,

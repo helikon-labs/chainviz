@@ -65,6 +65,10 @@ function getRandomCharacterType(): CharacterType {
     }
 }
 
+/**
+ * Utilized to draw the dynamic logo inside a canvas element.
+ * Currently not in use.
+ */
 class Logo {
     private readonly shapeType: ShapeType;
     private characterType: CharacterType;

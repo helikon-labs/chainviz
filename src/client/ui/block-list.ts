@@ -5,10 +5,16 @@ import { createTween } from '../util/tween';
 import * as TWEEN from '@tweenjs/tween.js';
 import { BlockDetailsBoard } from './block-details-board';
 
+/**
+ * Block list UI.
+ */
 interface UI {
     root: HTMLElement;
 }
 
+/**
+ * Block details. Utilized to display the list of non-finalized and finalized blocks.
+ */
 class BlockList {
     private readonly ui: UI;
     private readonly isCandidateBlockList: boolean;
@@ -71,6 +77,11 @@ class BlockList {
         blockDiv.innerHTML = this.getBlockHTML(block);
     }
 
+    /**
+     * Find the spot for a block and insert it.
+     *
+     * @param block new block
+     */
     private insertBlock(block: Block) {
         const newBlockNumber = block.block.header.number.toNumber();
         let nextBlockDiv: Element | undefined = undefined;
@@ -109,6 +120,11 @@ class BlockList {
         this.insertBlock(block);
     }
 
+    /**
+     * Fade in an existing block.
+     *
+     * @param block block to show
+     */
     showBlock(block: Block) {
         const blockDiv = this.getBlockDiv(block);
         if (blockDiv) {

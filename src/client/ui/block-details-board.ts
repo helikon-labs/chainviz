@@ -8,6 +8,9 @@ import {
 } from '../util/format';
 import { hide, show } from '../util/ui-util';
 
+/**
+ * Block details board UI.
+ */
 interface UI {
     root: HTMLElement;
     close: HTMLElement;
@@ -28,9 +31,18 @@ interface UI {
     eventContainer: HTMLElement;
 }
 
+/**
+ * Block details board. Displayed when a block from the block list is clicked.
+ */
 class BlockDetailsBoard {
     private readonly ui: UI;
+    /**
+     * Whether the block extrinsics are currently visible or not.
+     */
     private extrinsicsAreVisible: boolean = false;
+    /**
+     * Whether the block events are currently visible or not.
+     */
     private eventsAreVisible: boolean = false;
     private hash: string = '';
     private mouseIsInside: boolean = false;
@@ -59,6 +71,8 @@ class BlockDetailsBoard {
             eventsChevron: <HTMLElement>document.getElementById('block-details-events-chevron'),
             eventContainer: <HTMLElement>document.getElementById('block-details-event-container'),
         };
+
+        // add mouse events
         setTimeout(() => {
             this.ui.close.onclick = () => {
                 this.close();
@@ -118,6 +132,11 @@ class BlockDetailsBoard {
         this.eventsAreVisible = true;
     }
 
+    /**
+     * Display a block.
+     *
+     * @param block block to display
+     */
     display(block: Block) {
         this.hash = block.block.header.hash.toHex();
         this.hideExtrinsics();

@@ -1,3 +1,6 @@
+/**
+ * Substrate epoch.
+ */
 interface Epoch {
     index: number;
     startBlockNumber: number;

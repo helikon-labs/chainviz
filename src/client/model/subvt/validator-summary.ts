@@ -1,8 +1,11 @@
-import { InactiveNominationsSummary } from '../substrate/nomination';
-import { StakeSummary } from '../substrate/stake';
+import { InactiveNominationsSummary } from '../subvt/nomination';
+import { StakeSummary } from '../subvt/stake';
 import { ValidatorPreferences } from '../substrate/validator-preferences';
-import { ValidatorStakeSummary } from '../substrate/validator-stake';
+import { ValidatorStakeSummary } from '../subvt/validator-stake';
 
+/**
+ * SubVT validator summary type.
+ */
 interface ValidatorSummary {
     accountId: string;
     address: string;
@@ -28,6 +31,9 @@ interface ValidatorSummary {
     validatorStake?: ValidatorStakeSummary;
 }
 
+/**
+ *
+ */
 interface ValidatorSummaryDiff {
     accountId: string;
     controllerAccountId?: string;

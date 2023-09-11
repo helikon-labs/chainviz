@@ -1,5 +1,8 @@
 import * as THREE from 'three';
 
+/**
+ * Contains app-level constants.
+ */
 export abstract class Constants {
     // RPC
     //static readonly KUSAMA_RPC_URL = 'wss://rpc.ibp.network/kusama';

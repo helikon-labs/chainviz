@@ -8,6 +8,9 @@ import {
 } from '../util/format';
 import { hide, show } from '../util/ui-util';
 
+/**
+ * XCM transfer details board UI.
+ */
 interface UI {
     root: HTMLElement;
     close: HTMLElement;
@@ -20,6 +23,9 @@ interface UI {
     amount: HTMLElement;
 }
 
+/**
+ * Displays the details of an XCM transfer, as fetched from thje Polkaholic API.
+ */
 class XCMTransferDetailsBoard {
     private readonly ui: UI;
     private mouseIsInside: boolean = false;

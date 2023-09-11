@@ -41,15 +41,36 @@ interface ValidatorSlot {
     scale: number;
 }
 
+/**
+ * 3D validator mesh view.
+ */
 class ValidatorMesh {
     private arcMesh!: THREE.InstancedMesh;
     private validatorMesh!: THREE.InstancedMesh;
     private validatorSelectorMesh!: THREE.Mesh;
     private group!: THREE.Group;
+    /**
+     * Stores the validators as slots in a double array, a representation of the
+     * spheric visualization. First dimension is the arc index, and the second dimension
+     * is for each validator on a specific arc.
+     */
     private arcs: (ValidatorSlot | undefined)[][] = [];
+    /**
+     * Stores the highlighted validator's index in the instanced mesh. Undefined if no
+     * validator is highlighted.
+     */
     private highlightedValidatorIndex: number | undefined = undefined;
+    /**
+     * Stores the highlighted para id, when the validators of a para are displayed.
+     * Undefined if no para is highlighted.
+     */
     private highlightedParaId: number | undefined = undefined;
 
+    /**
+     * Calculates the min and max reward points stored in the mesh.
+     *
+     * @returns two-item array: first is the min reward points and second is the max
+     */
     private getMinMaxRewardPoints(): [number, number] {
         let minRewardPoints = Number.MAX_SAFE_INTEGER;
         let maxRewardPoints = 0;
@@ -65,6 +86,11 @@ class ValidatorMesh {
         return [minRewardPoints, maxRewardPoints];
     }
 
+    /**
+     * Initializes the slots in the arcs from the validator map.
+     *
+     * @param validatorMap map of stash addresses to validators
+     */
     private initSlots(validatorMap: Map<string, ValidatorSummary>) {
         // init arcs
         this.arcs = [];
@@ -94,6 +120,10 @@ class ValidatorMesh {
         }
     }
 
+    /**
+     * Validator sphere size is directly proportional to relative reward points of the validator.
+     * This function initializes the scales of all validators places in the arcs.
+     */
     private initScales() {
         const minScale =
             Constants.VALIDATOR_SPHERE_MIN_RADIUS / Constants.VALIDATOR_SPHERE_MAX_RADIUS;
@@ -113,6 +143,13 @@ class ValidatorMesh {
         }
     }
 
+    /**
+     * Called at start-up of network change.
+     *
+     * @param scene three.js scene
+     * @param validatorMap stash addresses to active validators
+     * @param onComplete completion callback
+     */
     start(
         scene: THREE.Scene,
         validatorMap: Map<string, ValidatorSummary>,
@@ -149,10 +186,16 @@ class ValidatorMesh {
             VALIDATOR_SELECTOR_MATERIAL,
             this.arcs.length * this.arcs[0].length,
         );
-        // initial animation
+        // run initial animation
         this.animate(false, onComplete);
     }
 
+    /**
+     * Runs the initial animation, or the reverse. Latter is called when a different network gets selected.
+     *
+     * @param isReverse whether to run the close animation
+     * @param onComplete completion callback
+     */
     private animate(isReverse: boolean, onComplete?: () => void) {
         const progress = { progress: isReverse ? 1.0 : 0.0 };
         const currentRotationY = this.group.rotation.y;
@@ -216,10 +259,21 @@ class ValidatorMesh {
         this.group.rotateY(Constants.VALIDATOR_MESH_ROTATE_Y_DELTA);
     }
 
+    /**
+     * Called right after a network change.
+     *
+     * @param onComplete completion callback
+     */
     reset(onComplete?: () => void) {
         this.animate(true, onComplete);
     }
 
+    /**
+     * Gets the instance index of a validator given the stash address.
+     *
+     * @param stashAddress stash address of the validator in SS58 encoding
+     * @returns instanced mesh index if validator is found, undefined otherwise
+     */
     getValidatorIndex(stashAddress: string): number | undefined {
         for (let i = 0; i < this.arcs.length; i++) {
             for (let j = 0; j < this.arcs[i].length; j++) {
@@ -234,6 +288,13 @@ class ValidatorMesh {
         return undefined;
     }
 
+    /**
+     * Get the position of the validator inside the group - doesn't take into account the rotation
+     * of the containing group.
+     *
+     * @param index instance index
+     * @returns coordinates of the validator sphere
+     */
     private getInnerValidatorPosition(index: number): THREE.Vector3 {
         const matrix = new THREE.Matrix4();
         this.validatorMesh.getMatrixAt(index, matrix);
@@ -242,6 +303,12 @@ class ValidatorMesh {
         return position;
     }
 
+    /**
+     * Get on-screen position of a validator.
+     *
+     * @param stashAddress stash address of the validator in SS58 encoding
+     * @returns on-screen coordinates of the validator sphere if the validator is found, undefined otherwise
+     */
     getValidatorPosition(stashAddress: string): THREE.Vector3 | undefined {
         const index = this.getValidatorIndex(stashAddress);
         if (index == undefined) {
@@ -252,6 +319,11 @@ class ValidatorMesh {
         return innerPosition.applyMatrix4(groupMatrix);
     }
 
+    /**
+     * Highlight a validator by its stash address.
+     *
+     * @param stashAddress stash address of the validator in SS58 encoding
+     */
     highlightValidator(stashAddress: string) {
         const index = this.getValidatorIndex(stashAddress);
         if (index != undefined) {
@@ -260,6 +332,10 @@ class ValidatorMesh {
         }
     }
 
+    /**
+     * Reset all validators' scales - called after a highlight to take all validators
+     * back to their initial scales.
+     */
     private resetScales() {
         for (let i = 0; i < this.arcs.length; i++) {
             const arcFirstIndex = i * this.arcs[0].length;
@@ -317,6 +393,9 @@ class ValidatorMesh {
         this.validatorMesh.computeBoundingSphere();
     }
 
+    /**
+     * Clear para or validator highlight.
+     */
     clearHighlight() {
         this.highlightedValidatorIndex = undefined;
         this.highlightedParaId = undefined;
@@ -324,17 +403,33 @@ class ValidatorMesh {
         ARC_MATERIAL.opacity = Constants.VALIDATOR_ARC_NORMAL_OPACITY;
     }
 
+    /**
+     * Get the validator slot with the given instance index.
+     *
+     * @param index validator instance index
+     * @returns validator slot if there's a validator at the given instance index, undefined otherwise
+     */
     getSlotAtIndex(index: number): ValidatorSlot | undefined {
         const arcIndex = Math.floor(index / this.arcs[0].length);
         const indexInArc = index % this.arcs[0].length;
         return this.arcs[arcIndex][indexInArc];
     }
 
+    /**
+     * Highlight validators of a given para.
+     *
+     * @param paraId id of the para
+     */
     highlightParaValidators(paraId: number) {
         this.highlightedParaId = paraId;
         this.resetScales();
     }
 
+    /**
+     * Get the list of paravalidator stash addresses for the given para
+     * @param paraId id of the para
+     * @returns list of paravalidator stash addresses, empty if there's none assigned to para
+     */
     getParavalidatorStashAddresses(paraId: number): string[] {
         const result: string[] = [];
         for (let i = 0; i < this.arcs.length; i++) {
@@ -348,6 +443,11 @@ class ValidatorMesh {
         return result;
     }
 
+    /**
+     * Select a validator by its stash address.
+     *
+     * @param stashAddress validator stash address in SS58 encoding
+     */
     selectValidator(stashAddress: string) {
         const index = this.getValidatorIndex(stashAddress);
         if (index != undefined) {
@@ -359,10 +459,18 @@ class ValidatorMesh {
         }
     }
 
+    /**
+     * Clear validator selection.
+     */
     clearSelection() {
         this.validatorSelectorMesh.removeFromParent();
     }
 
+    /**
+     * Add new active validators - sent as an update by the SubVT active validator list server.
+     *
+     * @param newValidators validators to be added
+     */
     onValidatorsAdded(newValidators: ValidatorSummary[]) {
         const count = newValidators.length;
         for (let i = 0; i < this.arcs.length; i++) {
@@ -386,6 +494,11 @@ class ValidatorMesh {
         }
     }
 
+    /**
+     * Update a number of existing active validators - sent as an update by the SubVT active validator list server.
+     *
+     * @param updatedValidators validators to be updated
+     */
     onValidatorsUpdated(updatedValidators: ValidatorSummary[]) {
         let updatedCount = 0;
         for (const updatedValidator of updatedValidators) {
@@ -404,6 +517,11 @@ class ValidatorMesh {
         }
     }
 
+    /**
+     * Remove a number of existing active validators - sent as an update by the SubVT active validator list server.
+     *
+     * @param removedStashAddresses stash addresses of validators to be removed, in SS58 encoding
+     */
     onValidatorsRemoved(removedStashAddresses: string[]) {
         let removedCount = 0;
         for (let i = 0; i < this.arcs.length; i++) {

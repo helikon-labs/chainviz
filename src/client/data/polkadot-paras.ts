@@ -1,5 +1,9 @@
 import { Para } from '../model/substrate/para';
 
+/**
+ * List of Polkadot parachains.
+ * From https://github.com/polkadot-js/apps/blob/master/packages/apps-config/src/endpoints/productionRelayPolkadot.ts.
+ */
 export const POLKADOT_PARAS: Para[] = [
     {
         homepage: 'https://acala.network/',
