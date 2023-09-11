@@ -1,6 +1,5 @@
 import * as THREE from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
-import Stats from 'three/examples/jsm/libs/stats.module';
 import { Constants } from '../util/constants';
 import { Para } from '../model/substrate/para';
 import { ValidatorSummary } from '../model/subvt/validator-summary';
