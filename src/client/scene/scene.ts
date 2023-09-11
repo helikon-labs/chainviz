@@ -150,8 +150,6 @@ class Scene {
             if (slot) {
                 this.delegate.onValidatorClick(this.highlightedValidatorIndex, slot.validator);
             }
-        } else if (this.highlightedParaId != undefined) {
-            // could view para details
         }
     }
 

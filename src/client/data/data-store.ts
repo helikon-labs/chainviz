@@ -294,7 +294,7 @@ class DataStore {
             finalizedBlock.isFinalized = true;
             finalizedBlocks.push(finalizedBlock);
             for (let i = 0; i < Constants.INITIAL_BLOCK_COUNT; i++) {
-                finalizedBlock = await this.getBlockByHash(finalizedBlock!.block.header.parentHash);
+                finalizedBlock = await this.getBlockByHash(finalizedBlock.block.header.parentHash);
                 if (finalizedBlock) {
                     finalizedBlock.isFinalized = true;
                     finalizedBlocks.push(finalizedBlock);
@@ -489,7 +489,7 @@ class DataStore {
                 removeIndices.push(i);
             }
         }
-        for (const removeIndex of removeIndices.reverse()) {
+        for (const removeIndex of removeIndices.slice().reverse()) {
             const removed = this.blocks.splice(removeIndex, 1);
             this.eventBus.dispatch<Block>(ChainvizEvent.DISCARDED_BLOCK, removed[0]);
         }
@@ -627,7 +627,7 @@ class DataStore {
             );
             this.eventBus.dispatch<XCMInfo[]>(ChainvizEvent.XCM_TRANSFERS_DISCARDED, discarded);
         }
-        for (const xcmTransfer of this.xcmTransfers.reverse()) {
+        for (const xcmTransfer of this.xcmTransfers.slice().reverse()) {
             this.eventBus.dispatch<XCMInfo>(ChainvizEvent.NEW_XCM_TRANSFER, xcmTransfer);
         }
 
