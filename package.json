@@ -8,7 +8,7 @@
         "lint": "eslint ./",
         "build": "webpack --config ./src/client/webpack.prod.js",
         "dev": "webpack serve --config ./src/client/webpack.dev.js",
-        "test": "jest",
+        "test": "jest --detectOpenHandles",
         "start": "node ./dist/server/server.js",
         "deploy": "gh-pages -d ./dist/client",
         "init-jest": "jest init"
@@ -25,14 +25,15 @@
         "@types/async-lock": "^1.4.0",
         "@types/camelcase-keys-deep": "^0.1.0",
         "@types/express": "^4.17.17",
-        "@types/node": "^20.5.9",
+        "@types/jsdom": "^21.1.2",
+        "@types/node": "^20.6.0",
         "@types/three": "^0.155.1",
         "@typescript-eslint/eslint-plugin": "^6.5.0",
         "@typescript-eslint/parser": "^6.5.0",
         "async-lock": "^1.4.0",
         "camelcase-keys-deep": "^0.1.0",
         "cannon-es": "^0.20.0",
-        "eslint": "^8.48.0",
+        "eslint": "^8.49.0",
         "eslint-config-standard": "^17.1.0",
         "eslint-plugin-import": "^2.28.1",
         "eslint-plugin-node": "^11.1.0",
@@ -56,6 +57,6 @@
         "webpack-cli": "^5.1.4",
         "webpack-dev-server": "^4.15.1",
         "webpack-merge": "^5.9.0",
-        "ws": "^8.13.0"
+        "ws": "^8.14.1"
     }
 }

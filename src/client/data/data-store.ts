@@ -3,7 +3,7 @@ import { Network, getNetworkPara } from '../model/substrate/network';
 import {
     RPCSubscriptionService,
     RPCSubscriptionServiceListener,
-} from '../service/rpc/RPCSubscriptionService';
+} from '../service/rpc/rpc-subscription-service';
 import { NetworkStatus, NetworkStatusUpdate } from '../model/subvt/network-status';
 import { ValidatorListUpdate, ValidatorSummary } from '../model/subvt/validator-summary';
 import { setAsyncTimeout } from '../util/async-util';
