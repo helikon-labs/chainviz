@@ -220,8 +220,9 @@ class DataStore {
         const removedStashAddresses: string[] = [];
         // remove first
         for (const removeAccountId of update.removeIds) {
-            this.validatorMap.delete(removeAccountId);
-            removedStashAddresses.push(getSS58Address(this.network.ss58Prefix, removeAccountId));
+            const address = getSS58Address(this.network.ss58Prefix, removeAccountId);
+            this.validatorMap.delete(address);
+            removedStashAddresses.push(address);
         }
         if (removedStashAddresses.length > 0) {
             this.eventBus.dispatch(
