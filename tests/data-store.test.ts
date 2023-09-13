@@ -5,6 +5,8 @@ import { Kusama } from '../src/client/model/substrate/network';
 import { EventBus } from '../src/client/event/event-bus';
 import { ChainvizEvent } from '../src/client/event/event';
 import { ValidatorSummary } from '../src/client/model/subvt/validator-summary';
+import { Constants } from '../src/client/util/constants';
+import { Block } from '../src/client/model/chainviz/block';
 
 // prettier-ignore
 (BigInt.prototype as any).toJSON = function () { // eslint-disable-line @typescript-eslint/no-explicit-any
@@ -41,7 +43,7 @@ describe('data store', () => {
     });
     test('active validator list remove works and publishes event', async () => {
         const dataStore = new DataStore();
-        dataStore.setNetwork(Kusama);
+        await dataStore.setNetwork(Kusama);
         dataStore['processActiveValidatorListUpdate']({
             finalizedBlockNumber: 0,
             insert: validators,
@@ -50,8 +52,8 @@ describe('data store', () => {
         });
         const removeIds = [validators[0].accountId, validators[1].accountId];
         const removeAddresses = [validators[0].address, validators[1].address];
-        const eventBus = EventBus.getInstance();
         let eventReceived = false;
+        const eventBus = EventBus.getInstance();
         eventBus.register(
             ChainvizEvent.ACTIVE_VALIDATOR_LIST_REMOVED,
             (removedStashAddresses: string[]) => {
@@ -74,7 +76,7 @@ describe('data store', () => {
     });
     test('active validator list update works and publishes event', async () => {
         const dataStore = new DataStore();
-        dataStore.setNetwork(Kusama);
+        await dataStore.setNetwork(Kusama);
         dataStore['processActiveValidatorListUpdate']({
             finalizedBlockNumber: 0,
             insert: validators,
@@ -86,8 +88,8 @@ describe('data store', () => {
             ],
             removeIds: [],
         });
-        const eventBus = EventBus.getInstance();
         let eventReceived = false;
+        const eventBus = EventBus.getInstance();
         eventBus.register(
             ChainvizEvent.ACTIVE_VALIDATOR_LIST_UPDATED,
             (updatedValidators: ValidatorSummary[]) => {
@@ -115,5 +117,84 @@ describe('data store', () => {
         expect(dataStore['validatorMap'].get(validators[1].address)?.paraId).toBe(2010);
         await new Promise((resolve) => setTimeout(resolve, 500));
         expect(eventReceived).toBeTruthy();
+    });
+    test('gets correct number of initial blocks', async () => {
+        const dataStore = new DataStore();
+        await dataStore.setNetwork(Kusama);
+        await dataStore.connectSubstrateRPC();
+        await dataStore.getInitialBlocks();
+        expect(dataStore['blocks'].length > Constants.INITIAL_FINALIZED_BLOCK_COUNT).toBeTruthy();
+        expect(dataStore['blocks'].filter((block) => block.isFinalized).length).toBe(
+            Constants.INITIAL_FINALIZED_BLOCK_COUNT,
+        );
+        await dataStore.disconnectSubstrateClient();
+    });
+    test('gets paras', async () => {
+        const dataStore = new DataStore();
+        await dataStore.setNetwork(Kusama);
+        await dataStore.connectSubstrateRPC();
+        const paraIds = await dataStore['getParaIds']();
+        await dataStore.getParas();
+        expect(dataStore.paras.length).toBeGreaterThan(30);
+        expect(dataStore.paras.length).toBeLessThanOrEqual(paraIds.length);
+        await dataStore.disconnectSubstrateClient();
+    });
+    test('subscribes to new blocks', async () => {
+        const dataStore = new DataStore();
+        await dataStore.setNetwork(Kusama);
+        await dataStore.connectSubstrateRPC();
+        let eventReceived = false;
+        const eventBus = EventBus.getInstance();
+        eventBus.register(ChainvizEvent.NEW_BLOCK, (block: Block) => {
+            expect(block.events.length).toBeGreaterThan(0);
+            eventReceived = true;
+        });
+        dataStore.subscribeToNewBlocks();
+        await new Promise((resolve) => setTimeout(resolve, 10_000));
+        expect(eventReceived).toBeTruthy();
+        await dataStore.disconnectSubstrateClient();
+    });
+    test('subscribes to finalized blocks', async () => {
+        const dataStore = new DataStore();
+        await dataStore.setNetwork(Kusama);
+        await dataStore.connectSubstrateRPC();
+        let eventReceived = false;
+        const eventBus = EventBus.getInstance();
+        eventBus.register(ChainvizEvent.FINALIZED_BLOCK, (block: Block) => {
+            expect(block.isFinalized).toBeTruthy();
+            expect(block.events.length).toBeGreaterThan(0);
+            eventReceived = true;
+        });
+        dataStore.subscribeToFinalizedBlocks();
+        await new Promise((resolve) => setTimeout(resolve, 10_000));
+        expect(eventReceived).toBeTruthy();
+        await dataStore.disconnectSubstrateClient();
+    });
+    test('can get block by hash', async () => {
+        const dataStore = new DataStore();
+        await dataStore.setNetwork(Kusama);
+        await dataStore.connectSubstrateRPC();
+        const blockNumber = 19662640;
+        const blockHash = await dataStore.getBlockHash(blockNumber);
+        expect(blockHash).toBeDefined();
+        expect(blockHash!.toHex()).toBe(
+            '0x4c7b7509917a547a205adcc5a11fe86a8527707500b0d453b3fbc1d129109f35',
+        );
+        const block = await dataStore.getBlockByHash(blockHash!);
+        expect(block).toBeDefined();
+        expect(block!.block.header.number.toNumber()).toBe(blockNumber);
+        expect(block!.events.length).toBe(48);
+        await dataStore.disconnectSubstrateClient();
+    });
+    test('can get block by number', async () => {
+        const dataStore = new DataStore();
+        await dataStore.setNetwork(Kusama);
+        await dataStore.connectSubstrateRPC();
+        const blockNumber = 19662639;
+        const block = await dataStore.getBlockByNumber(blockNumber);
+        expect(block).toBeDefined();
+        expect(block!.block.header.number.toNumber()).toBe(blockNumber);
+        expect(block!.events.length).toBe(44);
+        await dataStore.disconnectSubstrateClient();
     });
 });

@@ -29,7 +29,7 @@ import { getSS58Address } from '../util/crypto-util';
  */
 class DataStore {
     private network!: Network;
-    private substrateClient!: ApiPromise;
+    private substrateClient?: ApiPromise;
     private networkStatusClient!: RPCSubscriptionService<NetworkStatusUpdate>;
     private activeValidatorListClient!: RPCSubscriptionService<ValidatorListUpdate>;
     private readonly eventBus = EventBus.getInstance();
@@ -132,13 +132,12 @@ class DataStore {
      * Establishes the Substrate WS-RPC connection.
      */
     async connectSubstrateRPC() {
-        this.substrateClient = new ApiPromise({
-            provider: new WsProvider(this.network.rpcURL),
-        });
         try {
             // connection timeout handling
             await setAsyncTimeout(async (done) => {
-                await this.substrateClient.isReady;
+                this.substrateClient = await ApiPromise.create({
+                    provider: new WsProvider(this.network.rpcURL),
+                });
                 done(0);
             }, Constants.CONNECTION_TIMEOUT_MS);
             this.eventBus.dispatch<string>(ChainvizEvent.SUBSTRATE_API_READY);
@@ -287,6 +286,9 @@ class DataStore {
      * @returns list of blocks
      */
     async getInitialBlocks() {
+        if (!this.substrateClient) {
+            return;
+        }
         const finalizedBlocks: Block[] = [];
         // get finalized blocks
         const finalizedBlockHash = await this.substrateClient.rpc.chain.getFinalizedHead();
@@ -294,7 +296,7 @@ class DataStore {
         if (finalizedBlock) {
             finalizedBlock.isFinalized = true;
             finalizedBlocks.push(finalizedBlock);
-            for (let i = 0; i < Constants.INITIAL_BLOCK_COUNT; i++) {
+            for (let i = 0; i < Constants.INITIAL_FINALIZED_BLOCK_COUNT - 1; i++) {
                 finalizedBlock = await this.getBlockByHash(finalizedBlock.block.header.parentHash);
                 if (finalizedBlock) {
                     finalizedBlock.isFinalized = true;
@@ -308,16 +310,15 @@ class DataStore {
         }
         // get unfinalized blocks
         const unFinalizedBlocks: Block[] = [];
-        let nonFinalizedHeader = await this.substrateClient.rpc.chain.getHeader();
+        let unFinalizedHeader = await this.substrateClient.rpc.chain.getHeader();
         while (
-            nonFinalizedHeader.number.toNumber() !=
-            finalizedBlocks[0].block.header.number.toNumber()
+            unFinalizedHeader.number.toNumber() != finalizedBlocks[0].block.header.number.toNumber()
         ) {
-            const nonFinalizedBlock = await this.getBlockByHash(nonFinalizedHeader.hash);
-            if (nonFinalizedBlock) {
-                unFinalizedBlocks.push(nonFinalizedBlock);
-                nonFinalizedHeader = await this.substrateClient.rpc.chain.getHeader(
-                    nonFinalizedHeader.parentHash,
+            const unFinalizedBlock = await this.getBlockByHash(unFinalizedHeader.hash);
+            if (unFinalizedBlock) {
+                unFinalizedBlocks.push(unFinalizedBlock);
+                unFinalizedHeader = await this.substrateClient.rpc.chain.getHeader(
+                    unFinalizedHeader.parentHash,
                 );
             } else {
                 break;
@@ -333,6 +334,9 @@ class DataStore {
      * @returns  parachain/thread ids
      */
     private async getParaIds(): Promise<number[]> {
+        if (!this.substrateClient) {
+            return [];
+        }
         return (await this.substrateClient.query.paras.parachains()).toJSON() as number[];
     }
 
@@ -357,10 +361,10 @@ class DataStore {
      * @returns unsubscribe promise
      */
     subscribeToNewBlocks() {
-        if (this.newBlockSubscription) {
+        if (!this.substrateClient || this.newBlockSubscription) {
             return;
         }
-        this.newBlockSubscription = this.substrateClient.rpc.chain.subscribeNewHeads(
+        this.newBlockSubscription = this.substrateClient!.rpc.chain.subscribeNewHeads(
             async (header) => {
                 this.onNewBlock(header);
             },
@@ -373,10 +377,10 @@ class DataStore {
      * @returns unsubscribe promise
      */
     subscribeToFinalizedBlocks() {
-        if (this.finalizedHeaderSubscription) {
+        if (!this.substrateClient || this.finalizedHeaderSubscription) {
             return;
         }
-        this.finalizedHeaderSubscription = this.substrateClient.rpc.chain.subscribeFinalizedHeads(
+        this.finalizedHeaderSubscription = this.substrateClient!.rpc.chain.subscribeFinalizedHeads(
             async (header) => {
                 this.onFinalizedBlock(header);
             },
@@ -534,6 +538,9 @@ class DataStore {
      * @returns promise for the block with the actual Substrate block, timestamp, events, extrinsics, etc.
      */
     async getBlockByHash(hash: BlockHash): Promise<Block | undefined> {
+        if (!this.substrateClient) {
+            return undefined;
+        }
         try {
             const extendedHeader = await this.substrateClient.derive.chain.getHeader(hash);
             const substrateBlock = (await this.substrateClient.rpc.chain.getBlock(hash)).block;
@@ -569,8 +576,24 @@ class DataStore {
      * @returns promise for the block with the actual Substrate block, timestamp, events, extrinsics, etc.
      */
     async getBlockByNumber(number: number): Promise<Block | undefined> {
+        if (!this.substrateClient) {
+            return undefined;
+        }
         const hash = await this.substrateClient.rpc.chain.getBlockHash(number);
         return this.getBlockByHash(hash);
+    }
+
+    /**
+     * Fetches a block hash from the Substrate RPC node by block number.
+     *
+     * @param hash block number
+     * @returns promise for the block hash
+     */
+    async getBlockHash(number: number): Promise<BlockHash | undefined> {
+        if (!this.substrateClient) {
+            return undefined;
+        }
+        return await this.substrateClient.rpc.chain.getBlockHash(number);
     }
 
     /**
@@ -649,6 +672,7 @@ class DataStore {
         if (this.substrateClient) {
             try {
                 await this.substrateClient.disconnect();
+                this.substrateClient = undefined;
             } catch (error) {
                 console.error('Error while disconnecting Substrate client:', error);
             }

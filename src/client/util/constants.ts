@@ -20,7 +20,7 @@ export abstract class Constants {
     static readonly VALIDATOR_INSERT_DELAY_MS = 1000;
     static readonly CONTENT_FADE_ANIM_DURATION_MS = 500;
     static readonly UI_STATE_CHANGE_DELAY_MS = 300;
-    static readonly INITIAL_BLOCK_COUNT = 3;
+    static readonly INITIAL_FINALIZED_BLOCK_COUNT = 4;
     static readonly MAX_BLOCK_COUNT = 15;
     static readonly MAX_VALIDATORS_PER_ARC = 30;
     static readonly MIN_ARC_COUNT = 10;
