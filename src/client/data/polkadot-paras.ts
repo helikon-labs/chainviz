@@ -678,7 +678,7 @@ export const POLKADOT_PARAS: Para[] = [
         text: 'AssetHub',
         ui: {
             color: '#86e62a',
-            logo: 'AssetHub.svg',
+            logo: 'assetHub.svg',
         },
     },
     {
