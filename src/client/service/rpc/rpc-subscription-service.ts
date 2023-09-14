@@ -102,10 +102,16 @@ class RPCSubscriptionService<T> {
     }
 
     connect() {
-        this.connection = new ReconnectingWebSocket(this.url, [], {
-            WebSocket: ws,
-            connectionTimeout: 5000,
-        });
+        if (typeof window === 'undefined') {
+            this.connection = new ReconnectingWebSocket(this.url, [], {
+                WebSocket: ws,
+                connectionTimeout: 5000,
+            });
+        } else {
+            this.connection = new ReconnectingWebSocket(this.url, [], {
+                connectionTimeout: 5000,
+            });
+        }
         this.connection.onopen = () => {
             this.onOpen();
         };
