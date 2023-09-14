@@ -1,5 +1,5 @@
 <p align="center">
-    <img width="600" src="https://raw.githubusercontent.com/helikon-labs/chainviz/development/readme_files/chainviz_logo.png">
+    <img width="600" src="https://raw.githubusercontent.com/helikon-labs/chainviz/alpha/readme_files/chainviz_logo.png">
 </p>
 
 ![](https://github.com/helikon-labs/chainviz/actions/workflows/prettier_eslint.yml/badge.svg)
@@ -8,7 +8,7 @@
 ChainViz ([alpha.chainviz.app](https://alpha.chainviz.app)) is a real-time 3D chain visualization web application for Kusama.
 
 <p align="center">
-    <a href="https://alpha.chainviz.app" target="_blank"><img width="100%" src="https://raw.githubusercontent.com/helikon-labs/chainviz/development/readme_files/screenshot_01.png"></a>
+    <a href="https://alpha.chainviz.app" target="_blank"><img width="100%" src="https://raw.githubusercontent.com/helikon-labs/chainviz/alpha/readme_files/screenshot_01.png"></a>
 </p>
 
 ---
