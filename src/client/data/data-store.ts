@@ -436,7 +436,7 @@ class DataStore {
      * @param header new block header
      * @param done completion callback
      */
-    private async processNewBlock(header: Header, done: AsyncLock.AsyncLockDoneCallback<unknown>) {
+    private async processNewBlock(header: Header, done?: AsyncLock.AsyncLockDoneCallback<unknown>) {
         if (
             this.blocks.findIndex((block) => block.block.header.toHex() == header.hash.toHex()) >= 0
         ) {
@@ -450,7 +450,9 @@ class DataStore {
         while (this.blocks.length > Constants.MAX_BLOCK_COUNT) {
             this.eventBus.dispatch<Block>(ChainvizEvent.DISCARDED_BLOCK, this.blocks.pop());
         }
-        done();
+        if (done) {
+            done();
+        }
     }
 
     /**
@@ -481,7 +483,7 @@ class DataStore {
      */
     private async processFinalizedBlock(
         header: Header,
-        done: AsyncLock.AsyncLockDoneCallback<unknown>,
+        done?: AsyncLock.AsyncLockDoneCallback<unknown>,
     ) {
         // find unfinalized blocks before this one & discard & finalize
         const removeIndices: number[] = [];
@@ -499,18 +501,20 @@ class DataStore {
             this.eventBus.dispatch<Block>(ChainvizEvent.DISCARDED_BLOCK, removed[0]);
         }
 
-        let number = header.number.toNumber() - 1;
-        while (
-            this.blocks.findIndex((block) => block.block.header.number.toNumber() == number) < 0
-        ) {
-            const block = await this.getBlockByNumber(number);
-            if (block) {
-                block.isFinalized = true;
-                this.insertBlock(block);
-                this.eventBus.dispatch<Block>(ChainvizEvent.FINALIZED_BLOCK, block);
-                number--;
-            } else {
-                break;
+        if (this.blocks.length > 0) {
+            let number = header.number.toNumber() - 1;
+            while (
+                this.blocks.findIndex((block) => block.block.header.number.toNumber() == number) < 0
+            ) {
+                const block = await this.getBlockByNumber(number);
+                if (block) {
+                    block.isFinalized = true;
+                    this.insertBlock(block);
+                    this.eventBus.dispatch<Block>(ChainvizEvent.FINALIZED_BLOCK, block);
+                    number--;
+                } else {
+                    break;
+                }
             }
         }
 
@@ -528,7 +532,9 @@ class DataStore {
                 this.eventBus.dispatch<Block>(ChainvizEvent.FINALIZED_BLOCK, block);
             }
         }
-        done();
+        if (done) {
+            done();
+        }
     }
 
     /**

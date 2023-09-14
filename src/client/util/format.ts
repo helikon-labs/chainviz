@@ -38,7 +38,11 @@ function formatNumber(
     }
 
     const decimalPart = formatted.substring(formatted.length - formatDecimals);
-    formatted = `${integerPart}${Constants.DECIMAL_SEPARATOR}${decimalPart}`;
+    if (decimalPart.length > 0) {
+        formatted = `${integerPart}${Constants.DECIMAL_SEPARATOR}${decimalPart}`;
+    } else {
+        formatted = integerPart;
+    }
     if (ticker) {
         return `${formatted} ${ticker}`;
     } else {

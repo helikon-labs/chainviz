@@ -197,4 +197,129 @@ describe('data store', () => {
         expect(block!.events.length).toBe(44);
         await dataStore.disconnectSubstrateClient();
     });
+    test('inserts blocks at correct indices', async () => {
+        const dataStore = new DataStore();
+        await dataStore.setNetwork(Kusama);
+        await dataStore.connectSubstrateRPC();
+        const block10 = await dataStore.getBlockByNumber(10);
+        dataStore['insertBlock'](block10!);
+        const block30 = await dataStore.getBlockByNumber(30);
+        dataStore['insertBlock'](block30!);
+        const block20 = await dataStore.getBlockByNumber(20);
+        dataStore['insertBlock'](block20!);
+        const block15 = await dataStore.getBlockByNumber(15);
+        dataStore['insertBlock'](block15!);
+        expect(dataStore['blocks'][0].block.header.number.toNumber()).toBe(30);
+        expect(dataStore['blocks'][1].block.header.number.toNumber()).toBe(20);
+        expect(dataStore['blocks'][2].block.header.number.toNumber()).toBe(15);
+        expect(dataStore['blocks'][3].block.header.number.toNumber()).toBe(10);
+    });
+    test('discards older blocks', async () => {
+        const dataStore = new DataStore();
+        await dataStore.setNetwork(Kusama);
+        await dataStore.connectSubstrateRPC();
+        const initialBlockNumber = 10;
+        const excessBlockCount = 5;
+        for (let i = 0; i < Constants.MAX_BLOCK_COUNT + 5; i++) {
+            const block = await dataStore.getBlockByNumber(initialBlockNumber + i);
+            dataStore['insertBlock'](block!);
+        }
+        for (let i = 0; i < excessBlockCount; i++) {
+            const block = await dataStore.getBlockByNumber(10 + Constants.MAX_BLOCK_COUNT + i);
+            dataStore['processNewBlock'](block!.block.header);
+        }
+        expect(dataStore['blocks'].length).toBe(Constants.MAX_BLOCK_COUNT);
+    });
+    test('gets missing finalized blocks', async () => {
+        const dataStore = new DataStore();
+        await dataStore.setNetwork(Kusama);
+        await dataStore.connectSubstrateRPC();
+        const eventBus = EventBus.getInstance();
+        let finalizedBlockEventCount = 0;
+        eventBus.register(ChainvizEvent.FINALIZED_BLOCK, (_block: Block) => {
+            finalizedBlockEventCount++;
+        });
+        const initialBlockNumber = 10;
+        const firstBlock = await dataStore.getBlockByNumber(initialBlockNumber);
+        firstBlock!.isFinalized = true;
+        dataStore['insertBlock'](firstBlock!);
+        const lastBlock = await dataStore.getBlockByNumber(initialBlockNumber + 5);
+        await dataStore['processFinalizedBlock'](lastBlock!.block.header);
+        await new Promise((resolve) => setTimeout(resolve, 2_000));
+        expect(finalizedBlockEventCount).toBe(5);
+    });
+    test('removes unfinalized blocks and replaces with finalized blocks', async () => {
+        const dataStore = new DataStore();
+        await dataStore.setNetwork(Kusama);
+        await dataStore.connectSubstrateRPC();
+        const eventBus = EventBus.getInstance();
+        let discardedBlockEventCount = 0;
+        eventBus.register(ChainvizEvent.DISCARDED_BLOCK, (_block: Block) => {
+            discardedBlockEventCount++;
+        });
+        let finalizedBlockEventCount = 0;
+        eventBus.register(ChainvizEvent.FINALIZED_BLOCK, (_block: Block) => {
+            finalizedBlockEventCount++;
+        });
+        const block10 = await dataStore.getBlockByNumber(10);
+        block10!.isFinalized = true;
+        dataStore['insertBlock'](block10!);
+        const block11 = await dataStore.getBlockByNumber(11);
+        dataStore['insertBlock'](block11!);
+        const block12 = await dataStore.getBlockByNumber(12);
+        dataStore['insertBlock'](block12!);
+        const block13 = await dataStore.getBlockByNumber(13);
+        await dataStore['processFinalizedBlock'](block13!.block.header);
+        await new Promise((resolve) => setTimeout(resolve, 2_000));
+        expect(discardedBlockEventCount).toBe(2);
+        expect(finalizedBlockEventCount).toBe(3);
+    });
+    test('only removes unfinalized blocks if no finalized blocks prior', async () => {
+        const dataStore = new DataStore();
+        await dataStore.setNetwork(Kusama);
+        await dataStore.connectSubstrateRPC();
+        const eventBus = EventBus.getInstance();
+        let discardedBlockEventCount = 0;
+        eventBus.register(ChainvizEvent.DISCARDED_BLOCK, (_block: Block) => {
+            discardedBlockEventCount++;
+        });
+        let finalizedBlockEventCount = 0;
+        eventBus.register(ChainvizEvent.FINALIZED_BLOCK, (_block: Block) => {
+            finalizedBlockEventCount++;
+        });
+        const block10 = await dataStore.getBlockByNumber(10);
+        dataStore['insertBlock'](block10!);
+        const block11 = await dataStore.getBlockByNumber(11);
+        dataStore['insertBlock'](block11!);
+        const block12 = await dataStore.getBlockByNumber(12);
+        dataStore['insertBlock'](block12!);
+        const block13 = await dataStore.getBlockByNumber(13);
+        await dataStore['processFinalizedBlock'](block13!.block.header);
+        await new Promise((resolve) => setTimeout(resolve, 2_000));
+        expect(discardedBlockEventCount).toBe(3);
+        expect(finalizedBlockEventCount).toBe(1);
+    });
+    test('can get XCM transfers', async () => {
+        const dataStore = new DataStore();
+        await dataStore.setNetwork(Kusama);
+        await dataStore.getXCMTransfers();
+        expect(dataStore.xcmTransfers.length).toBeGreaterThan(0);
+        expect(dataStore.xcmTransfers.length).toBeLessThanOrEqual(Constants.XCM_DISPLAY_LIMIT);
+        for (const xcmTransfer of dataStore.xcmTransfers) {
+            expect(xcmTransfer.relayChain.relayChain).toBe(Kusama.id);
+            expect(xcmTransfer.origination).toBeDefined();
+            expect(xcmTransfer.destination).toBeDefined();
+        }
+        clearTimeout(dataStore['xcmTransferGetTimeout']);
+    });
+    test('can get XCM transfer by origin hash', async () => {
+        const dataStore = new DataStore();
+        await dataStore.setNetwork(Kusama);
+        await dataStore.getXCMTransfers();
+        const xcmTransfer = dataStore.getXCMTransferByOriginExtrinsicHash(
+            dataStore.xcmTransfers[0].origination.extrinsicHash,
+        );
+        expect(xcmTransfer).toBeDefined();
+        clearTimeout(dataStore['xcmTransferGetTimeout']);
+    });
 });

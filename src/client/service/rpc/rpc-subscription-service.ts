@@ -1,5 +1,6 @@
 import ReconnectingWebSocket from 'reconnecting-websocket';
 import camelcaseKeysDeep from 'camelcase-keys-deep';
+import ws from 'ws';
 
 /**
  * JSON-RPC 2.0 request.
@@ -79,7 +80,7 @@ class RPCSubscriptionService<T> {
     private onMessage(event: MessageEvent) {
         const json = JSON.parse(event.data);
         if (Object.prototype.hasOwnProperty.call(json, 'result')) {
-            if (isNaN(json['result'])) {
+            if (isNaN(parseFloat(json['result']))) {
                 this.state = RPCSubscriptionServiceState.Connected;
                 this.listener.onUnsubscribed(this.subscriptionId);
                 this.subscriptionId = 0;
@@ -102,7 +103,7 @@ class RPCSubscriptionService<T> {
 
     connect() {
         this.connection = new ReconnectingWebSocket(this.url, [], {
-            // WebSocket: WebSocket,
+            WebSocket: ws,
             connectionTimeout: 5000,
         });
         this.connection.onopen = () => {
