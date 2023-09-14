@@ -3,8 +3,7 @@ name: Prettier & ESLint
 on:
     push:
         branches:
-            - development
-            - main
+            - alpha
     pull_request:
         types:
             - opened
