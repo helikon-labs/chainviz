@@ -18,7 +18,7 @@
     "devDependencies": {
         "@polkadot/api": "^10.9.1",
         "@polkadot/api-derive": "^10.9.1",
-        "@polkadot/keyring": "^12.4.2",
+        "@polkadot/keyring": "^12.5.1",
         "@polkadot/types": "^10.9.1",
         "@polkadot/ui-shared": "^3.6.2",
         "@tweenjs/tween.js": "^21.0.0",
