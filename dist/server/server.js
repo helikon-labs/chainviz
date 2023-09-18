@@ -8,7 +8,7 @@ Object.defineProperty(exports, '__esModule', { value: true });
 const express_1 = __importDefault(require('express'));
 const path_1 = __importDefault(require('path'));
 const http_1 = __importDefault(require('http'));
-const port = 3000;
+const port = 8080;
 class App {
     constructor(tcpPort) {
         this.port = tcpPort;
