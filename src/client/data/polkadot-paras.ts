@@ -142,7 +142,7 @@ export const POLKADOT_PARAS: Para[] = [
         },
     },
     {
-        homepage: 'http://www.coinversation.io/',
+        homepage: 'https://www.coinversation.io/',
         info: 'coinversation',
         paraId: 2027,
         providers: {
@@ -578,7 +578,7 @@ export const POLKADOT_PARAS: Para[] = [
         },
     },
     {
-        homepage: 'http://subgame.org/',
+        homepage: 'https://subgame.org/',
         info: 'subgame',
         paraId: 2017,
         providers: {

@@ -1,6 +1,6 @@
 node_modules
 .vscode
-/dist/client/bundle.js
-/dist/client/bundle.js.LICENSE.txt
+bundle.js
+bundle.js.LICENSE.txt
 .DS_Store
 docker

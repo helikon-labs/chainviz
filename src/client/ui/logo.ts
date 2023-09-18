@@ -34,7 +34,10 @@ enum CharacterType {
 }
 
 function getRandomShapeType(): ShapeType {
-    const random = Math.floor(Math.random() * 7);
+    const crypto = window.crypto;
+    const typedArray = new Uint8Array(1);
+    crypto.getRandomValues(typedArray);
+    const random = typedArray[0] % 7;
     if (random == 0) {
         return ShapeType.Shape0;
     } else if (random == 1) {
@@ -53,7 +56,10 @@ function getRandomShapeType(): ShapeType {
 }
 
 function getRandomCharacterType(): CharacterType {
-    const random = Math.floor(Math.random() * 4);
+    const crypto = window.crypto;
+    const typedArray = new Uint8Array(1);
+    crypto.getRandomValues(typedArray);
+    const random = typedArray[0] % 4;
     if (random == 0) {
         return CharacterType.Word;
     } else if (random == 1) {

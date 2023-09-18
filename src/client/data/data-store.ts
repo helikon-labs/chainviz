@@ -134,11 +134,13 @@ class DataStore {
     async connectSubstrateRPC() {
         try {
             // connection timeout handling
-            await setAsyncTimeout(async (done) => {
-                this.substrateClient = await ApiPromise.create({
-                    provider: new WsProvider(this.network.rpcURL),
-                });
-                done(0);
+            await setAsyncTimeout((done) => {
+                (async () => {
+                    this.substrateClient = await ApiPromise.create({
+                        provider: new WsProvider(this.network.rpcURL),
+                    });
+                    done(0);
+                })();
             }, Constants.CONNECTION_TIMEOUT_MS);
             this.eventBus.dispatch<string>(ChainvizEvent.SUBSTRATE_API_READY);
         } catch (error) {
