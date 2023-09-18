@@ -40,6 +40,8 @@ npm install
 npm run dev
 ```
 
+Application is going to be available at port `8080`.
+
 ### Docker
 
 You can build and run the Docker image locally by running the following commands:
