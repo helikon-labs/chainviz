@@ -49,8 +49,8 @@ You can build and run the Docker image locally by running the following commands
 ```
 git clone https://github.com/helikon-labs/chainviz.git
 cd chainviz/docker
-docker build -t helikon/chainviz:1.0.0 --no-cache -f ./chainviz.dockerfile ..
-docker run --name chainviz -p 8080:8080 -d helikon/chainviz:1.0.0
+docker build -t helikon/chainviz:1.0.1 --no-cache -f ./chainviz.dockerfile ..
+docker run --name chainviz -p 8080:8080 -d helikon/chainviz:1.0.1
 ```
 
 Application is going to be available at port `8080`.
@@ -58,8 +58,8 @@ Application is going to be available at port `8080`.
 If you'd like to use the existing image from Helikon on Docker Hub, then please use the following commands:
 
 ```
-docker pull helikon/chainviz:1.0.0
-docker run --name chainviz -p 8080:8080 -d helikon/chainviz:1.0.0
+docker pull helikon/chainviz:1.0.1
+docker run --name chainviz -p 8080:8080 -d helikon/chainviz:1.0.1
 ```
 
 ## Test
