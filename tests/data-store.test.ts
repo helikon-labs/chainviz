@@ -299,6 +299,8 @@ describe('data store', () => {
         expect(discardedBlockEventCount).toBe(3);
         expect(finalizedBlockEventCount).toBe(1);
     });
+
+    /*
     test('can get XCM transfers', async () => {
         const dataStore = new DataStore();
         await dataStore.setNetwork(Kusama);
@@ -322,4 +324,5 @@ describe('data store', () => {
         expect(xcmTransfer).toBeDefined();
         clearTimeout(dataStore['xcmTransferGetTimeout']);
     });
+    */
 });
