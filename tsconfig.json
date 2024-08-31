@@ -4,7 +4,7 @@
         "moduleResolution": "node",
         "strict": true,
         "allowJs": true,
-        "esModuleInterop": true,
+        "esModuleInterop": true
     },
-    "include": ["**/*.ts"],
+    "include": ["**/*.ts"]
 }
