@@ -28,7 +28,7 @@
         "@types/jsdom": "^21.1.7",
         "@types/node": "^22.5.1",
         "@types/three": "^0.160.0",
-        "@typescript-eslint/eslint-plugin": "^7.18.0",
+        "@typescript-eslint/eslint-plugin": "^8.5.0",
         "@typescript-eslint/parser": "^7.18.0",
         "async-lock": "^1.4.1",
         "camelcase-keys-deep": "^0.1.0",
