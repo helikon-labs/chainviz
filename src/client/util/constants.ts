@@ -31,6 +31,7 @@ export abstract class Constants {
     static readonly VALIDATOR_GEOM_SEGMENTS = 16;
     static readonly VALIDATOR_GEOM_HEIGHT = 2.8;
     // validator colors
+    static readonly TRANSPARENT_COLOR = new THREE.Color(0.901, 0.0, 0.478);
     static readonly VALIDATOR_COLOR = new THREE.Color(0.901, 0.0, 0.478);
     static readonly VALIDATOR_SHININESS = 6;
     static readonly PARA_VALIDATOR_COLOR = new THREE.Color(0.556, 0.874, 1.0);

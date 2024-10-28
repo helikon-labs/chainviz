@@ -2,7 +2,6 @@ import * as THREE from 'three';
 import * as TWEEN from '@tweenjs/tween.js';
 import { Block as SubstrateBlock, SignedBlock } from '@polkadot/types/interfaces';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
-import Stats from 'three/examples/jsm/libs/stats.module';
 import { Block } from '../model/app/block';
 import { ValidatorSummary, ValidatorSummaryDiff } from '../model/subvt/validator_summary';
 import AsyncLock from 'async-lock';
@@ -19,15 +18,17 @@ import {
     ValidatorDetailsBoardDelegate,
 } from '../ui/validator_details_board';
 import { HeaderExtended } from '@polkadot/api-derive/types';
-import Visibility = require('visibilityjs');
+import * as Visibility from 'visibilityjs';
 import { createTween } from '../util/tween';
+
+// THREE.ColorManagement.enabled = false;
 
 class ChainVizScene {
     private readonly scene: THREE.Scene;
     private readonly camera: THREE.PerspectiveCamera;
     private readonly controls: OrbitControls;
     private readonly renderer: THREE.WebGLRenderer;
-    private readonly stats: Stats;
+    // private readonly stats: Stats;
 
     private readonly raycaster: THREE.Raycaster;
     private readonly hoverPoint: THREE.Vector2 = new THREE.Vector2();
@@ -75,7 +76,7 @@ class ChainVizScene {
         this.renderer.setPixelRatio(window.devicePixelRatio);
         this.renderer.shadowMap.enabled = true;
         this.renderer.shadowMap.type = THREE.PCFSoftShadowMap;
-        // this.renderer.outputColorSpace  = THREE.LinearSRGBColorSpace;
+        this.renderer.outputColorSpace = THREE.LinearSRGBColorSpace;
         document.body.appendChild(this.renderer.domElement);
         document.addEventListener('click', (event) => {
             this.onClick(event);
@@ -94,7 +95,8 @@ class ChainVizScene {
         });
 
         // stats
-        this.stats = Stats();
+        // this.stats = Stats();
+
         //document.body.appendChild(this.stats.dom);
         //this.stats.domElement.style.cssText = "position:absolute; bottom:0px; right:0px;";
         // orbit controls
@@ -173,25 +175,27 @@ class ChainVizScene {
         // point light front
         {
             const pointLight = new THREE.PointLight(0x404040);
-            pointLight.intensity = 1.0;
+            pointLight.intensity = Math.PI * 1.0 * 10;
             pointLight.position.x = 60;
             pointLight.position.y = 60;
             pointLight.position.z = 30;
+            pointLight.decay = 0.15;
             pointLight.castShadow = true;
             this.scene.add(pointLight);
         }
         // point light back
         {
             const pointLight = new THREE.PointLight(0x404040);
-            pointLight.intensity = 1.0;
+            pointLight.intensity = Math.PI * 1.0 * 10;
             pointLight.position.x = -20;
             pointLight.position.y = -40;
             pointLight.position.z = -30;
+            pointLight.decay = 0.15;
             pointLight.castShadow = true;
             this.scene.add(pointLight);
         }
         // ambient light
-        const ambientLight = new THREE.AmbientLight(0xffffff, 0.6);
+        const ambientLight = new THREE.AmbientLight(0xffffff, Math.PI * 0.6);
         this.scene.add(ambientLight);
     }
 
@@ -258,7 +262,7 @@ class ChainVizScene {
         this.controls.update();
         this.render();
         TWEEN.update();
-        this.stats.update();
+        // this.stats.update();
     }
 
     private setPointerCursor() {

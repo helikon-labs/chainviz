@@ -66,7 +66,7 @@ class Block {
                 {
                     font: font,
                     size: 0.45,
-                    height: 0,
+                    depth: 0,
                     curveSegments: 6,
                 }
             );
@@ -80,7 +80,7 @@ class Block {
             this.finalizedTextGeometry = new TextGeometry('+', {
                 font: font,
                 size: 2,
-                height: 0,
+                depth: 0,
                 curveSegments: 6,
             });
             const mesh = new THREE.Mesh(this.finalizedTextGeometry, this.finalizedTextMaterial);

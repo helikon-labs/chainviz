@@ -25,6 +25,7 @@ class ValidatorMesh {
     private selectedValidatorIndex = -1;
 
     constructor(validatorCount: number) {
+        this.material.vertexColors = false;
         this.mesh = new THREE.InstancedMesh(this.geometry, this.material, validatorCount);
         this.mesh.instanceMatrix.setUsage(THREE.DynamicDrawUsage);
     }
@@ -42,6 +43,10 @@ class ValidatorMesh {
 
     async addTo(scene: THREE.Scene, summaries: Array<ValidatorSummary>) {
         scene.add(this.mesh);
+        for (let i = 0; i < summaries.length; i++) {
+            this.mesh.setColorAt(i, new THREE.Color(0, 0, 0));
+        }
+        this.refreshMeshColor();
         let index = 0;
         for (let ring = 0; ring < this.ringSizes.length; ring++) {
             for (let i = 0; i < this.ringSizes[ring]; i++) {
@@ -149,7 +154,7 @@ class ValidatorMesh {
         index: number,
         renderer: THREE.WebGLRenderer,
         camera: THREE.Camera
-    ): THREE.Vec2 {
+    ): THREE.Vector2 {
         const matrix = new THREE.Matrix4();
         this.mesh.getMatrixAt(index, matrix);
         const position = new THREE.Vector3();

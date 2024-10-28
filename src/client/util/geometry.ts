@@ -31,7 +31,7 @@ function getOnScreenPosition(
     position: THREE.Vector3,
     renderer: THREE.WebGLRenderer,
     camera: THREE.Camera
-): THREE.Vec2 {
+): THREE.Vector2 {
     position.project(camera);
     const canvas = renderer.domElement;
     const widthHalf = canvas.clientWidth / 2;

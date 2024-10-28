@@ -1,5 +1,5 @@
 import ReconnectingWebSocket from 'reconnecting-websocket';
-import camelcaseKeysDeep = require('camelcase-keys-deep');
+import camelcaseKeysDeep from 'camelcase-keys-deep';
 
 class RPCRequest {
     id: number;
