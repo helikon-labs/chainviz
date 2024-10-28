@@ -1,7 +1,7 @@
 import { Para } from '../model/substrate/para';
 import * as THREE from 'three';
 import { Constants } from '../util/constants';
-import { createTween } from '../util/tween';
+import { createTween, startTween } from '../util/tween';
 import * as TWEEN from '@tweenjs/tween.js';
 
 const CROSSHAIR_LINE_MATERIAL = new THREE.LineBasicMaterial({
@@ -99,7 +99,7 @@ class ParaMesh {
         const progress = { progress: isReverse ? 1.0 : 0.0 };
         const initialRadius = Constants.VALIDATOR_ARC_RADIUS;
         const deltaRadius = Constants.PARAS_CIRCLE_RADIUS - Constants.VALIDATOR_ARC_RADIUS;
-        createTween(
+        const tween = createTween(
             progress,
             { progress: isReverse ? 0.0 : 1.0 },
             TWEEN.Easing.Exponential.InOut,
@@ -132,7 +132,8 @@ class ParaMesh {
                     }
                 }
             },
-        ).start();
+        );
+        startTween(tween);
     }
 
     /**

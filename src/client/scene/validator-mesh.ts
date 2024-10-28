@@ -1,7 +1,7 @@
 import * as THREE from 'three';
 import { ValidatorSummary } from '../model/subvt/validator-summary';
 import { Constants } from '../util/constants';
-import { createTween } from '../util/tween';
+import { createTween, startTween } from '../util/tween';
 import * as TWEEN from '@tweenjs/tween.js';
 import { rotateAboutPoint } from '../util/geometry';
 import { cloneJSONSafeObject } from '../util/object';
@@ -199,7 +199,7 @@ class ValidatorMesh {
     private animate(isReverse: boolean, onComplete?: () => void) {
         const progress = { progress: isReverse ? 1.0 : 0.0 };
         const currentRotationY = this.group.rotation.y;
-        createTween(
+        const tween = createTween(
             progress,
             { progress: isReverse ? 0.0 : 1.0 },
             TWEEN.Easing.Exponential.InOut,
@@ -252,7 +252,8 @@ class ValidatorMesh {
                 this.validatorMesh.computeBoundingSphere();
             },
             onComplete,
-        ).start();
+        );
+        startTween(tween);
     }
 
     rotate() {

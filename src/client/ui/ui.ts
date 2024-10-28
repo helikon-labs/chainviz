@@ -1,7 +1,7 @@
 import { Kusama, Network, Polkadot } from '../model/substrate/network';
 import { NetworkStatus } from '../model/subvt/network-status';
 import { Constants } from '../util/constants';
-import { createTween } from '../util/tween';
+import { createTween, startTween } from '../util/tween';
 import { show } from '../util/ui-util';
 import { NetworkStatusBoard } from './network-status-board';
 import { BlockList } from './block-list';
@@ -169,7 +169,7 @@ class UI {
 
     private fadeOutLoadingContainer(onComplete: () => void) {
         const opacity = { opacity: 100 };
-        createTween(
+        const tween = createTween(
             opacity,
             { opacity: 0 },
             TWEEN.Easing.Exponential.InOut,
@@ -182,13 +182,14 @@ class UI {
                 this.loadingContainer.style.display = 'none';
                 onComplete();
             },
-        ).start();
+        );
+        startTween(tween);
     }
 
     private fadeInLoadingContainer(onComplete: () => void) {
         this.loadingContainer.style.display = 'flex';
         const opacity = { opacity: 0 };
-        createTween(
+        const tween = createTween(
             opacity,
             { opacity: 100 },
             TWEEN.Easing.Exponential.InOut,
@@ -200,7 +201,8 @@ class UI {
             () => {
                 onComplete();
             },
-        ).start();
+        );
+        startTween(tween);
     }
 
     private fadeInBackground(onComplete: () => void) {
@@ -208,7 +210,7 @@ class UI {
         this.background.classList.remove('hidden');
         show(this.background);
         const opacity = { opacity: 0 };
-        createTween(
+        const tween = createTween(
             opacity,
             { opacity: 80 },
             TWEEN.Easing.Exponential.InOut,
@@ -218,7 +220,8 @@ class UI {
                 this.background.style.opacity = `${opacity.opacity}%`;
             },
             onComplete,
-        ).start();
+        );
+        startTween(tween);
     }
 
     private fadeInContent(onComplete?: () => void) {
@@ -226,7 +229,7 @@ class UI {
         this.content.classList.remove('hidden');
         show(this.content);
         const opacity = { opacity: 0 };
-        createTween(
+        const tween = createTween(
             opacity,
             { opacity: 100 },
             TWEEN.Easing.Exponential.InOut,
@@ -236,12 +239,13 @@ class UI {
                 this.content.style.opacity = `${opacity.opacity}%`;
             },
             onComplete,
-        ).start();
+        );
+        startTween(tween);
     }
 
     private fadeOutForNetworkChange(onComplete?: () => void) {
         const opacity = { opacity: 100 };
-        createTween(
+        const tween = createTween(
             opacity,
             { opacity: 0 },
             TWEEN.Easing.Exponential.InOut,
@@ -262,12 +266,13 @@ class UI {
                     onComplete();
                 }
             },
-        ).start();
+        );
+        startTween(tween);
     }
 
     private fadeInAfterNetworkChange(onComplete?: () => void) {
         const opacity = { opacity: 0 };
-        createTween(
+        const tween = createTween(
             opacity,
             { opacity: 100 },
             TWEEN.Easing.Exponential.InOut,
@@ -282,7 +287,8 @@ class UI {
                 this.sceneContainer.style.opacity = `${opacity.opacity}%`;
             },
             onComplete,
-        ).start();
+        );
+        startTween(tween);
     }
 
     start(

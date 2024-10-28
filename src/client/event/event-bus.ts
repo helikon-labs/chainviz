@@ -9,7 +9,7 @@ export interface Registry {
 }
 
 export interface Callable {
-    [key: string]: Function; // eslint-disable-line @typescript-eslint/ban-types
+    [key: string]: Function; // eslint-disable-line @typescript-eslint/no-unsafe-function-type
 }
 
 export interface Subscriber {
@@ -18,7 +18,7 @@ export interface Subscriber {
 
 export interface IEventBus {
     dispatch<T>(event: string, arg?: T): void;
-    register(event: string, callback: Function): Registry; // eslint-disable-line @typescript-eslint/ban-types
+    register(event: string, callback: Function): Registry; // eslint-disable-line @typescript-eslint/no-unsafe-function-type
 }
 
 export class EventBus implements IEventBus {
@@ -47,7 +47,7 @@ export class EventBus implements IEventBus {
     }
 
     // prettier-ignore
-    public register(event: string, callback: Function): Registry { // eslint-disable-line @typescript-eslint/ban-types
+    public register(event: string, callback: Function): Registry { // eslint-disable-line @typescript-eslint/no-unsafe-function-type
         const id = this.getNextId();
         if (!this.subscribers[event]) this.subscribers[event] = {};
 

@@ -7,7 +7,7 @@ import { ValidatorMesh } from './validator-mesh';
 import { ParaMesh } from './para-mesh';
 import { getOnScreenPosition } from '../util/geometry';
 import { Block } from '../model/chainviz/block';
-import { createTween } from '../util/tween';
+import { createTween, startTween } from '../util/tween';
 import * as TWEEN from '@tweenjs/tween.js';
 
 const VALIDATOR_PARA_LINE_MATERIAL = new THREE.LineBasicMaterial({
@@ -484,7 +484,7 @@ class Scene {
         const hash = block.block.header.hash.toHex();
         const progress = { progress: 0 };
         let crossedHalfTime = false;
-        createTween(
+        const tween = createTween(
             progress,
             { progress: positionCount * 2 },
             TWEEN.Easing.Quadratic.InOut,
@@ -540,7 +540,8 @@ class Scene {
                 this.scene.remove(blockLine);
                 onComplete();
             },
-        ).start();
+        );
+        startTween(tween);
     }
 
     /**

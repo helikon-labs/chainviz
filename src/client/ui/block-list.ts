@@ -1,7 +1,7 @@
 import { Block } from '../model/chainviz/block';
 import { Constants } from '../util/constants';
 import { getCondensedHash } from '../util/format';
-import { createTween } from '../util/tween';
+import { createTween, startTween } from '../util/tween';
 import * as TWEEN from '@tweenjs/tween.js';
 import { BlockDetailsBoard } from './block-details-board';
 
@@ -131,7 +131,7 @@ class BlockList {
             blockDiv.classList.remove('transparent');
             blockDiv.style.opacity = '0%';
             const progress = { progress: 0 };
-            createTween(
+            const tween = createTween(
                 progress,
                 { progress: 100 },
                 TWEEN.Easing.Quadratic.InOut,
@@ -140,7 +140,8 @@ class BlockList {
                 () => {
                     blockDiv.style.opacity = `${progress.progress}%`;
                 },
-            ).start();
+            );
+            startTween(tween);
         }
     }
 

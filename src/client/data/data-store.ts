@@ -143,7 +143,7 @@ class DataStore {
                 })();
             }, Constants.CONNECTION_TIMEOUT_MS);
             this.eventBus.dispatch<string>(ChainvizEvent.SUBSTRATE_API_READY);
-        } catch (error) {
+        } catch (_error) {
             this.eventBus.dispatch<string>(ChainvizEvent.SUBSTRATE_API_CONNECTION_TIMED_OUT);
         }
     }

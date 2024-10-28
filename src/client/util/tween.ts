@@ -32,3 +32,15 @@ export function createTween<T, U>(
             }
         });
 }
+
+export function startTween(tween: TWEEN.Tween<any>) {
+    const group = new TWEEN.Group(tween);
+    tween.start();
+    animate(performance.now());
+    function animate(time: number) {
+        group.update(time);
+        if (!group.allStopped()) {
+            requestAnimationFrame(animate);
+        }
+    }
+}
