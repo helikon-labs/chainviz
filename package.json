@@ -29,7 +29,7 @@
         "@types/node": "^22.8.1",
         "@types/three": "^0.165.0",
         "@typescript-eslint/eslint-plugin": "^8.11.0",
-        "@typescript-eslint/parser": "^8.11.0",
+        "@typescript-eslint/parser": "^8.13.0",
         "async-lock": "^1.4.1",
         "camelcase-keys-deep": "^0.1.0",
         "cannon-es": "^0.20.0",
