@@ -251,7 +251,7 @@ hr {
     visibility: hidden;
     margin-top: 4px;
     flex-grow: 1;
-    overflow: scroll;
+    overflow: auto;
 }
 
 #validator-list .validator {

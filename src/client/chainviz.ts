@@ -65,7 +65,7 @@ class ChainViz {
     private readonly validatorListClient: RPCSubscriptionService<ValidatorListUpdate>;
     private validatorListClientIsConnected = false;
     private substrateClient: ApiPromise = new ApiPromise({
-        provider: new WsProvider('wss://rpc.dotters.network/kusama'),
+        provider: new WsProvider('wss://rpc.helikon.io/kusama'),
     });
     private substrateClientIsConnected = false;
 
