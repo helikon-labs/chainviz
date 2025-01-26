@@ -100,7 +100,7 @@ class DataStore {
                 this.processActiveValidatorListUpdate(update);
             },
             onError: (code: number, message: string) => {
-                console.log(`Validator list service error (${code}: ${message}).`);
+                console.error(`Validator list service error (${code}: ${message}).`);
                 this.disconnectActiveValidatorListService();
                 this.eventBus.dispatch<string>(ChainvizEvent.ACTIVE_VALIDATOR_LIST_SERVICE_ERROR);
             },
@@ -339,7 +339,20 @@ class DataStore {
         if (!this.substrateClient) {
             return [];
         }
-        return (await this.substrateClient.query.paras.parachains()).toJSON() as number[];
+        let paraIds: number[] = [];
+        let headEntries = await this.substrateClient.query.paras.heads.entries();
+        headEntries.forEach(
+            ([
+                {
+                    args: [paraId],
+                },
+                value,
+            ]) => {
+                paraIds.push(Number(paraId.toString()));
+            },
+        );
+        paraIds.sort((a, b) => a - b);
+        return paraIds;
     }
 
     /**

@@ -377,7 +377,7 @@ class Chainviz {
             () => {
                 this.dataStore.subscribeToNewBlocks();
                 this.dataStore.subscribeToFinalizedBlocks();
-                this.dataStore.getXCMTransfers();
+                // this.dataStore.getXCMTransfers();
                 this.started = true;
             },
         );
