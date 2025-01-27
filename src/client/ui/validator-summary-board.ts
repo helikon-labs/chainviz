@@ -1,4 +1,5 @@
 import { Network } from '../model/substrate/network';
+import { Para } from '../model/substrate/para';
 import { ValidatorSummary } from '../model/subvt/validator-summary';
 import { Constants } from '../util/constants';
 import { formatNumber } from '../util/format';
@@ -39,7 +40,7 @@ class ValidatorSummaryBoard {
         };
     }
 
-    show(network: Network, validator: ValidatorSummary) {
+    show(network: Network, validator: ValidatorSummary, para: Para | undefined) {
         this.validator = cloneJSONSafeObject(validator);
         // identity & para
         {
@@ -47,7 +48,6 @@ class ValidatorSummaryBoard {
                 getValidatorIdentityIconHTML(validator) +
                 `<span class="identity">${getValidatorSummaryDisplay(validator)}</span>`;
             if (validator.isParaValidator) {
-                const para = network.paras.find((para) => para.paraId == validator.paraId);
                 if (para) {
                     const imageHTML = `<img class="parachain-icon" src="/img/paras/${para.ui.logo}" alt="${para.text}" title="${para.text}" />`;
                     this.ui.paraInfo.innerHTML = `${imageHTML}<span>${para.text} Paravalidator</span>`;
@@ -105,10 +105,14 @@ class ValidatorSummaryBoard {
         this.validator = undefined;
     }
 
-    onValidatorUpdated(network: Network, updatedValidator: ValidatorSummary) {
+    onValidatorUpdated(
+        network: Network,
+        updatedValidator: ValidatorSummary,
+        para: Para | undefined,
+    ) {
         if (this.validator && this.validator.accountId == updatedValidator.accountId) {
             Object.assign(this.validator, updatedValidator);
-            this.show(network, this.validator);
+            this.show(network, this.validator, para);
         }
     }
 

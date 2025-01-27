@@ -114,7 +114,6 @@ describe('data store', () => {
         });
         expect(dataStore['validatorMap'].get(validators[0].address)?.oversubscribed).toBeTruthy();
         expect(dataStore['validatorMap'].get(validators[1].address)?.blocksAuthored).toBe(16);
-        expect(dataStore['validatorMap'].get(validators[1].address)?.paraId).toBe(2010);
         await new Promise((resolve) => setTimeout(resolve, 500));
         expect(eventReceived).toBeTruthy();
     });

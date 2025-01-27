@@ -305,12 +305,11 @@ class Scene {
      * @param paraId para id
      * @param paravalidatorStashAddresses stash addresses of the paravalidators
      */
-    private addParavalidatorLines(paraId: number, paravalidatorStashAddresses: string[]) {
+    private addParavalidatorLines(paraId: number, paravalidators: string[]) {
         const paraPosition = this.paraMesh.getParaPosition(paraId);
         if (paraPosition) {
-            for (const paravalidatorStashAddress of paravalidatorStashAddresses) {
-                const validatorPosition =
-                    this.validatorMesh.getValidatorPosition(paravalidatorStashAddress);
+            for (const paravalidator of paravalidators) {
+                const validatorPosition = this.validatorMesh.getValidatorPosition(paravalidator);
                 if (validatorPosition == undefined) {
                     continue;
                 }
@@ -340,10 +339,10 @@ class Scene {
      *
      * @param validator validator to be highlighted
      */
-    highlightValidator(validator: ValidatorSummary) {
+    highlightValidator(validator: ValidatorSummary, paraId: number | undefined) {
         this.validatorMesh.highlightValidator(validator.address);
-        if (validator.paraId) {
-            this.addParavalidatorLines(validator.paraId, [validator.address]);
+        if (paraId) {
+            this.addParavalidatorLines(paraId, [validator.address]);
         }
     }
 
@@ -369,12 +368,12 @@ class Scene {
      * Highlight a single para and its validators.
      *
      * @param paraId para id
-     * @param paravalidatorStashAddresses stash addresses of the para's validators
+     * @param paravalidators stash addresses of the para's validators
      */
-    highlightPara(paraId: number, paravalidatorStashAddresses: string[]) {
+    highlightPara(paraId: number, paravalidators: string[]) {
         this.paraMesh.highlightParas([paraId]);
-        this.validatorMesh.highlightParaValidators(paraId);
-        this.addParavalidatorLines(paraId, paravalidatorStashAddresses);
+        this.validatorMesh.highlightParaValidators(paraId, paravalidators);
+        this.addParavalidatorLines(paraId, paravalidators);
         this.validatorMesh.clearSelection();
     }
 
@@ -580,23 +579,13 @@ class Scene {
         if (this.started) {
             this.validatorMesh.onValidatorsUpdated(updatedValidators);
         }
-        if (this.highlightedValidatorIndex != undefined) {
-            for (const updatedValidator of updatedValidators) {
-                const validatorIndex = this.validatorMesh.getValidatorIndex(
-                    updatedValidator.address,
-                );
-                if (validatorIndex == this.highlightedValidatorIndex) {
-                    this.removeParaValidatorLines();
-                    this.addParavalidatorLines(updatedValidator.paraId ?? -1, [
-                        updatedValidator.address,
-                    ]);
-                }
-            }
-        } else if (this.highlightedParaId != undefined) {
+    }
+
+    onCoresUpdated(assignments: Map<number, string[]>) {
+        if (this.highlightedParaId != undefined) {
+            const stashAddresses = assignments.get(this.highlightedParaId) ?? [];
+            this.validatorMesh.highlightParaValidators(this.highlightedParaId, stashAddresses);
             this.removeParaValidatorLines();
-            const stashAddresses = this.validatorMesh.getParavalidatorStashAddresses(
-                this.highlightedParaId,
-            );
             this.addParavalidatorLines(this.highlightedParaId, stashAddresses);
         }
     }
@@ -609,16 +598,6 @@ class Scene {
      */
     onValidatorsRemoved(removedStashAddresses: string[]) {
         this.validatorMesh.onValidatorsRemoved(removedStashAddresses);
-    }
-
-    /**
-     * Get paravalidator stash addresses for a given para id.
-     *
-     * @param paraId para id
-     * @returns paravalidaor stash addresses
-     */
-    getParavalidatorStashAddresses(paraId: number): string[] {
-        return this.validatorMesh.getParavalidatorStashAddresses(paraId);
     }
 }
 

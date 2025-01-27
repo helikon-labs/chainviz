@@ -23,7 +23,6 @@ interface ValidatorSummary {
     slashCount: number;
     isEnrolledIn1kv: boolean;
     isParaValidator: boolean;
-    paraId?: number;
     returnRatePerBillion: number;
     blocksAuthored: number;
     rewardPoints: number;

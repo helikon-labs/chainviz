@@ -397,8 +397,9 @@ class UI {
         network: Network,
         validatorSummary: ValidatorSummary,
         position: Vec2,
+        para: Para | undefined,
     ) {
-        this.validatorSummaryBoard.show(network, validatorSummary);
+        this.validatorSummaryBoard.show(network, validatorSummary, para);
         this.validatorSummaryBoard.setPosition(
             position.x + this.sceneContainer.getBoundingClientRect().left,
             position.y + this.sceneContainer.getBoundingClientRect().top,
@@ -426,16 +427,23 @@ class UI {
     highlightValidator(
         network: Network,
         validator: ValidatorSummary,
+        paraId: number | undefined,
         highlightValidatorInScene: boolean,
         showValidatorSummaryBoard: boolean,
     ) {
+        const para = network.paras.find((p) => p.paraId == paraId);
         const position = this.scene.getValidatorOnScreenPosition(validator.address);
         if (position != undefined) {
             if (highlightValidatorInScene) {
-                this.scene.highlightValidator(validator);
+                this.scene.highlightValidator(validator, paraId);
             }
             if (showValidatorSummaryBoard) {
-                this.showValidatorSummaryBoard(network, cloneJSONSafeObject(validator), position);
+                this.showValidatorSummaryBoard(
+                    network,
+                    cloneJSONSafeObject(validator),
+                    position,
+                    para,
+                );
             }
             this.highlightedValidatorStashAddress = validator.address;
             this.validatorHighlightCircle.style.display = 'block';
@@ -448,8 +456,8 @@ class UI {
         this.validatorHighlightCircle.style.display = 'none';
     }
 
-    selectValidator(network: Network, validator: ValidatorSummary) {
-        this.validatorDetailsBoard.show(network, validator);
+    selectValidator(network: Network, validator: ValidatorSummary, para: Para | undefined) {
+        this.validatorDetailsBoard.show(network, validator, para);
         this.scene.selectValidator(validator.address);
     }
 
@@ -496,15 +504,8 @@ class UI {
     onValidatorsUpdated(network: Network, updatedValidators: ValidatorSummary[]) {
         this.scene.onValidatorsUpdated(updatedValidators);
         for (const updatedValidator of updatedValidators) {
-            this.validatorSummaryBoard.onValidatorUpdated(network, updatedValidator);
-            this.validatorDetailsBoard.onValidatorUpdated(network, updatedValidator);
-        }
-        if (this.highlightedPara != undefined) {
-            this.showParaSummaryBoard(
-                this.highlightedPara,
-                this.scene.getParavalidatorStashAddresses(this.highlightedPara.paraId).length,
-                this.scene.getParaOnScreenPosition(this.highlightedPara.paraId),
-            );
+            this.validatorSummaryBoard.onValidatorUpdated(network, updatedValidator, undefined);
+            this.validatorDetailsBoard.onValidatorUpdated(network, updatedValidator, undefined);
         }
     }
 
@@ -514,6 +515,18 @@ class UI {
             this.validatorSummaryBoard.onValidatorRemoved(removedStashAddress);
             this.validatorDetailsBoard.onValidatorRemoved(removedStashAddress);
             this.validatorList.onValidatorRemoved(removedStashAddress);
+        }
+    }
+
+    onCoresUpdated(assignments: Map<number, string[]>) {
+        this.scene.onCoresUpdated(assignments);
+        if (this.highlightedPara != undefined) {
+            const stashAddresses = assignments.get(this.highlightedPara.paraId) ?? [];
+            this.showParaSummaryBoard(
+                this.highlightedPara,
+                stashAddresses.length,
+                this.scene.getParaOnScreenPosition(this.highlightedPara.paraId),
+            );
         }
     }
 

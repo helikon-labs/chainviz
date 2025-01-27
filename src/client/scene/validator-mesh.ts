@@ -60,11 +60,8 @@ class ValidatorMesh {
      * validator is highlighted.
      */
     private highlightedValidatorIndex: number | undefined = undefined;
-    /**
-     * Stores the highlighted para id, when the validators of a para are displayed.
-     * Undefined if no para is highlighted.
-     */
     private highlightedParaId: number | undefined = undefined;
+    private paravalidators: string[] = [];
 
     /**
      * Calculates the min and max reward points stored in the mesh.
@@ -361,7 +358,7 @@ class ValidatorMesh {
                     const slot = this.arcs[i][j];
                     if (slot) {
                         let scale = 0.0;
-                        if (slot.validator.paraId == this.highlightedParaId) {
+                        if (this.paravalidators.indexOf(slot.validator.address) >= 0) {
                             scale = 1;
                         }
                         const matrix = new THREE.Matrix4();
@@ -400,6 +397,7 @@ class ValidatorMesh {
     clearHighlight() {
         this.highlightedValidatorIndex = undefined;
         this.highlightedParaId = undefined;
+        this.paravalidators = [];
         this.resetScales();
         ARC_MATERIAL.opacity = Constants.VALIDATOR_ARC_NORMAL_OPACITY;
     }
@@ -421,27 +419,10 @@ class ValidatorMesh {
      *
      * @param paraId id of the para
      */
-    highlightParaValidators(paraId: number) {
+    highlightParaValidators(paraId: number, paravalidators: string[]) {
         this.highlightedParaId = paraId;
+        this.paravalidators = paravalidators;
         this.resetScales();
-    }
-
-    /**
-     * Get the list of paravalidator stash addresses for the given para
-     * @param paraId id of the para
-     * @returns list of paravalidator stash addresses, empty if there's none assigned to para
-     */
-    getParavalidatorStashAddresses(paraId: number): string[] {
-        const result: string[] = [];
-        for (let i = 0; i < this.arcs.length; i++) {
-            for (let j = 0; j <= this.arcs[0].length; j++) {
-                const slot = this.arcs[i][j];
-                if (slot != undefined && slot.validator.paraId == paraId) {
-                    result.push(slot.stashAddress);
-                }
-            }
-        }
-        return result;
     }
 
     /**

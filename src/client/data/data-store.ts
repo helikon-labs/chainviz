@@ -13,7 +13,7 @@ import { ChainvizEvent } from '../event/event';
 import { UnsubscribePromise } from '@polkadot/api/types';
 import { Block } from '../model/chainviz/block';
 import { BlockHash, Header } from '@polkadot/types/interfaces';
-import { AnyJson } from '@polkadot/types/types';
+import { AnyJson, Codec } from '@polkadot/types/types';
 import { XCMInfo, XCMInfoWrapper, isXCMInfo } from '../model/polkaholic/xcm';
 import { Para } from '../model/substrate/para';
 import { getValidatorIdentityIconHTML, getValidatorSummaryDisplay } from '../util/ui-util';
@@ -33,11 +33,22 @@ class DataStore {
     private networkStatusClient!: RPCSubscriptionService<NetworkStatusUpdate>;
     private activeValidatorListClient!: RPCSubscriptionService<ValidatorListUpdate>;
     private readonly eventBus = EventBus.getInstance();
-    private newBlockSubscription?: UnsubscribePromise;
-    private finalizedHeaderSubscription?: UnsubscribePromise;
+    private unsubscribeNewBlock?: UnsubscribePromise;
+    private unsubscribeFinalizedHeader?: UnsubscribePromise;
     private xcmTransferGetTimeout?: NodeJS.Timeout;
     private readonly lock = new AsyncLock();
     private readonly blockProcessLockKey = 'block_process';
+
+    private readonly paravalidatorLock = new AsyncLock();
+    private readonly paravalidatorProcessLockKey = 'paravalidator';
+    private validators: string[] = [];
+    private unsubscribeValidators?: Promise<Codec>;
+    private paravalidators: string[] = [];
+    private unsubscribeParavalidators?: Promise<Codec>;
+    private paravalidatorGroups: string[][] = [];
+    private unsubscribeParavalidatorGroups?: Promise<Codec>;
+    private cores: (number | undefined)[] = [];
+    private unsubscribeCores?: Promise<Codec>;
 
     private networkStatus!: NetworkStatus;
     validatorMap = new Map<string, ValidatorSummary>();
@@ -270,15 +281,171 @@ class DataStore {
      * @param para parachain/thread
      * @returns paravalidator stash addresses in an array
      */
-    getParavalidatorStashAddresses(para: Para): string[] {
-        const stashAddresses: string[] = [];
-        for (const stashAddress of this.validatorMap.keys()) {
-            const validator = this.validatorMap.get(stashAddress);
-            if (validator?.paraId == para.paraId) {
-                stashAddresses.push(validator.address);
-            }
+    getParavalidatorStashAddresses(para: Para, callback: (stashAdresses: string[]) => void) {
+        this.paravalidatorLock.acquire(
+            this.paravalidatorProcessLockKey,
+            (done) => {
+                let paravalidators: string[] = [];
+                for (let i = 0; i < this.cores.length; i++) {
+                    if (this.cores[i] == para.paraId) {
+                        paravalidators = this.paravalidatorGroups[i];
+                        break;
+                    }
+                }
+                callback(paravalidators);
+                done();
+            },
+            (error, _) => {
+                if (error) {
+                    console.log('Error while processing subscribed paravalidator list:', error);
+                }
+                // lock released
+            },
+        );
+    }
+
+    async getValidatorParaId(address: string, callback: (paraId: number | undefined) => void) {
+        this.paravalidatorLock.acquire(
+            this.paravalidatorProcessLockKey,
+            (done) => {
+                let paraId: number | undefined = undefined;
+                for (let i = 0; i < this.paravalidatorGroups.length; i++) {
+                    if (this.paravalidatorGroups[i].indexOf(address) >= 0) {
+                        paraId = this.cores[i];
+                    }
+                }
+                callback(paraId);
+                done();
+            },
+            (error, _) => {
+                if (error) {
+                    console.log('Error while processing subscribed paravalidator list:', error);
+                }
+                // lock released
+            },
+        );
+    }
+
+    async subscribeToValidators() {
+        if (!this.substrateClient) {
+            return;
         }
-        return stashAddresses;
+        // @ts-expect-error untyped
+        this.unsubscribeValidators = this.substrateClient.query.session.validators((data) => {
+            this.paravalidatorLock.acquire(
+                this.paravalidatorProcessLockKey,
+                (done) => {
+                    this.validators = data.toJSON() as string[];
+                    done();
+                },
+                (error, _) => {
+                    if (error) {
+                        console.log('Error while processing subscribed validator list:', error);
+                    }
+                    // lock released
+                },
+            );
+        });
+    }
+
+    async subscribeToParavalidators() {
+        if (!this.substrateClient) {
+            return;
+        }
+        this.unsubscribeParavalidators =
+            // @ts-expect-error untyped
+            this.substrateClient.query.parasShared.activeValidatorIndices((data) => {
+                const paravalidatorIndices = data.toJSON() as number[];
+                this.paravalidatorLock.acquire(
+                    this.paravalidatorProcessLockKey,
+                    (done) => {
+                        this.paravalidators = paravalidatorIndices.map((i) => this.validators[i]);
+                        done();
+                    },
+                    (error, _) => {
+                        if (error) {
+                            console.log(
+                                'Error while processing subscribed paravalidator list:',
+                                error,
+                            );
+                        }
+                        // lock released
+                    },
+                );
+            });
+    }
+
+    async subscribeToParavalidatorGroups() {
+        if (!this.substrateClient) {
+            return;
+        }
+        this.unsubscribeParavalidatorGroups =
+            // @ts-expect-error untyped
+            this.substrateClient.query.paraScheduler.validatorGroups((data) => {
+                const groups = data.toJSON() as number[][];
+                this.paravalidatorLock.acquire(
+                    this.paravalidatorProcessLockKey,
+                    (done) => {
+                        this.paravalidatorGroups = groups.map((i) =>
+                            i.map((j) => this.paravalidators[j]),
+                        );
+                        done();
+                    },
+                    (error, _) => {
+                        if (error) {
+                            console.log(
+                                'Error while processing subscribed paravalidator groups:',
+                                error,
+                            );
+                        }
+                        // lock released
+                    },
+                );
+            });
+    }
+
+    async subscribeToCores() {
+        if (!this.substrateClient) {
+            return;
+        }
+        this.unsubscribeCores = this.substrateClient.query.paraScheduler.availabilityCores(
+            // @ts-expect-error untyped
+            (data) => {
+                /* eslint-disable @typescript-eslint/no-explicit-any */
+                const cores = data.toJSON() as any[];
+                this.paravalidatorLock.acquire(
+                    this.paravalidatorProcessLockKey,
+                    (done) => {
+                        const assignments = new Map<number, string[]>();
+                        this.cores = [];
+                        for (let i = 0; i < cores.length; i++) {
+                            const core = cores[i];
+                            if (core.paras?.assignment?.bulk) {
+                                const paraId = core.paras.assignment.bulk as number;
+                                this.cores.push(paraId);
+                                assignments.set(paraId, this.paravalidatorGroups[i]);
+                            } else {
+                                this.cores.push(undefined);
+                            }
+                        }
+                        this.eventBus.dispatch<Map<number, string[]>>(
+                            ChainvizEvent.CORES_UPDATED,
+                            assignments,
+                        );
+                        done();
+                    },
+                    (error, _) => {
+                        if (error) {
+                            console.log(
+                                'Error while processing subscribed paravalidator groups:',
+                                error,
+                            );
+                        }
+                        // lock released
+                    },
+                );
+            },
+        );
     }
 
     /**
@@ -339,14 +506,14 @@ class DataStore {
         if (!this.substrateClient) {
             return [];
         }
-        let paraIds: number[] = [];
-        let headEntries = await this.substrateClient.query.paras.heads.entries();
+        const paraIds: number[] = [];
+        const headEntries = await this.substrateClient.query.paras.heads.entries();
         headEntries.forEach(
             ([
                 {
                     args: [paraId],
                 },
-                value,
+                _value,
             ]) => {
                 paraIds.push(Number(paraId.toString()));
             },
@@ -376,10 +543,10 @@ class DataStore {
      * @returns unsubscribe promise
      */
     subscribeToNewBlocks() {
-        if (!this.substrateClient || this.newBlockSubscription) {
+        if (!this.substrateClient || this.unsubscribeNewBlock) {
             return;
         }
-        this.newBlockSubscription = this.substrateClient!.rpc.chain.subscribeNewHeads(
+        this.unsubscribeNewBlock = this.substrateClient!.rpc.chain.subscribeNewHeads(
             async (header) => {
                 this.onNewBlock(header);
             },
@@ -392,10 +559,10 @@ class DataStore {
      * @returns unsubscribe promise
      */
     subscribeToFinalizedBlocks() {
-        if (!this.substrateClient || this.finalizedHeaderSubscription) {
+        if (!this.substrateClient || this.unsubscribeFinalizedHeader) {
             return;
         }
-        this.finalizedHeaderSubscription = this.substrateClient!.rpc.chain.subscribeFinalizedHeads(
+        this.unsubscribeFinalizedHeader = this.substrateClient!.rpc.chain.subscribeFinalizedHeads(
             async (header) => {
                 this.onFinalizedBlock(header);
             },
@@ -682,14 +849,31 @@ class DataStore {
     }
 
     async disconnectSubstrateClient() {
-        if (this.newBlockSubscription) {
-            (await this.newBlockSubscription)();
-            this.newBlockSubscription = undefined;
+        if (this.unsubscribeNewBlock) {
+            await this.unsubscribeNewBlock;
+            this.unsubscribeNewBlock = undefined;
         }
-        if (this.finalizedHeaderSubscription) {
-            (await this.finalizedHeaderSubscription)();
-            this.finalizedHeaderSubscription = undefined;
+        if (this.unsubscribeFinalizedHeader) {
+            await this.unsubscribeFinalizedHeader;
+            this.unsubscribeFinalizedHeader = undefined;
         }
+        if (this.unsubscribeValidators) {
+            await this.unsubscribeValidators;
+            this.unsubscribeValidators = undefined;
+        }
+        if (this.unsubscribeParavalidators) {
+            await this.unsubscribeParavalidators;
+            this.unsubscribeParavalidators = undefined;
+        }
+        if (this.unsubscribeParavalidatorGroups) {
+            await this.unsubscribeParavalidatorGroups;
+            this.unsubscribeParavalidatorGroups = undefined;
+        }
+        if (this.unsubscribeCores) {
+            await this.unsubscribeCores;
+            this.unsubscribeCores = undefined;
+        }
+
         if (this.substrateClient) {
             try {
                 await this.substrateClient.disconnect();

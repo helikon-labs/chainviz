@@ -30,7 +30,9 @@ class Chainviz {
      */
     private readonly sceneDelegate = <SceneDelegate>{
         onValidatorMouseEnter: (validator: ValidatorSummary) => {
-            this.ui.highlightValidator(this.network, validator, true, true);
+            this.dataStore.getValidatorParaId(validator.address, (paraId) => {
+                this.ui.highlightValidator(this.network, validator, paraId, true, true);
+            });
         },
         onValidatorMouseLeave: () => {
             this.ui.clearValidatorHighlight();
@@ -38,16 +40,22 @@ class Chainviz {
         onParaMouseEnter: (paraId: number) => {
             const para = this.dataStore.getParaById(paraId);
             if (para != undefined) {
-                const paravalidatorStashAdresses =
-                    this.dataStore.getParavalidatorStashAddresses(para);
-                this.ui.highlightPara(para, paravalidatorStashAdresses);
+                this.dataStore.getParavalidatorStashAddresses(
+                    para,
+                    (paravalidatorStashAdresses) => {
+                        this.ui.highlightPara(para, paravalidatorStashAdresses);
+                    },
+                );
             }
         },
         onParaMouseLeave: () => {
             this.ui.clearParaHighlight();
         },
         onValidatorClick: (index: number, validator: ValidatorSummary) => {
-            this.ui.selectValidator(this.network, validator);
+            this.dataStore.getValidatorParaId(validator.address, (paraId) => {
+                const para = this.dataStore.paras.find((p) => p.paraId == paraId);
+                this.ui.selectValidator(this.network, validator, para);
+            });
         },
     };
 
@@ -58,7 +66,9 @@ class Chainviz {
         onMouseOver: (stashAddress: string) => {
             const validator = this.dataStore.validatorMap.get(stashAddress);
             if (validator) {
-                this.ui.highlightValidator(this.network, validator, false, false);
+                this.dataStore.getValidatorParaId(validator.address, (paraId) => {
+                    this.ui.highlightValidator(this.network, validator, paraId, true, true);
+                });
             }
         },
         onMouseLeave: (_stashAddress: string) => {
@@ -67,7 +77,10 @@ class Chainviz {
         onClick: (stashAddress: string) => {
             const validator = this.dataStore.validatorMap.get(stashAddress);
             if (validator) {
-                this.ui.selectValidator(this.network, validator);
+                this.dataStore.getValidatorParaId(validator.address, (paraId) => {
+                    const para = this.dataStore.paras.find((p) => p.paraId == paraId);
+                    this.ui.selectValidator(this.network, validator, para);
+                });
             }
         },
     };
@@ -194,6 +207,12 @@ class Chainviz {
         this.eventBus.register(ChainvizEvent.XCM_TRANSFERS_DISCARDED, (xcmTransfers: XCMInfo[]) => {
             this.ui.removeXCMTransfers(xcmTransfers);
         });
+        this.eventBus.register(
+            ChainvizEvent.CORES_UPDATED,
+            (assignments: Map<number, string[]>) => {
+                this.ui.onCoresUpdated(assignments);
+            },
+        );
     }
 
     async init() {
@@ -315,7 +334,39 @@ class Chainviz {
 
     private async getParas() {
         this.ui.setLoadingInfo('fetching parachains');
-        this.dataStore.getParas();
+        await this.dataStore.getParas();
+        setTimeout(() => {
+            this.getValidators();
+        }, Constants.UI_STATE_CHANGE_DELAY_MS);
+    }
+
+    private async getValidators() {
+        this.ui.setLoadingInfo('fetching validators');
+        await this.dataStore.subscribeToValidators();
+        setTimeout(() => {
+            this.getParavalidators();
+        }, Constants.UI_STATE_CHANGE_DELAY_MS);
+    }
+
+    private async getParavalidators() {
+        this.ui.setLoadingInfo('fetching paravalidators');
+        await this.dataStore.subscribeToParavalidators();
+        setTimeout(() => {
+            this.getParavalidatorGroups();
+        }, Constants.UI_STATE_CHANGE_DELAY_MS);
+    }
+
+    private async getParavalidatorGroups() {
+        this.ui.setLoadingInfo('fetching paravalidator groups');
+        await this.dataStore.subscribeToParavalidatorGroups();
+        setTimeout(() => {
+            this.getCores();
+        }, Constants.UI_STATE_CHANGE_DELAY_MS);
+    }
+
+    private async getCores() {
+        this.ui.setLoadingInfo('fetching cores');
+        await this.dataStore.subscribeToCores();
         setTimeout(() => {
             this.getInitialBlocks();
         }, Constants.UI_STATE_CHANGE_DELAY_MS);

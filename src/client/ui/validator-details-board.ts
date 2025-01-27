@@ -1,4 +1,5 @@
 import { Network } from '../model/substrate/network';
+import { Para } from '../model/substrate/para';
 import { ValidatorSummary } from '../model/subvt/validator-summary';
 import { Constants } from '../util/constants';
 import { getSS58Address } from '../util/crypto-util';
@@ -133,7 +134,7 @@ class ValidatorDetailsBoard {
      * @param network current network
      * @param validator selected validator
      */
-    show(network: Network, validator: ValidatorSummary) {
+    show(network: Network, validator: ValidatorSummary, para: Para | undefined) {
         this.validator = cloneJSONSafeObject(validator);
         this.ui.identiconContainer.innerHTML = generateIdenticonSVGHTML(
             validator.address,
@@ -146,7 +147,6 @@ class ValidatorDetailsBoard {
             validator.address
         }" target="_blank">${getCondensedAddress(validator.address)}</a>`;
         if (validator.isParaValidator) {
-            const para = network.paras.find((para) => para.paraId == validator.paraId);
             if (para) {
                 const imageHTML = `<img class="parachain-icon" src="/img/paras/${para.ui.logo}" alt="${para.text}" title="${para.text}" />`;
                 this.ui.paraInfo.innerHTML = `${imageHTML}<span>${para.text} Paravalidator</span><span class="flex-spacer"></span>`;
@@ -276,9 +276,13 @@ class ValidatorDetailsBoard {
         this.delegate.onClose();
     }
 
-    onValidatorUpdated(network: Network, updatedValidator: ValidatorSummary) {
+    onValidatorUpdated(
+        network: Network,
+        updatedValidator: ValidatorSummary,
+        para: Para | undefined,
+    ) {
         if (this.validator && this.validator.accountId == updatedValidator.accountId) {
-            this.show(network, cloneJSONSafeObject(updatedValidator));
+            this.show(network, cloneJSONSafeObject(updatedValidator), para);
         }
     }
 
