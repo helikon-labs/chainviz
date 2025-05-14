@@ -404,8 +404,57 @@ class DataStore {
             });
     }
 
+    async subscribeToCoresLegacy() {
+        if (!this.substrateClient) {
+            return;
+        }
+        this.unsubscribeCores = this.substrateClient.query.paraScheduler.availabilityCores(
+            // @ts-expect-error untyped
+            (data) => {
+                /* eslint-disable @typescript-eslint/no-explicit-any */
+                const cores = data.toJSON() as any[];
+                this.paravalidatorLock.acquire(
+                    this.paravalidatorProcessLockKey,
+                    (done) => {
+                        const assignments = new Map<number, string[]>();
+                        this.cores = [];
+                        for (let i = 0; i < cores.length; i++) {
+                            const core = cores[i];
+                            if (core.paras?.assignment?.bulk) {
+                                const paraId = core.paras.assignment.bulk as number;
+                                this.cores.push(paraId);
+                                assignments.set(paraId, this.paravalidatorGroups[i]);
+                            } else {
+                                this.cores.push(undefined);
+                            }
+                        }
+                        this.eventBus.dispatch<Map<number, string[]>>(
+                            ChainvizEvent.CORES_UPDATED,
+                            assignments,
+                        );
+                        done();
+                    },
+                    (error, _) => {
+                        if (error) {
+                            console.log(
+                                'Error while processing subscribed paravalidator groups:',
+                                error,
+                            );
+                        }
+                        // lock released
+                    },
+                );
+            },
+        );
+    }
+
     async subscribeToCores() {
         if (!this.substrateClient) {
+            return;
+        }
+        console.log(this.substrateClient.query.paraScheduler.availabilityCores);
+        if (this.substrateClient.query.paraScheduler.availabilityCores) {
+            await this.subscribeToCoresLegacy();
             return;
         }
         this.unsubscribeCores = this.substrateClient.query.paraScheduler.claimQueue(
