@@ -408,20 +408,20 @@ class DataStore {
         if (!this.substrateClient) {
             return;
         }
-        this.unsubscribeCores = this.substrateClient.query.paraScheduler.availabilityCores(
+        this.unsubscribeCores = this.substrateClient.query.paraScheduler.claimQueue(
             // @ts-expect-error untyped
             (data) => {
                 /* eslint-disable @typescript-eslint/no-explicit-any */
-                const cores = data.toJSON() as any[];
+                const claims = Object.values(data.toJSON() as any[]);
                 this.paravalidatorLock.acquire(
                     this.paravalidatorProcessLockKey,
                     (done) => {
                         const assignments = new Map<number, string[]>();
                         this.cores = [];
-                        for (let i = 0; i < cores.length; i++) {
-                            const core = cores[i];
-                            if (core.paras?.assignment?.bulk) {
-                                const paraId = core.paras.assignment.bulk as number;
+                        for (let i = 0; i < claims.length; i++) {
+                            const claim = claims[i];
+                            if (claim[0] != undefined && claim[0].bulk != undefined) {
+                                const paraId = claim[0].bulk as number;
                                 this.cores.push(paraId);
                                 assignments.set(paraId, this.paravalidatorGroups[i]);
                             } else {
