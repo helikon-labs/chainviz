@@ -489,7 +489,7 @@ export const KUSAMA_PARAS: Para[] = [
         },
     },
     {
-        homepage: 'http://apron.network/',
+        homepage: 'https://apron.network/',
         info: 'kpron',
         isUnreachable: true,
         paraId: 2019,
@@ -741,7 +741,7 @@ export const KUSAMA_PARAS: Para[] = [
         },
     },
     {
-        homepage: 'http://robonomics.network/',
+        homepage: 'https://robonomics.network/',
         info: 'robonomics',
         paraId: 2048,
         providers: {
@@ -758,7 +758,7 @@ export const KUSAMA_PARAS: Para[] = [
         },
     },
     {
-        homepage: 'http://robonomics.network/',
+        homepage: 'https://robonomics.network/',
         info: 'robonomics',
         isUnreachable: true,
         paraId: 2240,

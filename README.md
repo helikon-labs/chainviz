@@ -15,13 +15,13 @@ You may find the release article on [Medium](https://medium.com/helikon/introduc
 
 [Chainviz](https://chainviz.app) visualizes the following elements of the Polkadot and Kusama relay chains and validators in real-time:
 
--   Active validators in a 3D representation and list format.
--   Block production process.
--   Block list, and block contents on click.
--   Parachains, and their assigned validators.
--   Recent XCM transfer messages, and message contents (powered by [Polkaholic API](https://docs.polkaholic.io/#introduction)).
--   Basic network and staking data.
--   Validator details panel, where the user can observe the validator in real-time.
+- Active validators in a 3D representation and list format.
+- Block production process.
+- Block list, and block contents on click.
+- Parachains, and their assigned validators.
+- Recent XCM transfer messages, and message contents (powered by [Polkaholic API](https://docs.polkaholic.io/#introduction)).
+- Basic network and staking data.
+- Validator details panel, where the user can observe the validator in real-time.
 
 Chainviz uses the services provided by the [SubVT backend](https://github.com/helikon-labs/subvt-backend/tree/development), part of [SubVT](https://subvt.io), a project supported by the Kusama Treasury and W3F Grants.
 
