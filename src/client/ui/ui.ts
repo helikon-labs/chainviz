@@ -14,7 +14,7 @@ import { EventBus } from '../event/event-bus';
 import { ChainvizEvent } from '../event/event';
 import { ValidatorSummaryBoard } from './validator-summary-board';
 import { cloneJSONSafeObject } from '../util/object';
-import { Vec2 } from 'three';
+import { Vector2 } from 'three';
 import { ParaSummaryBoard } from './para-summary-board';
 import { XCMInfo } from '../model/polkaholic/xcm';
 import { Block } from '../model/chainviz/block';
@@ -396,7 +396,7 @@ class UI {
     showValidatorSummaryBoard(
         network: Network,
         validatorSummary: ValidatorSummary,
-        position: Vec2,
+        position: Vector2,
         para: Para | undefined,
     ) {
         this.validatorSummaryBoard.show(network, validatorSummary, para);
@@ -478,7 +478,7 @@ class UI {
         this.highlightedPara = undefined;
     }
 
-    showParaSummaryBoard(para: Para, paravalidatorCount: number, position: Vec2) {
+    showParaSummaryBoard(para: Para, paravalidatorCount: number, position: Vector2) {
         this.paraSummaryBoard.show(para, paravalidatorCount);
         this.paraSummaryBoard.setPosition(
             position.x + this.sceneContainer.getBoundingClientRect().left,

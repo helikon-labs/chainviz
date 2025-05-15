@@ -291,7 +291,7 @@ class Scene {
      * @param stashAddress validator stash address in SS58 encoding
      * @returns position of the validator if exists, undefined otherwise
      */
-    getValidatorOnScreenPosition(stashAddress: string): THREE.Vec2 | undefined {
+    getValidatorOnScreenPosition(stashAddress: string): THREE.Vector2 | undefined {
         const position = this.validatorMesh.getValidatorPosition(stashAddress);
         if (position == undefined) {
             return undefined;
@@ -392,7 +392,7 @@ class Scene {
      * @param paraId para id
      * @returns position of the para with the gives id
      */
-    getParaOnScreenPosition(paraId: number): THREE.Vec2 {
+    getParaOnScreenPosition(paraId: number): THREE.Vector2 {
         return getOnScreenPosition(
             this.paraMesh.getParaPosition(paraId)!,
             this.renderer,
