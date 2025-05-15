@@ -846,7 +846,7 @@ export const KUSAMA_PARAS: Para[] = [
         },
     },
     {
-        homepage: 'http://subgame.org/',
+        homepage: 'https://subgame.org/',
         info: 'subgame',
         paraId: 2018,
         providers: {
