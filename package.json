@@ -34,7 +34,7 @@
         "async-lock": "^1.4.1",
         "camelcase-keys-deep": "^0.1.0",
         "cannon-es": "^0.20.0",
-        "eslint": "^9.26.0",
+        "eslint": "^9.27.0",
         "express": "^5.1.0",
         "follow-redirects": "^1.15.9",
         "jest": "^29.7.0",
