@@ -46,7 +46,7 @@
         "terser": "^5.39.1",
         "three": "^0.176.0",
         "tone": "^15.1.22",
-        "ts-jest": "^29.3.3",
+        "ts-jest": "^29.3.4",
         "ts-loader": "^9.5.2",
         "typescript": "5.8.3",
         "visibilityjs": "^2.0.2",
