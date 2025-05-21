@@ -27,7 +27,7 @@
         "@types/camelcase-keys-deep": "^0.1.2",
         "@types/express": "^5.0.1",
         "@types/jsdom": "^21.1.7",
-        "@types/node": "^22.15.18",
+        "@types/node": "^22.15.21",
         "@types/three": "^0.176.0",
         "@typescript-eslint/eslint-plugin": "^8.32.1",
         "@typescript-eslint/parser": "^8.32.1",
