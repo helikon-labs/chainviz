@@ -20,6 +20,7 @@ import { getValidatorIdentityIconHTML, getValidatorSummaryDisplay } from '../uti
 import AsyncLock from 'async-lock';
 import { cloneJSONSafeObject } from '../util/object';
 import { getSS58Address } from '../util/crypto-util';
+import { ClaimQueue, GroupRotationInfo, buildCoreAssignmentState } from './core-assignment';
 
 /**
  * Stores data and contains data-related logic.
@@ -48,7 +49,9 @@ class DataStore {
     private paravalidatorGroups: string[][] = [];
     private unsubscribeParavalidatorGroups?: Promise<Codec>;
     private cores: (number | undefined)[] = [];
+    private validatorsByCore: string[][] = [];
     private unsubscribeCores?: Promise<Codec>;
+    private refreshCoresOnNewHeads = false;
 
     private networkStatus!: NetworkStatus;
     validatorMap = new Map<string, ValidatorSummary>();
@@ -285,14 +288,13 @@ class DataStore {
         this.paravalidatorLock.acquire(
             this.paravalidatorProcessLockKey,
             (done) => {
-                let paravalidators: string[] = [];
+                const paravalidators: string[] = [];
                 for (let i = 0; i < this.cores.length; i++) {
                     if (this.cores[i] == para.paraId) {
-                        paravalidators = this.paravalidatorGroups[i];
-                        break;
+                        paravalidators.push(...(this.validatorsByCore[i] ?? []));
                     }
                 }
-                callback(paravalidators);
+                callback(Array.from(new Set(paravalidators)));
                 done();
             },
             (error, _) => {
@@ -309,9 +311,10 @@ class DataStore {
             this.paravalidatorProcessLockKey,
             (done) => {
                 let paraId: number | undefined = undefined;
-                for (let i = 0; i < this.paravalidatorGroups.length; i++) {
-                    if (this.paravalidatorGroups[i].indexOf(address) >= 0) {
+                for (let i = 0; i < this.validatorsByCore.length; i++) {
+                    if (this.validatorsByCore[i].indexOf(address) >= 0) {
                         paraId = this.cores[i];
+                        break;
                     }
                 }
                 callback(paraId);
@@ -418,12 +421,19 @@ class DataStore {
                     (done) => {
                         const assignments = new Map<number, string[]>();
                         this.cores = [];
+                        this.validatorsByCore = [];
                         for (let i = 0; i < cores.length; i++) {
                             const core = cores[i];
+                            const validators = this.paravalidatorGroups[i] ?? [];
+                            this.validatorsByCore.push(validators);
                             if (core.paras?.assignment?.bulk) {
                                 const paraId = core.paras.assignment.bulk as number;
                                 this.cores.push(paraId);
-                                assignments.set(paraId, this.paravalidatorGroups[i]);
+                                const assignedValidators = assignments.get(paraId) ?? [];
+                                assignments.set(
+                                    paraId,
+                                    Array.from(new Set([...assignedValidators, ...validators])),
+                                );
                             } else {
                                 this.cores.push(undefined);
                             }
@@ -448,51 +458,78 @@ class DataStore {
         );
     }
 
+    private async applyClaimQueue(
+        claimQueue: ClaimQueue,
+        validatorGroups: string[][],
+        rotationInfo?: GroupRotationInfo,
+    ) {
+        const state = buildCoreAssignmentState(claimQueue, validatorGroups, rotationInfo);
+        await this.paravalidatorLock.acquire(this.paravalidatorProcessLockKey, () => {
+            this.paravalidatorGroups = validatorGroups;
+            this.cores = state.cores;
+            this.validatorsByCore = state.validatorsByCore;
+            this.eventBus.dispatch<Map<number, string[]>>(
+                ChainvizEvent.CORES_UPDATED,
+                state.assignments,
+            );
+        });
+    }
+
+    private async refreshCoresFromRuntimeApi(blockHash?: BlockHash) {
+        if (!this.substrateClient) {
+            return;
+        }
+        const api = blockHash ? await this.substrateClient.at(blockHash) : this.substrateClient;
+        const [claimQueueData, validatorGroupData] = await Promise.all([
+            api.call.parachainHost.claimQueue(),
+            api.call.parachainHost.validatorGroups(),
+        ]);
+        const claimQueue = claimQueueData.toJSON() as ClaimQueue;
+        const [groupIndices, rotationInfo] = validatorGroupData.toJSON() as [
+            number[][],
+            GroupRotationInfo,
+        ];
+        const validatorGroups = groupIndices.map((group) =>
+            group
+                .map((validatorIndex) => this.paravalidators[validatorIndex])
+                .filter((validator): validator is string => validator != undefined),
+        );
+        await this.applyClaimQueue(claimQueue, validatorGroups, rotationInfo);
+    }
+
     async subscribeToCores() {
         if (!this.substrateClient) {
             return;
         }
-        console.log(this.substrateClient.query.paraScheduler.availabilityCores);
+        if (
+            typeof this.substrateClient.call.parachainHost?.claimQueue == 'function' &&
+            typeof this.substrateClient.call.parachainHost?.validatorGroups == 'function'
+        ) {
+            this.refreshCoresOnNewHeads = true;
+            await this.refreshCoresFromRuntimeApi();
+            return;
+        }
         if (this.substrateClient.query.paraScheduler.availabilityCores) {
             await this.subscribeToCoresLegacy();
             return;
         }
-        this.unsubscribeCores = this.substrateClient.query.paraScheduler.claimQueue(
+        const claimQueue = this.substrateClient.query.paraScheduler.claimQueue;
+        if (typeof claimQueue != 'function') {
+            throw new Error(
+                'The connected runtime does not expose a supported core scheduler API.',
+            );
+        }
+        this.unsubscribeCores = claimQueue(
             // @ts-expect-error untyped
-            (data) => {
-                /* eslint-disable @typescript-eslint/no-explicit-any */
-                const claims = Object.values(data.toJSON() as any[]);
-                this.paravalidatorLock.acquire(
-                    this.paravalidatorProcessLockKey,
-                    (done) => {
-                        const assignments = new Map<number, string[]>();
-                        this.cores = [];
-                        for (let i = 0; i < claims.length; i++) {
-                            const claim = claims[i];
-                            if (claim[0] != undefined && claim[0].bulk != undefined) {
-                                const paraId = claim[0].bulk as number;
-                                this.cores.push(paraId);
-                                assignments.set(paraId, this.paravalidatorGroups[i]);
-                            } else {
-                                this.cores.push(undefined);
-                            }
-                        }
-                        this.eventBus.dispatch<Map<number, string[]>>(
-                            ChainvizEvent.CORES_UPDATED,
-                            assignments,
-                        );
-                        done();
-                    },
-                    (error, _) => {
-                        if (error) {
-                            console.log(
-                                'Error while processing subscribed paravalidator groups:',
-                                error,
-                            );
-                        }
-                        // lock released
-                    },
-                );
+            async (data) => {
+                try {
+                    await this.applyClaimQueue(
+                        data.toJSON() as ClaimQueue,
+                        this.paravalidatorGroups,
+                    );
+                } catch (error) {
+                    console.error('Error while processing core assignments:', error);
+                }
             },
         );
     }
@@ -674,6 +711,13 @@ class DataStore {
             return;
         }
         const block = await this.getBlockByHash(header.hash);
+        if (this.refreshCoresOnNewHeads) {
+            try {
+                await this.refreshCoresFromRuntimeApi(header.hash);
+            } catch (error) {
+                console.error('Error while refreshing core assignments:', error);
+            }
+        }
         if (block) {
             this.insertBlock(block);
             this.eventBus.dispatch<Block>(ChainvizEvent.NEW_BLOCK, block);
@@ -898,6 +942,7 @@ class DataStore {
     }
 
     async disconnectSubstrateClient() {
+        this.refreshCoresOnNewHeads = false;
         if (this.unsubscribeNewBlock) {
             await this.unsubscribeNewBlock;
             this.unsubscribeNewBlock = undefined;
