@@ -1,6 +1,6 @@
 import * as THREE from 'three';
 import { UI } from './ui/ui';
-import { Network, Kusama } from './model/substrate/network';
+import { Network, Polkadot } from './model/substrate/network';
 import { DataStore } from './data/data-store';
 import { EventBus } from './event/event-bus';
 import { ChainvizEvent } from './event/event';
@@ -22,7 +22,7 @@ class Chainviz {
     private readonly ui: UI;
     private readonly dataStore: DataStore;
     private readonly eventBus = EventBus.getInstance();
-    private network: Network = Kusama;
+    private network: Network = Polkadot;
     private started = false;
 
     /**
