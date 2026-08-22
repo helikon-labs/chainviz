@@ -2,7 +2,6 @@ import { Network } from '../model/substrate/network';
 import { Para } from '../model/substrate/para';
 import { ValidatorSummary } from '../model/subvt/validator-summary';
 import { Constants } from '../util/constants';
-import { getSS58Address } from '../util/crypto-util';
 import { formatNumber, getCondensedAddress } from '../util/format';
 import { generateIdenticonSVGHTML } from '../util/identicon';
 import { cloneJSONSafeObject } from '../util/object';
@@ -28,7 +27,6 @@ interface UI {
     paraInfoContainer: HTMLElement;
     paraInfo: HTMLElement;
     stashAddress: HTMLElement;
-    controllerAddress: HTMLElement;
     commission: HTMLElement;
     blocksInEra: HTMLElement;
     eraRewardPoints: HTMLElement;
@@ -71,9 +69,6 @@ class ValidatorDetailsBoard {
             ),
             paraInfo: <HTMLElement>document.getElementById('validator-details-para-info'),
             stashAddress: <HTMLElement>document.getElementById('validator-details-stash-address'),
-            controllerAddress: <HTMLElement>(
-                document.getElementById('validator-details-controller-address')
-            ),
             commission: <HTMLElement>document.getElementById('validator-details-commission'),
             blocksInEra: <HTMLElement>document.getElementById('validator-details-blocks-in-era'),
             eraRewardPoints: <HTMLElement>(
@@ -156,19 +151,6 @@ class ValidatorDetailsBoard {
             this.ui.paraInfoContainer.style.display = 'block';
         } else {
             this.ui.paraInfoContainer.style.display = 'none';
-        }
-        if (validator.controllerAccountId == undefined) {
-            this.ui.controllerAddress.innerHTML = '-';
-        } else {
-            const controllerAddress = getSS58Address(
-                network.ss58Prefix,
-                validator.controllerAccountId,
-            );
-            this.ui.controllerAddress.innerHTML = `<a href="https://${
-                network.id
-            }.subscan.io/account/${controllerAddress}" target="_blank">${getCondensedAddress(
-                controllerAddress,
-            )}</a>`;
         }
         const commission = formatNumber(BigInt(validator.preferences.commissionPerBillion), 7, 2);
         this.ui.commission.innerHTML = `${commission}%`;

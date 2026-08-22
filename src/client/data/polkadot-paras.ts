@@ -295,7 +295,7 @@ export const POLKADOT_PARAS: Para[] = [
         },
         text: 'Crust',
         ui: {
-            logo: 'crustParachain.svg',
+            logo: 'crust.svg',
         },
     },
     {
