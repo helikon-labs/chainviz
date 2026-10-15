@@ -38,11 +38,11 @@ describe('rpc subscription service', () => {
         await new Promise((resolve) => setTimeout(resolve, 1_000));
         networkStatusClient.disconnect();
         await new Promise((resolve) => setTimeout(resolve, 1_000));
-        expect(onSubscribed).toBeCalled();
-        expect(onUpdate).toBeCalled();
-        expect(onUnsubscribed).toBeCalled();
-        expect(onDisconnected).toBeCalled();
-        expect(onError).not.toBeCalled();
+        expect(onSubscribed).toHaveBeenCalled();
+        expect(onUpdate).toHaveBeenCalled();
+        expect(onUnsubscribed).toHaveBeenCalled();
+        expect(onDisconnected).toHaveBeenCalled();
+        expect(onError).not.toHaveBeenCalled();
     });
     test('active validator list service subscription works', async () => {
         const onSubscribed = jest.fn((_subscriptionId: number) => {});
@@ -72,10 +72,10 @@ describe('rpc subscription service', () => {
         await new Promise((resolve) => setTimeout(resolve, 1_000));
         activeValidatorListClient.disconnect();
         await new Promise((resolve) => setTimeout(resolve, 1_000));
-        expect(onSubscribed).toBeCalled();
-        expect(onUpdate).toBeCalled();
-        expect(onUnsubscribed).toBeCalled();
-        expect(onDisconnected).toBeCalled();
-        expect(onError).not.toBeCalled();
+        expect(onSubscribed).toHaveBeenCalled();
+        expect(onUpdate).toHaveBeenCalled();
+        expect(onUnsubscribed).toHaveBeenCalled();
+        expect(onDisconnected).toHaveBeenCalled();
+        expect(onError).not.toHaveBeenCalled();
     });
 });

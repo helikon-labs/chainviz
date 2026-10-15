@@ -475,7 +475,7 @@ class DataStore {
         });
     }
 
-    private async refreshCoresFromRuntimeApi(blockHash?: BlockHash) {
+    private async refreshCoresFromRuntimeApi(blockHash?: string) {
         if (!this.substrateClient) {
             return;
         }
@@ -547,12 +547,14 @@ class DataStore {
         const finalizedBlocks: Block[] = [];
         // get finalized blocks
         const finalizedBlockHash = await this.substrateClient.rpc.chain.getFinalizedHead();
-        let finalizedBlock = await this.getBlockByHash(finalizedBlockHash);
+        let finalizedBlock = await this.getBlockByHash(finalizedBlockHash.toHex());
         if (finalizedBlock) {
             finalizedBlock.isFinalized = true;
             finalizedBlocks.push(finalizedBlock);
             for (let i = 0; i < Constants.INITIAL_FINALIZED_BLOCK_COUNT - 1; i++) {
-                finalizedBlock = await this.getBlockByHash(finalizedBlock.block.header.parentHash);
+                finalizedBlock = await this.getBlockByHash(
+                    finalizedBlock.block.header.parentHash.toHex(),
+                );
                 if (finalizedBlock) {
                     finalizedBlock.isFinalized = true;
                     finalizedBlocks.push(finalizedBlock);
@@ -569,7 +571,7 @@ class DataStore {
         while (
             unFinalizedHeader.number.toNumber() != finalizedBlocks[0].block.header.number.toNumber()
         ) {
-            const unFinalizedBlock = await this.getBlockByHash(unFinalizedHeader.hash);
+            const unFinalizedBlock = await this.getBlockByHash(unFinalizedHeader.hash.toHex());
             if (unFinalizedBlock) {
                 unFinalizedBlocks.push(unFinalizedBlock);
                 unFinalizedHeader = await this.substrateClient.rpc.chain.getHeader(
@@ -710,10 +712,10 @@ class DataStore {
         ) {
             return;
         }
-        const block = await this.getBlockByHash(header.hash);
+        const block = await this.getBlockByHash(header.hash.toHex());
         if (this.refreshCoresOnNewHeads) {
             try {
-                await this.refreshCoresFromRuntimeApi(header.hash);
+                await this.refreshCoresFromRuntimeApi(header.hash.toHex());
             } catch (error) {
                 console.error('Error while refreshing core assignments:', error);
             }
@@ -800,7 +802,7 @@ class DataStore {
             this.blocks[index].isFinalized = true;
             this.eventBus.dispatch<Block>(ChainvizEvent.FINALIZED_BLOCK, this.blocks[index]);
         } else {
-            const block = await this.getBlockByHash(header.hash);
+            const block = await this.getBlockByHash(header.hash.toHex());
             if (block) {
                 block.isFinalized = true;
                 this.insertBlock(block);
@@ -818,7 +820,7 @@ class DataStore {
      * @param hash block hash
      * @returns promise for the block with the actual Substrate block, timestamp, events, extrinsics, etc.
      */
-    async getBlockByHash(hash: BlockHash): Promise<Block | undefined> {
+    async getBlockByHash(hash: string): Promise<Block | undefined> {
         if (!this.substrateClient) {
             return undefined;
         }
@@ -861,7 +863,7 @@ class DataStore {
             return undefined;
         }
         const hash = await this.substrateClient.rpc.chain.getBlockHash(number);
-        return this.getBlockByHash(hash);
+        return this.getBlockByHash(hash.toHex());
     }
 
     /**

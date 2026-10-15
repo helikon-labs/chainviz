@@ -29,8 +29,8 @@ const Kusama = {
     paras: KUSAMA_PARAS,
     rpcURL: Constants.KUSAMA_RPC_URL,
     //rpcURL: 'wss://kusama-rpc.polkadot.io',
-    networkStatusServiceURL: 'wss://service.subvt.io:17888',
-    activeValidatorListServiceURL: 'wss://service.subvt.io:17889',
+    networkStatusServiceURL: 'wss://api.kusama.subvt.io:17888',
+    activeValidatorListServiceURL: 'wss://api.kusama.subvt.io:17889',
 } as Network;
 
 const Polkadot = {
@@ -43,8 +43,8 @@ const Polkadot = {
     paras: POLKADOT_PARAS,
     rpcURL: Constants.POLKADOT_RPC_URL,
     //rpcURL: 'wss://rpc.polkadot.io',
-    networkStatusServiceURL: 'wss://service.subvt.io:17888',
-    activeValidatorListServiceURL: 'wss://service.subvt.io:17889',
+    networkStatusServiceURL: 'wss://api.polkadot.subvt.io:18888',
+    activeValidatorListServiceURL: 'wss://api.polkadot.subvt.io:18889',
 } as Network;
 
 function getNetworkPara(network: Network, paraId: number): Para | undefined {

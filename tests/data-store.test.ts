@@ -179,7 +179,7 @@ describe('data store', () => {
         expect(blockHash!.toHex()).toBe(
             '0x4c7b7509917a547a205adcc5a11fe86a8527707500b0d453b3fbc1d129109f35',
         );
-        const block = await dataStore.getBlockByHash(blockHash!);
+        const block = await dataStore.getBlockByHash(blockHash!.toHex());
         expect(block).toBeDefined();
         expect(block!.block.header.number.toNumber()).toBe(blockNumber);
         expect(block!.events.length).toBe(48);
