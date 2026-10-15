@@ -21,13 +21,13 @@ ChainViz ([alpha.chainviz.app](https://alpha.chainviz.app)) is a real-time 3D ch
 
 Chainviz visualizes the following aspects of the Kusama relay chain and validators in real-time:
 
--   Active Validators, and the block production and finalization process.
--   Network stats.
-    -   Best and finalized blocks.
-    -   Era staking data.
--   Active validator list and their activity.
--   Paravalidators, and the assignment of paravalidators to parachains.
--   Validator details panel, where the user can watch the validator in real-time.
+- Active Validators, and the block production and finalization process.
+- Network stats.
+    - Best and finalized blocks.
+    - Era staking data.
+- Active validator list and their activity.
+- Paravalidators, and the assignment of paravalidators to parachains.
+- Validator details panel, where the user can watch the validator in real-time.
 
 Chainviz uses the services provided by the [SubVT backend](https://github.com/helikon-labs/subvt-backend), part of SubVT, a project supported by the Kusama Treasury.
 
